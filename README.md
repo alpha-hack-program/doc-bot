@@ -77,6 +77,8 @@ git lfs install
 git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ID}
 ```
 
+### Copy the model files to an S3 bucket
+
 Upload to an S3 bucket:
 
 ```sh
@@ -93,6 +95,25 @@ aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
 aws s3 cp ${MODEL_ID}/ s3://mybucket/ --recursive 
 ```
+
+### Deploy the model to vLLM
+
+This runtime can be used in the exact same way as the out of the box ones:
+
+- Create a connection to the S3 bucket that contains the model files.
+- Deploy the model from the Dashboard.
+- Make sure you have added a GPU to your GPU configuration, that you have enough VRAM (GPU memory) to load the model, and that you have enough standard memory (RAM). Although the model loads into the GPU, RAM is still used for the pre-loading operations.
+- Once the model is loaded, you can access the inference endpoint provided through the dashboard.
+
+### Usage
+
+This implementation of the runtime provides an **OpenAI compatible API**. So any tool or library that can connect to OpenAI services will be able to consume the endpoint.
+
+Python and Curl examples are provided [here](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#using-openai-completions-api-with-vllm).
+
+You can also find a notebook example using Langchain to query vLLM in this repo [here](../../examples/notebooks/langchain/Langchain-vLLM-Prompt-memory.ipynb).
+
+Also, vLLM provides a full Swagger UI where you can get the full documentation of the API (methods, parameters), and try it directly without any coding,... It is accessible at the address `https://your-endpoint-address/docs`.
 
 # QA
 
