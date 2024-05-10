@@ -29,8 +29,8 @@
 
 Deploy vLLM Model Serving instance in the OpenAI compatible API mode, either:
 
-- [as a custom server runtime in ODH/RHOAI](https://github.com/rh-aiservices-bu/llm-on-openshift/blob/main/serving-runtimes/vllm_runtime/README.md)
-- [as a standalone server in OpenShift](https://github.com/rh-aiservices-bu/llm-on-openshift/blob/main/llm-servers/vllm/README.md)
+- [as a custom server runtime in ODH/RHOAI](https://github.com/atarazana/doc-bot/blob/main/serving-runtimes/vllm_runtime/README.md)
+- [as a standalone server in OpenShift](https://github.com/atarazana/doc-bot/blob/main/llm-servers/vllm/README.md)
 
 ### As a runtime
 
@@ -121,7 +121,7 @@ Also, vLLM provides a full Swagger UI where you can get the full documentation o
 
 For our RAG we will need a Vector Database to store the Embeddings of the different documents. In this example we are using Milvus.
 
-Deployment instructions specific to OpenShift are available [here](https://github.com/rh-aiservices-bu/llm-on-openshift/tree/main/vector-databases/milvus).
+Deployment instructions specific to OpenShift are available [here](https://github.com/atarazana/doc-bot/tree/main/vector-databases/milvus).
 
 After you follow those instructions you should have a Milvus instance ready to be populated with documents.
 
@@ -167,7 +167,7 @@ helm repo update
 - Fetch the file [`openshift-values.yaml`](openshift-values.yaml) from this repo. This file is really important as it sets specific values for OpenShift compatibility. You can also modify some of the values in this file to adapt the deployment to your requirements, notably modify the Minio admin user and password.
 
     ```bash
-    wget https://raw.githubusercontent.com/rh-aiservices-bu/llm-on-openshift/main/vector-databases/milvus/openshift-values.yaml
+    wget https://raw.githubusercontent.com/atarazana/doc-bot/main/vector-databases/milvus/openshift-values.yaml
     ```
 
 - Create the manifest:
@@ -216,7 +216,7 @@ helm repo update
 - To deploy the management UI for Milvus, called Attu, apply the file [attu-deployment.yaml](attu-deployment.yaml):
 
 ```bash
-oc apply -f https://raw.githubusercontent.com/rh-aiservices-bu/llm-on-openshift/main/vector-databases/milvus/attu-deployment.yaml
+oc apply -f https://raw.githubusercontent.com/atarazana/doc-bot/main/vector-databases/milvus/attu-deployment.yaml
 ```
 
 NOTE: Attu deployment could have been done through the Helm chart, but this would not properly create the access Route.
@@ -252,5 +252,5 @@ Several example notebooks are available to show how to use Milvus:
 # Documentation
 
 - [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/openshift/23.9.2/index.html)
-- [How to install vLLM as a RHOAI runtime](https://github.com/rh-aiservices-bu/llm-on-openshift/blob/main/serving-runtimes/vllm_runtime/README.md)
-- [How to install vLLM as deployment](https://github.com/rh-aiservices-bu/llm-on-openshift/blob/main/llm-servers/vllm/README.md)
+- [How to install vLLM as a RHOAI runtime](https://github.com/atarazana/doc-bot/blob/main/serving-runtimes/vllm_runtime/README.md)
+- [How to install vLLM as deployment](https://github.com/atarazana/doc-bot/blob/main/llm-servers/vllm/README.md)
