@@ -117,9 +117,34 @@ This implementation of the runtime provides an **OpenAI compatible API**. So any
 
 Python and Curl examples are provided [here](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#using-openai-completions-api-with-vllm).
 
-You can also find a notebook example using Langchain to query vLLM in this repo [here](../../examples/notebooks/langchain/Langchain-vLLM-Prompt-memory.ipynb).
+You can also find a notebook example using Langchain to query vLLM in this repo [here](../examples/notebooks/langchain/Langchain-vLLM-Prompt-memory.ipynb).
 
 Also, vLLM provides a full Swagger UI where you can get the full documentation of the API (methods, parameters), and try it directly without any coding,... It is accessible at the address `https://your-endpoint-address/docs`.
+
+Example tested on vLLM on RHOAI 2.8:
+
+Get models:
+
+```sh
+export VLLM_PREDICTOR_URL="https://vllm-doc-bot.apps.cluster-wrzqv.sandbox3011.opentlc.com"
+RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${VLLM_PREDICTOR_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
+echo ${RUNTIME_MODEL_ID}
+```
+
+Prompt:
+
+```sh
+curl -k -X 'POST' \
+  "${VLLM_PREDICTOR_URL}/v1/completions" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "'${RUNTIME_MODEL_ID}'",
+  "prompt": "San Francisco is a",
+  "max_tokens": 7,
+  "temperature": 0
+}'
+```
 
 # Vector Store
 
