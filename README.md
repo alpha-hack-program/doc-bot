@@ -25,7 +25,7 @@
 
 # Starting point of this hacking sprint
 
-[Chat with your documentation](https://ai-on-openshift.io/demos/llm-chat-doc/llm-chat-doc/#model-serving) lab from [AI on OpenShift](https://ai-on-openshift.io/).
+[Chat with your documentation](https://ai-on-openshift.io/demos/llm-chat-doc/llm-chat-doc/) lab from [AI on OpenShift](https://ai-on-openshift.io/).
 
 # Steps
 
