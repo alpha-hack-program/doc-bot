@@ -1,3 +1,4 @@
 .*token
 tmp
 *.tmp
+.DS_Store

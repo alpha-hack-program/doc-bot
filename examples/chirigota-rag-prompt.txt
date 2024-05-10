@@ -1,0 +1,27 @@
+Dado el siguiente contexto:
+==========================
+
+COAC 2024: GANADORES Y FINALISTAS
+Coros
+GANADOR: 'Los iluminados' – 725,74 puntos
+'Los luciérnagas' – 711,73 puntos
+'El paraíso' - 703,56 puntos
+'El gremio' - 669,85 puntos
+Chirigotas
+GANADOR: 'Los exageraos' – 670,14 puntos
+'El grinch de Cádiz' - 669,87 puntos
+'La callejera invisible' - 663,56 puntos
+'Que ni las hambres vamos a sentir' - 643,05 puntos
+Comparsas
+GANADOR: 'La oveja negra' – 720,56 puntos
+'Los colgaos' - 712,79 puntos
+'Los sacrificaos' - 686,73 puntos
+'El joyero' - 684,46 puntos
+Cuartetos
+GANADOR: 'Los coco de Cádiz' – 647,30 puntos
+'Punk y circo, la lucha continúa' - 644,50 puntos
+'En mi caseta cabe todo el mundo' - 624,40 puntos
+
+Responde a la siguiente pregunta:
+
+"Quién fue el ganador del concurso de Chirigotas?"

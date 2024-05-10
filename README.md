@@ -74,11 +74,12 @@ Get a PAT from HF and put it in `.hf-token`.
 ```sh
 export HF_USERNAME=cvicens
 export HF_TOKEN=$(cat .hf-token)
-export MODEL_ID="mistralai/Mistral-7B-Instruct-v0.2"
+export MODEL_ROOT="mistralai"
+export MODEL_ID="Mistral-7B-Instruct-v0.2"
 mkdir tmp
 cd tmp
 git lfs install
-git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ID}
+git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
 ```
 
 ### Copy the model files to an S3 bucket
@@ -87,10 +88,10 @@ Upload to an S3 bucket:
 
 ```sh
 export BUCKET_NAME=mistral
-export AWS_ACCESS_KEY_ID=your_minio_access_key
-export AWS_SECRET_ACCESS_KEY=your_minio_secret_key
+export AWS_ACCESS_KEY_ID=minio
+export AWS_SECRET_ACCESS_KEY=minio123
 export AWS_DEFAULT_REGION=none  # Any value is fine
-export AWS_S3_ENDPOINT=your_minio_endpoint  # e.g., http://localhost:9000
+export AWS_S3_ENDPOINT=minio-console-ic-shared-minio.apps.cluster-wrzqv.sandbox3011.opentlc.com  # e.g., http://localhost:9000
 export AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
 export AWS_S3_USE_PATH_STYLE=1
 
@@ -98,7 +99,7 @@ aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
 aws configure set default.s3.addressing_style path
 aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
-aws s3 cp ${MODEL_ID}/ s3://${BUCKET_NAME}/ --recursive 
+aws s3 --no-verify-ssl sync ${MODEL_ID} s3://${BUCKET_NAME}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
 ```
 
 ### Deploy the model to vLLM
@@ -263,3 +264,6 @@ Several example notebooks are available to show how to use Milvus:
 - https://huggingface.co/learn/cookbook/en/advanced_rag
 - https://github.com/alvarolop/ocp-ai/blob/main/openshift/rhoai-configuration/OdhDashboardConfig.yaml#L32-L34
 - https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.8/html-single/serving_models/index#about-model-serving_about-model-serving
+- https://aws.amazon.com/ec2/instance-types/
+- https://aws.amazon.com/ec2/pricing/on-demand/
+- https://github.com/alvarolop/rhoai-gitops/tree/main
