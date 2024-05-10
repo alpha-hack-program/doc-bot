@@ -86,6 +86,7 @@ git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ID}
 Upload to an S3 bucket:
 
 ```sh
+export BUCKET_NAME=mistral
 export AWS_ACCESS_KEY_ID=your_minio_access_key
 export AWS_SECRET_ACCESS_KEY=your_minio_secret_key
 export AWS_DEFAULT_REGION=none  # Any value is fine
@@ -97,7 +98,7 @@ aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
 aws configure set default.s3.addressing_style path
 aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
-aws s3 cp ${MODEL_ID}/ s3://mybucket/ --recursive 
+aws s3 cp ${MODEL_ID}/ s3://${BUCKET_NAME}/ --recursive 
 ```
 
 ### Deploy the model to vLLM
@@ -258,3 +259,7 @@ Several example notebooks are available to show how to use Milvus:
 - [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/openshift/23.9.2/index.html)
 - [How to install vLLM as a RHOAI runtime](https://github.com/atarazana/doc-bot/blob/main/serving-runtimes/vllm_runtime/README.md)
 - [How to install vLLM as deployment](https://github.com/atarazana/doc-bot/blob/main/llm-servers/vllm/README.md)
+- https://www.3blue1brown.com/lessons/attention
+- https://huggingface.co/learn/cookbook/en/advanced_rag
+- https://github.com/alvarolop/ocp-ai/blob/main/openshift/rhoai-configuration/OdhDashboardConfig.yaml#L32-L34
+- https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.8/html-single/serving_models/index#about-model-serving_about-model-serving
