@@ -292,3 +292,9 @@ Several example notebooks are available to show how to use Milvus:
 - https://aws.amazon.com/ec2/instance-types/
 - https://aws.amazon.com/ec2/pricing/on-demand/
 - https://github.com/alvarolop/rhoai-gitops/tree/main
+
+RAG:
+- https://huggingface.co/blog/ray-rag
+
+Infra:
+- https://github.com/alvarolop/rhoai-gitops.git
