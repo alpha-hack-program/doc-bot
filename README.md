@@ -294,7 +294,14 @@ Several example notebooks are available to show how to use Milvus:
 - https://github.com/alvarolop/rhoai-gitops/tree/main
 
 RAG:
+- https://huggingface.co/learn/cookbook/advanced_rag
 - https://huggingface.co/blog/ray-rag
+- https://ai.meta.com/blog/retrieval-augmented-generation-streamlining-the-creation-of-intelligent-natural-language-processing-models/
 
 Infra:
 - https://github.com/alvarolop/rhoai-gitops.git
+
+RAG Evaluation:
+- https://docs.ragas.io/en/latest/index.html
+- https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation.html
+- https://www.trulens.org/
