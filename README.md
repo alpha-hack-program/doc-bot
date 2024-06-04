@@ -47,6 +47,107 @@ From the documentation:
 > - **Red Hat OpenShift Serverless:** A cloud-native development model that allows for serverless deployments of models. OpenShift Serverless is based on the open source Knative project.
 > - **Red Hat OpenShift Service Mesh:** A service mesh networking layer that manages traffic flows and enforces access policies. OpenShift Service Mesh is based on the open source Istio project.
 
+### As a deployment [optional]
+
+TODO
+
+## Preparation
+
+Install the following operators prior to install OpenShift AI operator:
+
+- OpenShift Serverless
+- OpenShift Service Mesh
+
+Now, in order to deploy `KServe` using the same certificate OpenShift cluster is using for routers, do the following:
+
+> Intructions from: https://ai-on-openshift.io/odh-rhoai/single-stack-serving-certificate/
+
+Get the name of the secret used for routing tasks in your OpenShift cluster:
+
+```sh
+# export INGRESS_SECRET_NAME=$(kubectl get secrets -n openshift-ingress | grep certs | grep Opaque | awk '{print $1}')
+export INGRESS_SECRET_NAME=$(oc get ingresscontroller default -n openshift-ingress-operator -o json | jq -r .spec.defaultCertificate.name)
+
+oc get secret ${INGRESS_SECRET_NAME} -n openshift-ingress -o yaml > rhods-internal-primary-cert-bundle-secret.yaml
+```
+
+Clean `rhods-internal-primary-cert-bundle-secret.yaml`, change name to `rhods-internal-primary-cert-bundle-secret` and type to `kubernetes.io/tls`, it should look like:
+
+```yaml
+kind: Secret
+apiVersion: v1
+metadata:
+name: rhods-internal-primary-cert-bundle-secret
+data:
+tls.crt: >-
+    LS0tLS1CRUd...
+tls.key: >-
+    LS0tLS1CRUd...
+type: kubernetes.io/tls
+```
+
+Create the secret in `istio-system`:
+
+```sh
+oc apply -n istio-system -f rhods-internal-primary-cert-bundle-secret.yaml
+```
+
+Check the secret is in place:
+
+```sh
+oc get secret rhods-internal-primary-cert-bundle-secret -n istio-system
+```
+
+Install OpenShift AI operator.
+
+Finally create the `DSC` object (RHOAI CRD) which should look like [this](./examples/cluster/default-dsc.yaml):
+
+```sh
+cat << EOF| oc create -f -
+apiVersion: datasciencecluster.opendatahub.io/v1
+kind: DataScienceCluster
+metadata:
+  labels:
+    app.kubernetes.io/created-by: rhods-operator
+    app.kubernetes.io/instance: default-dsc
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: datasciencecluster
+    app.kubernetes.io/part-of: rhods-operator
+  name: default-dsc
+spec:
+  components:
+    codeflare:
+      managementState: Managed
+    kserve:
+      managementState: Managed
+      serving:
+        ingressGateway:
+          certificate:
+            # Intructions from: https://ai-on-openshift.io/odh-rhoai/single-stack-serving-certificate/
+            # You have to copy the secret create it in istio-system namespace
+            secretName: rhods-internal-primary-cert-bundle-secret
+            type: Provided
+        managementState: Managed
+        name: knative-serving
+    trustyai:
+      managementState: Removed
+    ray:
+      managementState: Managed
+    kueue:
+      managementState: Managed
+    workbenches:
+      managementState: Managed
+    dashboard:
+      managementState: Managed
+    modelmeshserving:
+      managementState: Managed
+    datasciencepipelines:
+      managementState: Managed
+EOF
+```
+
+## Deploying the vLLM runtime
+
 Once the stack is installed, adding the runtime is pretty straightforward:
 
 - As an admin, in the OpenShift AI Dashboard, open the menu `Settings -> Serving runtimes`.
@@ -56,9 +157,12 @@ Once the stack is installed, adding the runtime is pretty straightforward:
 
 The runtime is now available when deploying a model.
 
-### As a deployment [optional]
+*TODO: This won't work... find out why!*
+Or run this command:
 
-TODO
+```sh
+oc create -f ./vllm_runtime/vllm-runtime.yaml
+```
 
 ## Deploying the model
 
@@ -72,26 +176,42 @@ Some hints:
 Get a PAT from HF and put it in `.hf-token`.
 
 ```sh
-export HF_USERNAME=cvicens
+export HF_USERNAME=<YOU_USER_NAME>
 export HF_TOKEN=$(cat .hf-token)
 export MODEL_ROOT="mistralai"
 export MODEL_ID="Mistral-7B-Instruct-v0.2"
-mkdir tmp
-cd tmp
+export HF_TMPDIR="tmp"
+
+mkdir ${HF_TMPDIR} && cd ${HF_TMPDIR}
 git lfs install
 git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
 ```
 
-### Copy the model files to an S3 bucket
-
-Upload to an S3 bucket:
+Flan T5
 
 ```sh
-export BUCKET_NAME=mistral
+export HF_USERNAME=<YOU_USER_NAME>
+export HF_TOKEN=$(cat .hf-token)
+export MODEL_ROOT="google"
+export MODEL_ID="flan-t5-small"
+export HF_TMPDIR="tmp"
+
+mkdir -p ${HF_TMPDIR} && cd ${HF_TMPDIR}
+git lfs install
+git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
+rm -rf ${MODEL_ID}/.git
+```
+
+### Copy the model files to an S3 bucket
+
+Upload to an S3 bucket. Run this commands from `${HF_TMPDIR}`:
+
+```sh
+export BUCKET_NAME=models
 export AWS_ACCESS_KEY_ID=minio
 export AWS_SECRET_ACCESS_KEY=minio123
 export AWS_DEFAULT_REGION=none  # Any value is fine
-export AWS_S3_ENDPOINT=minio-console-ic-shared-minio.apps.cluster-wrzqv.sandbox3011.opentlc.com  # e.g., http://localhost:9000
+export AWS_S3_ENDPOINT=minio-s3-ic-shared-minio.apps.cluster-cn24g.sandbox1999.opentlc.com  # e.g., http://localhost:9000
 export AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
 export AWS_S3_USE_PATH_STYLE=1
 
@@ -99,17 +219,66 @@ aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
 aws configure set default.s3.addressing_style path
 aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
-aws s3 --no-verify-ssl sync ${MODEL_ID} s3://${BUCKET_NAME}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+# Create a bucket
+aws s3api create-bucket --bucket ${BUCKET_NAME} --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+
+# Upload the model to files folder in the bucket
+aws s3 sync ${MODEL_ID} s3://${BUCKET_NAME}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
 ```
 
 ### Deploy the model to vLLM
 
-This runtime can be used in the exact same way as the out of the box ones:
+This runtime can be used in the exact same way as the out of the box ones. This is the sequence of actions to use our custom `vLLM` runtime:
 
-- Create a connection to the S3 bucket that contains the model files.
-- Deploy the model from the Dashboard.
-- Make sure you have added a GPU to your GPU configuration, that you have enough VRAM (GPU memory) to load the model, and that you have enough standard memory (RAM). Although the model loads into the GPU, RAM is still used for the pre-loading operations.
-- Once the model is loaded, you can access the inference endpoint provided through the dashboard.
+> **Remember** that the custom runtime has to be installed before proceeding with this instructions.
+
+1. Create a project in RHOAI
+2. Create a connection to the S3 bucket that contains the model files.
+3. Deploy the model from the Dashboard.
+   > Make sure you have added a GPU to your GPU configuration, that you have enough VRAM (GPU memory) to load the model, and that you have enough standard memory (RAM). Although the model loads into the GPU, RAM is still used for the pre-loading operations.
+4. Once the model is loaded, you can access the inference endpoint provided through the dashboard.
+
+#### Create a project in RHOAI
+
+Click on `Create data science project`.
+
+![Create DS Project](./images/create-ds-project-1.png)
+
+Give it a name.
+
+![Create DS Project](./images/create-ds-project-2.png)
+
+#### Create a data connection
+
+Click on `Add data connection`.
+
+![Create Data Connection](./images/add-data-connection.png)
+
+**Name for your connection:** mistral
+
+#### Deploy the model from the Dashboard
+
+Click on `Deploy Model` in Single-model serving platform.
+
+![Deploy LLM](./images/deploy-model-on-vllm-1.png)
+
+Use the following data to deploy your model:
+
+- **Model name:** vllm
+- **Serving runtime:** vLLM
+- **Model framework (name - version):** pytorch
+- **Model server size:** Custom
+  - *CPUs requested:* 6 cores
+  - *Memory requested:* 24 Gi
+  - *CPUs limit:* 8 cores
+  - *Memory limit:* 24 Gi
+- **Accelerator:** NVIDIA GPU
+- **Number of accelerators:** 1
+- **Existing data connection:**
+  - *Name:* mistral
+  - *Path:* mistral/Mistral-7B-Instruct-v0.2
+
+Path should be `${MODEL_ROOT}/${MODEL_ID}`.
 
 ### Usage
 
@@ -126,7 +295,10 @@ Example tested on vLLM on RHOAI 2.8:
 Get models:
 
 ```sh
-export VLLM_PREDICTOR_URL="https://vllm-doc-bot.apps.cluster-wrzqv.sandbox3011.opentlc.com"
+export DS_PROJECT_NAME="vllm"
+export MODEL_NAME="vllm"
+export DOMAIN_NAME=$(oc get ingresscontroller default -n openshift-ingress-operator -o json | jq -r .status.domain)
+export VLLM_PREDICTOR_URL="https://${MODEL_NAME}-${DS_PROJECT_NAME}.${DOMAIN_NAME}"
 RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${VLLM_PREDICTOR_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
 echo ${RUNTIME_MODEL_ID}
 ```
@@ -134,7 +306,7 @@ echo ${RUNTIME_MODEL_ID}
 Prompt:
 
 ```sh
-curl -k -X 'POST' \
+curl -s -X 'POST' \
   "${VLLM_PREDICTOR_URL}/v1/completions" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
@@ -305,3 +477,15 @@ RAG Evaluation:
 - https://docs.ragas.io/en/latest/index.html
 - https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation.html
 - https://www.trulens.org/
+
+GPUs:
+- https://github.com/rh-aiservices-bu/gpu-partitioning-guide
+
+GitOps Iniciatives:
+- https://gitlab.consulting.redhat.com/denizbank-ai/mlops-cluster-config
+- https://github.com/rh-aiservices-bu/parasol-insurance
+- https://github.com/redhat-na-ssa/demo-ai-gitops-catalog
+
+
+KServe certs:
+- https://ai-on-openshift.io/odh-rhoai/single-stack-serving-certificate/#procedure
