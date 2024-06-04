@@ -480,6 +480,7 @@ RAG Evaluation:
 
 GPUs:
 - https://github.com/rh-aiservices-bu/gpu-partitioning-guide
+- https://github.com/rh-aiservices-bu/multi-gpu-llms
 
 GitOps Iniciatives:
 - https://gitlab.consulting.redhat.com/denizbank-ai/mlops-cluster-config
