@@ -477,6 +477,8 @@ RAG Evaluation:
 - https://docs.ragas.io/en/latest/index.html
 - https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation.html
 - https://www.trulens.org/
+- https://docs.ragas.io/en/latest/getstarted/evaluation.html#get-started-evaluation
+- https://github.com/rcarrat-AI/unir_master_thesis/blob/main/notebooks/TFM_Experiments_LLM_vs_RAG.ipynb
 
 GPUs:
 - https://github.com/rh-aiservices-bu/gpu-partitioning-guide
