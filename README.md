@@ -53,6 +53,8 @@ TODO
 
 ## Preparation
 
+> If you need to delete RHOAI go [here](./docs/Uninstall.md)
+
 Install the following operators prior to install OpenShift AI operator:
 
 - OpenShift Serverless
