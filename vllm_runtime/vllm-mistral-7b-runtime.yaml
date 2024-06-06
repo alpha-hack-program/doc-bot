@@ -1,11 +1,15 @@
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
-labels:
-  opendatahub.io/dashboard: "true"
 metadata:
   annotations:
-    openshift.io/display-name: vLLM
-  name: vllm
+    opendatahub.io/accelerator-name: migrated-gpu
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/template-display-name: vLLM Mistral 7B
+    opendatahub.io/template-name: vllm-mistral-7b
+    openshift.io/display-name: mistral-7b
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: mistral-7b
 spec:
   builtInAdapter:
     modelLoadingTimeoutMillis: 90000
@@ -19,7 +23,7 @@ spec:
         - "8080"
         - --max-model-len
         - "6144"
-      image: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.0.post1
+      image: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2
       name: kserve-container
       ports:
         - containerPort: 8080

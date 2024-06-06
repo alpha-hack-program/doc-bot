@@ -182,9 +182,10 @@ export MODEL_ROOT="mistralai"
 export MODEL_ID="Mistral-7B-Instruct-v0.2"
 export HF_TMPDIR="tmp"
 
-mkdir ${HF_TMPDIR} && cd ${HF_TMPDIR}
+mkdir -p ${HF_TMPDIR} && cd ${HF_TMPDIR}
 git lfs install
 git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
+rm -rf ${MODEL_ID}/.git
 ```
 
 Flan T5
@@ -207,23 +208,23 @@ rm -rf ${MODEL_ID}/.git
 Upload to an S3 bucket. Run this commands from `${HF_TMPDIR}`:
 
 ```sh
-export BUCKET_NAME=models
+export AWS_S3_BUCKET=models
 export AWS_ACCESS_KEY_ID=minio
 export AWS_SECRET_ACCESS_KEY=minio123
 export AWS_DEFAULT_REGION=none  # Any value is fine
-export AWS_S3_ENDPOINT=minio-s3-ic-shared-minio.apps.cluster-cn24g.sandbox1999.opentlc.com  # e.g., http://localhost:9000
+export AWS_S3_ENDPOINT=minio-s3-ic-shared-minio.apps.cluster-78z4l.sandbox2699.opentlc.com  # e.g., http://localhost:9000
 export AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
 export AWS_S3_USE_PATH_STYLE=1
 
-aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
-aws configure set default.s3.addressing_style path
-aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
+# aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
+# aws configure set default.s3.addressing_style path
+# aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
 # Create a bucket
-aws s3api create-bucket --bucket ${BUCKET_NAME} --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "https://${AWS_S3_ENDPOINT}" 
 
 # Upload the model to files folder in the bucket
-aws s3 sync ${MODEL_ID} s3://${BUCKET_NAME}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
 ```
 
 ### Deploy the model to vLLM
@@ -248,6 +249,18 @@ Give it a name.
 
 ![Create DS Project](./images/create-ds-project-2.png)
 
+Or run this:
+
+```sh
+PROJECT_NAME="vllm-mistral"
+DISPLAY_NAME="vLLM Mistral"
+DESCRIPTION="Mistral Model run using vLLM"
+
+oc new-project $PROJECT_NAME --display-name="$DISPLAY_NAME" --description="$DESCRIPTION"
+
+oc label namespace $PROJECT_NAME opendatahub.io/dashboard=true
+```
+
 #### Create a data connection
 
 Click on `Add data connection`.
@@ -255,6 +268,25 @@ Click on `Add data connection`.
 ![Create Data Connection](./images/add-data-connection.png)
 
 **Name for your connection:** mistral
+
+Or run this:
+
+```sh
+CONNECTION_NAME=mistral
+AWS_S3_ENDPOINT=http://minio.ic-shared-minio.svc:9000
+
+oc create secret generic -n ${PROJECT_NAME} aws-connection-${CONNECTION_NAME} \
+--from-literal=AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+--from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+--from-literal=AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+--from-literal=AWS_S3_ENDPOINT=${AWS_S3_ENDPOINT} \
+--from-literal=AWS_S3_BUCKET=${AWS_S3_BUCKET}
+
+oc label secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/dashboard=true
+oc label secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/managed=true
+oc annotate secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/connection-type=s3
+oc annotate secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME openshift.io/display-name=${CONNECTION_NAME}
+```
 
 #### Deploy the model from the Dashboard
 
@@ -264,8 +296,8 @@ Click on `Deploy Model` in Single-model serving platform.
 
 Use the following data to deploy your model:
 
-- **Model name:** vllm
-- **Serving runtime:** vLLM
+- **Model name:** mistral-7b
+- **Serving runtime:** mistral-7b
 - **Model framework (name - version):** pytorch
 - **Model server size:** Custom
   - *CPUs requested:* 6 cores
@@ -276,9 +308,25 @@ Use the following data to deploy your model:
 - **Number of accelerators:** 1
 - **Existing data connection:**
   - *Name:* mistral
-  - *Path:* mistral/Mistral-7B-Instruct-v0.2
+  - *Path:* mistralai/Mistral-7B-Instruct-v0.2
 
 Path should be `${MODEL_ROOT}/${MODEL_ID}`.
+
+Or you can run this command:
+
+```sh
+oc create -n ${PROJECT_NAME} -f ./vllm_runtime/vllm-instance.yaml
+```
+
+Wait until the model has been correctly deployed.
+
+> **S3:** `oc logs deploy/mistral-7b-predictor-00001-deployment -c storage-initializer -n ${PROJECT_NAME}`
+
+Check if url is ready:
+
+```sh
+oc get inferenceservice/mistral-7b -n $PROJECT_NAME -o json | jq -r .status.url
+```
 
 ### Usage
 
@@ -292,13 +340,12 @@ Also, vLLM provides a full Swagger UI where you can get the full documentation o
 
 Example tested on vLLM on RHOAI 2.8:
 
-Get models:
+Get model ID:
 
 ```sh
-export DS_PROJECT_NAME="vllm"
-export MODEL_NAME="vllm"
-export DOMAIN_NAME=$(oc get ingresscontroller default -n openshift-ingress-operator -o json | jq -r .status.domain)
-export VLLM_PREDICTOR_URL="https://${MODEL_NAME}-${DS_PROJECT_NAME}.${DOMAIN_NAME}"
+MODEL_NAME="mistral-7b"
+VLLM_PREDICTOR_URL=$(oc get inferenceservice/${MODEL_NAME} -n $PROJECT_NAME -o json | jq -r .status.url)
+
 RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${VLLM_PREDICTOR_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
 echo ${RUNTIME_MODEL_ID}
 ```
@@ -313,7 +360,7 @@ curl -s -X 'POST' \
   -d '{
   "model": "'${RUNTIME_MODEL_ID}'",
   "prompt": "San Francisco is a",
-  "max_tokens": 7,
+  "max_tokens": 25,
   "temperature": 0
 }'
 ```
@@ -489,6 +536,14 @@ GitOps Iniciatives:
 - https://github.com/rh-aiservices-bu/parasol-insurance
 - https://github.com/redhat-na-ssa/demo-ai-gitops-catalog
 
-
 KServe certs:
 - https://ai-on-openshift.io/odh-rhoai/single-stack-serving-certificate/#procedure
+
+Embeddings:
+- https://old.tacosdedatos.com/word-to-vec-ilustrado
+
+Dataset Embeddings:
+- https://huggingface.co/datasets/embedding-data/simple-wiki
+
+Uninstall RHOAI:
+- https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.8/html/installing_and_uninstalling_openshift_ai_self-managed/uninstalling-openshift-ai-self-managed_uninstalling-openshift-ai-self-managed
