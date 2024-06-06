@@ -1,0 +1,85 @@
+---
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  annotations:
+    openshift.io/display-name: mistral-7b-2x-t4
+    serving.knative.openshift.io/enablePassthrough: 'true'
+    sidecar.istio.io/inject: 'true'
+    sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+  name: mistral-7b-2x-t4
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  predictor:
+    maxReplicas: 1
+    minReplicas: 1
+    model:
+      modelFormat:
+        name: pytorch
+      name: ''
+      resources:
+        limits:
+          nvidia.com/gpu: '2'
+        requests:
+          nvidia.com/gpu: '2'
+      runtime: mistral-7b-2x-t4
+      storage:
+        key: aws-connection-mistral
+        path: mistralai/Mistral-7B-Instruct-v0.2
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
+---
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    opendatahub.io/accelerator-name: migrated-gpu
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/template-display-name: vLLM Mistral 7b 2x T4
+    opendatahub.io/template-name: mistral-7b-2x-t4
+    openshift.io/display-name: mistral-7b-2x-t4
+  name: mistral-7b-2x-t4
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  builtInAdapter:
+    modelLoadingTimeoutMillis: 90000
+  containers:
+    - args:
+        - '--model'
+        - /mnt/models/
+        - '--download-dir'
+        - /models-cache
+        - '--port'
+        - '8080'
+        - '--dtype'
+        - float16
+        - '--tensor-parallel-size=2'
+      image: 'quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2'
+      name: kserve-container
+      ports:
+        - containerPort: 8080
+          name: http1
+          protocol: TCP
+      resources:
+        limits:
+          cpu: '8'
+          memory: 24Gi
+        requests:
+          cpu: '6'
+          memory: 24Gi
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: shm
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: pytorch
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 15Gi
+      name: shm

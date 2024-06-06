@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 ### Define Instance Types
 INSTANCE_KEYS=(
   "Tesla T4 Single GPU"

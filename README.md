@@ -227,7 +227,7 @@ aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "https://${AWS_
 aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
 ```
 
-### Deploy the model to vLLM
+### Deploy the mistral to vLLM
 
 This runtime can be used in the exact same way as the out of the box ones. This is the sequence of actions to use our custom `vLLM` runtime:
 
@@ -322,13 +322,13 @@ Wait until the model has been correctly deployed.
 
 > **S3:** `oc logs deploy/mistral-7b-predictor-00001-deployment -c storage-initializer -n ${PROJECT_NAME}`
 
-Check if url is ready:
+Check if the predictor url is ready:
 
 ```sh
 oc get inferenceservice/mistral-7b -n $PROJECT_NAME -o json | jq -r .status.url
 ```
 
-### Usage
+#### Usage
 
 This implementation of the runtime provides an **OpenAI compatible API**. So any tool or library that can connect to OpenAI services will be able to consume the endpoint.
 
@@ -344,6 +344,184 @@ Get model ID:
 
 ```sh
 MODEL_NAME="mistral-7b"
+VLLM_PREDICTOR_URL=$(oc get inferenceservice/${MODEL_NAME} -n $PROJECT_NAME -o json | jq -r .status.url)
+
+RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${VLLM_PREDICTOR_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
+echo ${RUNTIME_MODEL_ID}
+```
+
+Prompt:
+
+```sh
+curl -s -X 'POST' \
+  "${VLLM_PREDICTOR_URL}/v1/completions" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "'${RUNTIME_MODEL_ID}'",
+  "prompt": "San Francisco is a",
+  "max_tokens": 25,
+  "temperature": 0
+}'
+```
+
+### Deploy the mistral to vLLM but using 2x T4 GPUs
+
+#### First let's create a machineset for our purposes
+
+Run `./bootstrap/gpu-machineset.sh` and choose `(2) Tesla T4 Multi GPU` and make sure you get this after typing `2`.
+
+> You have to be `cluster-admin` for this to succeed.
+
+```
+### Selected GPU instance type: Tesla T4 Multi GPU
+### Selected GPU instance type: g4dn.12xlarge
+```
+
+Now choose the AWS region and AZ you want the machine set to deploy workers with GPUs:
+
+> If starting of the RHPDS Claim Service demo you should probably use `us-east-2` and `az1`.
+
+```
+### Enter the AWS region (default: us-west-2): us-east-2
+### Select the availability zone (az1, az2, az3):
+1) az1
+2) az2
+3) az3
+Please enter your choice: 1
+### Creating new machineset worker-gpu-g4dn.12xlarge-us-east-2a.
+machineset.machine.openshift.io/worker-gpu-g4dn.12xlarge-us-east-2a created
+--- New machineset worker-gpu-g4dn.12xlarge-us-east-2a created.
+```
+
+Run this command to check if the machineset is in place.
+
+```sh
+MACHINESET_NAME=$(oc get machineset -n openshift-machine-api -o json | jq -r '.items[] | select(.metadata.name | test("^worker-gpu")) | .metadata.name')
+echo ${MACHINESET_NAME}
+```
+
+It should return something like: "worker-gpu-g4dn.12xlarge-us-east-2a"
+
+Check if our new nodes are resdy:
+
+```sh
+oc get machineset/${MACHINESET_NAME} -n openshift-machine-api
+```
+
+You should get something like this:
+
+```
+NAME                                  DESIRED   CURRENT   READY   AVAILABLE   AGE
+worker-gpu-g4dn.12xlarge-us-east-2a   1         1         1       1           8m31s
+```
+
+#### Create a project in RHOAI
+
+```sh
+PROJECT_NAME="vllm-mistral-2x-t4"
+DISPLAY_NAME="vLLM Mistral 2x T4"
+DESCRIPTION="Mistral Model run using vLLM with 2x T4"
+
+oc new-project $PROJECT_NAME --display-name="$DISPLAY_NAME" --description="$DESCRIPTION"
+
+oc label namespace $PROJECT_NAME opendatahub.io/dashboard=true
+```
+
+#### Create a data connection
+
+Click on `Add data connection`.
+
+![Create Data Connection](./images/add-data-connection.png)
+
+**Name for your connection:** mistral
+
+Or run this:
+
+```sh
+CONNECTION_NAME=mistral
+AWS_S3_ENDPOINT=http://minio.ic-shared-minio.svc:9000
+
+oc create secret generic -n ${PROJECT_NAME} aws-connection-${CONNECTION_NAME} \
+--from-literal=AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+--from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+--from-literal=AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+--from-literal=AWS_S3_ENDPOINT=${AWS_S3_ENDPOINT} \
+--from-literal=AWS_S3_BUCKET=${AWS_S3_BUCKET}
+
+oc label secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/dashboard=true
+oc label secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/managed=true
+oc annotate secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME opendatahub.io/connection-type=s3
+oc annotate secret aws-connection-${CONNECTION_NAME} -n $PROJECT_NAME openshift.io/display-name=${CONNECTION_NAME}
+```
+
+#### Deploy the model from the cli
+
+```sh
+oc create -n ${PROJECT_NAME} -f ./vllm_runtime/vllm-mistral-7b-multigpu-instance.yaml
+```
+
+Wait until the model has been correctly deployed.
+
+> **S3:** `oc logs deploy/mistral-7b-2x-t4-predictor-00001-deployment -c storage-initializer -n ${PROJECT_NAME}`
+
+Check if the predictor url is ready:
+
+```sh
+oc get inferenceservice/mistral-7b-2x-t4 -n $PROJECT_NAME -o json | jq -r .status.url
+```
+
+Run this command to check if the pod has two T4s:
+
+```sh
+T4_POD=$(oc get pod -n $PROJECT_NAME -o json | jq -r .items[0].metadata.name)
+oc rsh ${T4_POD} nvidia-smi
+```
+
+You should get something like this:
+
+```
+Thu Jun  6 17:37:44 2024       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.104.05             Driver Version: 535.104.05   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  Tesla T4                       On  | 00000000:00:1C.0 Off |                    0 |
+| N/A   37C    P0              26W /  70W |  11145MiB / 15360MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+|   1  Tesla T4                       On  | 00000000:00:1D.0 Off |                    0 |
+| N/A   37C    P0              26W /  70W |  11145MiB / 15360MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
++---------------------------------------------------------------------------------------+
+```
+
+#### Usage
+
+This implementation of the runtime provides an **OpenAI compatible API**. So any tool or library that can connect to OpenAI services will be able to consume the endpoint.
+
+Python and Curl examples are provided [here](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#using-openai-completions-api-with-vllm).
+
+You can also find a notebook example using Langchain to query vLLM in this repo [here](../examples/notebooks/langchain/Langchain-vLLM-Prompt-memory.ipynb).
+
+Also, vLLM provides a full Swagger UI where you can get the full documentation of the API (methods, parameters), and try it directly without any coding,... It is accessible at the address `https://your-endpoint-address/docs`.
+
+Example tested on vLLM on RHOAI 2.8:
+
+Get model ID:
+
+```sh
+MODEL_NAME="mistral-7b-2x-t4"
 VLLM_PREDICTOR_URL=$(oc get inferenceservice/${MODEL_NAME} -n $PROJECT_NAME -o json | jq -r .status.url)
 
 RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${VLLM_PREDICTOR_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
