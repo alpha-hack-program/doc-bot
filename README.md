@@ -159,13 +159,6 @@ Once the stack is installed, adding the runtime is pretty straightforward:
 
 The runtime is now available when deploying a model.
 
-*TODO: This won't work... find out why!*
-Or run this command:
-
-```sh
-oc create -f ./vllm_runtime/vllm-runtime.yaml
-```
-
 ## Deploying the model
 
 In both cases, deploy the model `mistralai/Mistral-7B-Instruct-v0.2`. The model can be found [here](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2).
@@ -214,13 +207,9 @@ export AWS_S3_BUCKET=models
 export AWS_ACCESS_KEY_ID=minio
 export AWS_SECRET_ACCESS_KEY=minio123
 export AWS_DEFAULT_REGION=none  # Any value is fine
-export AWS_S3_ENDPOINT=minio-s3-ic-shared-minio.apps.cluster-78z4l.sandbox2699.opentlc.com  # e.g., http://localhost:9000
+export AWS_S3_ENDPOINT=localhost:9000  # e.g., http://localhost:9000
 export AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
 export AWS_S3_USE_PATH_STYLE=1
-
-# aws configure set default.s3.endpoint_url ${AWS_S3_ENDPOINT}
-# aws configure set default.s3.addressing_style path
-# aws configure set default.s3.region ${AWS_DEFAULT_REGION}  # Any value is fine
 
 # Create a bucket
 aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "https://${AWS_S3_ENDPOINT}" 
