@@ -243,8 +243,8 @@ Give it a name.
 Or run this:
 
 ```sh
-PROJECT_NAME="vllm-mistral"
-DISPLAY_NAME="vLLM Mistral"
+PROJECT_NAME="vllm-mistral-7b"
+DISPLAY_NAME="vLLM Mistral 7B"
 DESCRIPTION="Mistral Model run using vLLM"
 
 oc new-project $PROJECT_NAME --display-name="$DISPLAY_NAME" --description="$DESCRIPTION"
@@ -306,7 +306,7 @@ Path should be `${MODEL_ROOT}/${MODEL_ID}`.
 Or you can run this command:
 
 ```sh
-oc create -n ${PROJECT_NAME} -f ./vllm_runtime/vllm-instance.yaml
+oc create -n ${PROJECT_NAME} -f ./vllm_runtime/vllm-mistral-7b-instance.yaml
 ```
 
 Wait until the model has been correctly deployed.
