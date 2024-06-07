@@ -41,6 +41,9 @@ objects:
       - containerPort: 8080
         name: http1
         protocol: TCP
+      # TODO to be tested!!!
+      nodeSelector:
+        nvidia.com/gpu.product: NVIDIA-A10G
     multiModel: false
     supportedModelFormats:
     - autoSelect: true

@@ -309,6 +309,45 @@ Or you can run this command:
 oc create -n ${PROJECT_NAME} -f ./vllm_runtime/vllm-mistral-7b-instance.yaml
 ```
 
+> It's worth mentioning that we have added a node selector to move this workload to a node with A10G gpu.
+> ```yaml
+>apiVersion: serving.kserve.io/v1beta1
+>kind: InferenceService
+>metadata:
+>  annotations:
+>    openshift.io/display-name: mistral-7b
+>    serving.knative.openshift.io/enablePassthrough: 'true'
+>    sidecar.istio.io/inject: 'true'
+>    sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+>  name: mistral-7b
+>  labels:
+>    opendatahub.io/dashboard: 'true'
+>spec:
+>  predictor:
+>    maxReplicas: 1
+>    minReplicas: 1
+>    model:
+>      modelFormat:
+>        name: pytorch
+>      name: ''
+>      resources:
+>        limits:
+>          nvidia.com/gpu: '1'
+>        requests:
+>          nvidia.com/gpu: '1'
+>      runtime: mistral-7b
+>      storage:
+>        key: aws-connection-mistral
+>        path: mistralai/Mistral-7B-Instruct-v0.2
+>    tolerations:
+>      - effect: NoSchedule
+>        key: nvidia.com/gpu
+>        operator: Exists
+>    nodeSelector:
+>      nvidia.com/gpu.product: NVIDIA-A10G # HERE
+>```
+
+
 Wait until the model has been correctly deployed.
 
 > **S3:** `oc logs deploy/mistral-7b-predictor-00001-deployment -c storage-initializer -n ${PROJECT_NAME}`
