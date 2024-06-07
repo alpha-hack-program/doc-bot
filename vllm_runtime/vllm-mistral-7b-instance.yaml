@@ -31,6 +31,8 @@ spec:
       - effect: NoSchedule
         key: nvidia.com/gpu
         operator: Exists
+    nodeSelector:
+      nvidia.com/gpu.product: NVIDIA-A10G
 ---
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
