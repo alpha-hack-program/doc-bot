@@ -5,7 +5,7 @@ metadata:
     notebooks.opendatahub.io/inject-oauth: 'true'
     opendatahub.io/image-display-name: PyTorch
     notebooks.opendatahub.io/oauth-logout-url: >-
-      $DASHBOARD_ROUTE/projects/user0?notebookLogout={{ .Values.workbench.name }}
+      $DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
     opendatahub.io/accelerator-name: ''
     openshift.io/description: ''
     openshift.io/display-name: '{{ .Values.workbench.displayName }}'
