@@ -24,7 +24,7 @@ spec:
           nvidia.com/gpu: '{{ .Values.model.accelerator.max }}'
         requests:
           nvidia.com/gpu: '{{ .Values.model.accelerator.min }}'
-      runtime: {{ .Values.model.runtime.name }}
+      runtime: {{ .Values.model.name }}
       storage:
         key: aws-connection-{{ .Values.model.connection.name }}
         path: {{ .Values.model.connection.path }}
@@ -43,8 +43,8 @@ metadata:
     opendatahub.io/apiProtocol: {{ .Values.model.apiProtocol }}
     opendatahub.io/template-display-name: {{ .Values.model.runtime.templateDisplayName }}
     opendatahub.io/template-name: {{ .Values.model.runtime.templateName }}
-    openshift.io/display-name: {{ .Values.model.runtime.displayName }}
-  name: {{ .Values.model.runtime.name }}
+    openshift.io/display-name: {{ .Values.model.displayName }}
+  name: {{ .Values.model.name }}
   labels:
     opendatahub.io/dashboard: 'true'
 spec:
