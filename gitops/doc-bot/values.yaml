@@ -24,7 +24,7 @@ modelConnection:
   awsS3Bucket: models
   awsS3Endpoint: http://minio.ic-shared-minio.svc:9000
 
-pipelineConnection:
+pipelinesConnection:
   name: pipelines
   displayName: pipelines
   type: s3
