@@ -1,0 +1,63 @@
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: elyra-pipelines-{{ .Values.dataScienceProjectNamespace }}
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+#   labels:
+#     opendatahub.io/dashboard: 'true'
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Values.dataScienceProjectNamespace }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: Role
+#   name: ds-pipeline-user-access-dspa
+---
+apiVersion: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+kind: DataSciencePipelinesApplication
+metadata:
+  name: dspa
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+spec:
+  apiServer:
+    stripEOF: true
+    dbConfigConMaxLifetimeSec: 120
+    applyTektonCustomResource: true
+    deploy: true
+    enableSamplePipeline: false
+    autoUpdatePipelineDefaultVersion: true
+    archiveLogs: false
+    terminateStatus: Cancelled
+    enableOauth: true
+    trackArtifacts: true
+    collectMetrics: true
+    injectDefaultScript: true
+  database:
+    disableHealthCheck: false
+    mariaDB:
+      deploy: true
+      pipelineDBName: mlpipeline
+      pvcSize: 10Gi
+      username: mlpipeline
+  dspVersion: v2
+  objectStorage:
+    disableHealthCheck: false
+    enableExternalRoute: false
+    externalStorage:
+      basePath: ''
+      bucket: '{{ .Values.pipelinesConnection.awsS3Bucket}}'
+      host: '{{ .Values.pipelinesConnection.awsS3Endpoint }}'
+      port: ''
+      region: '{{ .Values.pipelinesConnection.awsDefaultRegion }}'
+      s3CredentialsSecret:
+        accessKey: AWS_ACCESS_KEY_ID
+        secretKey: AWS_SECRET_ACCESS_KEY
+        secretName: dashboard-dspa-secret
+      scheme: http
+  persistenceAgent:
+    deploy: true
+    numWorkers: 2
+  scheduledWorkflow:
+    cronScheduleTimezone: UTC
+    deploy: true

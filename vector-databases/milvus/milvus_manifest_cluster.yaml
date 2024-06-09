@@ -378,6 +378,7 @@ data:
   PULSAR_MEM: |
     -Xms2048m -Xmx2048m
   httpNumThreads: "100"
+
 # Source: milvus/charts/pulsar/templates/zookeeper-configmap.yaml
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -432,6 +433,8 @@ data:
     #    proxy:
     #      http:
     #        enabled: true
+    #      maxUserNum: 100
+    #      maxRoleNum: 10
     ##  Enable tlsMode and set the tls cert and key
     #  tls:
     #    serverPemPath: /etc/milvus/certs/tls.crt
@@ -786,6 +789,7 @@ spec:
     app: pulsar
     release: vectordb
     component: proxy
+
 # Source: milvus/charts/pulsar/templates/zookeeper-service.yaml
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -844,10 +848,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-datacoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "datacoord"
 spec:
@@ -872,10 +876,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-datanode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "datanode"
 spec:
@@ -897,10 +901,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-indexcoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "indexcoord"
 spec:
@@ -925,10 +929,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-indexnode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "indexnode"
 spec:
@@ -950,10 +954,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-querycoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "querycoord"
 spec:
@@ -978,10 +982,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-querynode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "querynode"
 spec:
@@ -1003,10 +1007,10 @@ kind: Service
 metadata:
   name: vectordb-milvus-rootcoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "rootcoord"
 spec:
@@ -1031,10 +1035,10 @@ kind: Service
 metadata:
   name: vectordb-milvus
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "proxy"
 spec:
@@ -1059,10 +1063,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-datacoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "datacoord"
   annotations:
@@ -1082,7 +1086,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "datacoord"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1098,7 +1102,7 @@ spec:
               name: tools
       containers:
         - name: datacoord
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "datacoord"]
           env:
@@ -1152,10 +1156,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-datanode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "datanode"
   annotations:
@@ -1173,7 +1177,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "datanode"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1189,7 +1193,7 @@ spec:
               name: tools
       containers:
         - name: datanode
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "datanode"]
           env:
@@ -1243,10 +1247,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-indexcoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "indexcoord"
   annotations:
@@ -1266,7 +1270,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "indexcoord"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1282,7 +1286,7 @@ spec:
               name: tools
       containers:
         - name: indexcoord
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "indexcoord"]
           env:
@@ -1336,10 +1340,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-indexnode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "indexnode"
   annotations:
@@ -1357,7 +1361,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "indexnode"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1373,7 +1377,7 @@ spec:
               name: tools
       containers:
         - name: indexnode
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "indexnode"]
           env:
@@ -1431,10 +1435,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-proxy
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "proxy"
   annotations:
@@ -1452,7 +1456,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "proxy"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1468,7 +1472,7 @@ spec:
               name: tools
       containers:
         - name: proxy
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "proxy"]
           env:
@@ -1522,10 +1526,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-querycoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "querycoord"
   annotations:
@@ -1545,7 +1549,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "querycoord"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1561,7 +1565,7 @@ spec:
               name: tools
       containers:
         - name: querycoord
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "querycoord"]
           env:
@@ -1615,10 +1619,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-querynode
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "querynode"
   annotations:
@@ -1636,7 +1640,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "querynode"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1652,7 +1656,7 @@ spec:
               name: tools
       containers:
         - name: querynode
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "querynode"]
           env:
@@ -1710,10 +1714,10 @@ kind: Deployment
 metadata:
   name: vectordb-milvus-rootcoord
   labels:
-    helm.sh/chart: milvus-4.1.19
+    helm.sh/chart: milvus-4.1.33
     app.kubernetes.io/name: milvus
     app.kubernetes.io/instance: vectordb
-    app.kubernetes.io/version: "2.3.10"
+    app.kubernetes.io/version: "2.4.4"
     app.kubernetes.io/managed-by: Helm
     component: "rootcoord"
   annotations:
@@ -1733,7 +1737,7 @@ spec:
         app.kubernetes.io/instance: vectordb
         component: "rootcoord"
       annotations:
-        checksum/config: 7f44ffef22411cb5348154aeae39e06a9844f6c884e04a7a44964af045b0ed1c
+        checksum/config: ed4da14f0ca17cffdb1f416fc119162bffb88a6c21dfb56442365f5f26135080
     spec:
       serviceAccountName: default
       initContainers:
@@ -1749,7 +1753,7 @@ spec:
               name: tools
       containers:
         - name: rootcoord
-          image: "quay.io/rh-data-services/milvus-openshift:v2.3.10"
+          image: "milvusdb/milvus:v2.4.4"
           imagePullPolicy: IfNotPresent
           args: ["/milvus/tools/run-helm.sh", "milvus", "run", "rootcoord"]
           env:
@@ -2565,6 +2569,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: "vectordb-pulsar-proxy"
+
 # Source: milvus/charts/pulsar/templates/zookeeper-statefulset.yaml
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -2843,6 +2848,7 @@ spec:
           volumeMounts:
       volumes:
       restartPolicy: OnFailure
+
 # Source: milvus/charts/pulsar/templates/autorecovery-podmonitor.yaml
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -2863,92 +2869,868 @@ spec:
 # under the License.
 #
 ---
+{}
 
+# deploy broker PodMonitor only when `$.Values.broker.podMonitor.enabled` is true
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/autorecovery-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/bookkeeper-podmonitor.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# deploy bookkeeper PodMonitor only when `$.Values.bookkeeper.podMonitor.enabled` is true
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/bookkeeper-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/bookkeeper-storageclass.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/broker-podmonitor.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# deploy broker PodMonitor only when `$.Values.broker.podMonitor.enabled` is true
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/broker-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/dashboard-deployment.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/dashboard-ingress.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/dashboard-service.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/function-worker-configmap.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/grafana-admin-secret.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/grafana-configmap.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/grafana-deployment.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/grafana-ingress.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/keytool.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# script to process key/cert to keystore and truststore
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/namespace.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-configmap.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-deployment.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-pvc.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-service.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/prometheus-storageclass.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/proxy-ingress.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/proxy-podmonitor.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# deploy proxy PodMonitor only when `$.Values.proxy.podMonitor.enabled` is true
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/proxy-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/pulsar-manager-admin-secret.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/pulsar-manager-configmap.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/pulsar-manager-deployment.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/pulsar-manager-ingress.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/pulsar-manager-service.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/tls-cert-internal-issuer.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/tls-certs-internal.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/toolset-configmap.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/toolset-rbac.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/toolset-service.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/zookeeper-pdb.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/zookeeper-podmonitor.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# deploy zookeeper PodMonitor only when `$.Values.zookeeper.podMonitor.enabled` is true
 ---
+{}
 
+# Source: milvus/charts/pulsar/templates/zookeeper-storageclass.yaml
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 ---
+{}
 
+# deploy zookeeper only when `components.zookeeper` is true
+
+# define the storage class for data directory

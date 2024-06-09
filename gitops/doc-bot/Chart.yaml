@@ -1,0 +1,5 @@
+apiVersion: v2
+name: doc-bot
+description: A Helm chart to deploy Doc Bot Application
+version: 0.1.0
+appVersion: "1.0"

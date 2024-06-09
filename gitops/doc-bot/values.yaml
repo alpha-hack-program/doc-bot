@@ -1,0 +1,50 @@
+dataScienceProjectDisplayName: vllm-mistral-7b
+dataScienceProjectNamespace: vllm-mistral-7b
+milvusNamespace: milvus
+
+workbench:
+  name: rag-workbench
+  displayName: RAG Workbench
+  namespace: rag-workbench
+  image: pytorch:2024.1
+  resources:
+    limits:
+      cpu: '2'
+      memory: 8Gi
+    requests:
+      cpu: '1'
+      memory: 6Gi
+    
+modelConnection:
+  name: llm
+  displayName: llm
+  type: s3
+  awsAccessKeyId: minio
+  awsSecretAccessKey: minio123
+  awsDefaultRegion: none
+  awsS3Bucket: models
+  awsS3Endpoint: http://minio.ic-shared-minio.svc:9000
+
+pipelineConnection:
+  name: pipelines
+  displayName: pipelines
+  type: s3
+  awsAccessKeyId: minio
+  awsSecretAccessKey: minio123
+  awsDefaultRegion: none
+  awsS3Bucket: pipelines
+  awsS3Endpoint: http://minio.ic-shared-minio.svc:9000
+
+application:
+  name: my-app
+  namespace: argocd
+  project: default
+  source:
+    repoURL: https://github.com/your-repo/your-app.git
+    path: .
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated: true

@@ -579,7 +579,7 @@ curl -s -X 'POST' \
 
 For our RAG we will need a Vector Database to store the Embeddings of the different documents. In this example we are using Milvus.
 
-Deployment instructions specific to OpenShift are available [here](https://github.com/atarazana/doc-bot/tree/main/vector-databases/milvus).
+Deployment instructions specific to OpenShift are available [here](./vector-databases/milvus).
 
 After you follow those instructions you should have a Milvus instance ready to be populated with documents.
 
@@ -605,14 +605,15 @@ To modify those components, as well many other configuration parameters, please 
 
 Milvus can be deployed in Standalone or Cluster mode. Cluster mode, leveraging Pulsar, etcd and Minio for data persistency, will bring redundancy, as well as easy scale up and down of the different components.
 
-> **REVISIT:** Apparently there is an operator but not ready as of the time of writing this document.
+Although Milvus features an operator to easily deploy it in a Kubernetes environment, this method has not been tested yet, while waiting for the different corrections to be made to the deployment code for OpenShift specificities.
 
-This deployment method is based on the [Offline installation](https://milvus.io/docs/install_offline-helm.md) that purely rely on Helm Charts.
+Instead, this deployment method is based on the [Offline installation](https://milvus.io/docs/install_offline-helm.md) that purely rely on Helm Charts.
 
 - Log into your OpenShift cluster, and create a new project to host your Milvus installation:
 
 ```bash
-oc new-project milvus
+MILVUS_PROJECT_NAME=milvus
+oc new-project ${MILVUS_PROJECT_NAME}
 ```
 
 - Add and update Milvus Helm repository locally:
@@ -625,7 +626,7 @@ helm repo update
 - Fetch the file [`openshift-values.yaml`](openshift-values.yaml) from this repo. This file is really important as it sets specific values for OpenShift compatibility. You can also modify some of the values in this file to adapt the deployment to your requirements, notably modify the Minio admin user and password.
 
     ```bash
-    wget https://raw.githubusercontent.com/atarazana/doc-bot/main/vector-databases/milvus/openshift-values.yaml
+    wget https://raw.githubusercontent.com/alpha-hack-program/doc-bot/main/vector-databases/milvus/openshift-values.yaml
     ```
 
 - Create the manifest:
@@ -648,6 +649,7 @@ helm repo update
     yq '(select(.kind == "StatefulSet" and .metadata.name == "vectordb-etcd") | .spec.template.spec.securityContext) = {}' -i milvus_manifest_standalone.yaml
     yq '(select(.kind == "StatefulSet" and .metadata.name == "vectordb-etcd") | .spec.template.spec.containers[0].securityContext) = {"capabilities": {"drop": ["ALL"]}, "runAsNonRoot": true, "allowPrivilegeEscalation": false}' -i milvus_manifest_standalone.yaml
     yq '(select(.kind == "Deployment" and .metadata.name == "vectordb-minio") | .spec.template.spec.securityContext) = {"capabilities": {"drop": ["ALL"]}, "runAsNonRoot": true, "allowPrivilegeEscalation": false}' -i milvus_manifest_standalone.yaml
+    ```
 
   - For Milvus Cluster:
   
@@ -662,19 +664,19 @@ helm repo update
   - For Milvus Standalone:
   
     ```bash
-    oc apply -f milvus_manifest_standalone.yaml
+    oc apply -n ${MILVUS_PROJECT_NAME} -f milvus_manifest_standalone.yaml
     ```
 
   - For Milvus Cluster:
   
     ```bash
-    oc apply -f milvus_manifest_cluster.yaml
+    oc apply -n ${MILVUS_PROJECT_NAME} -f milvus_manifest_cluster.yaml
     ```
 
 - To deploy the management UI for Milvus, called Attu, apply the file [attu-deployment.yaml](attu-deployment.yaml):
 
 ```bash
-oc apply -f https://raw.githubusercontent.com/atarazana/doc-bot/main/vector-databases/milvus/attu-deployment.yaml
+oc apply -f https://raw.githubusercontent.com/alpha-hack-program/doc-bot/main/vector-databases/milvus/attu-deployment.yaml
 ```
 
 NOTE: Attu deployment could have been done through the Helm chart, but this would not properly create the access Route.
