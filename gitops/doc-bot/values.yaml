@@ -1,6 +1,5 @@
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
-milvusNamespace: milvus
 
 workbench:
   name: rag-workbench
