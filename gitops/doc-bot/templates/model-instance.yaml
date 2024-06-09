@@ -3,7 +3,7 @@ apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
   annotations:
-    openshift.io/display-name: {{ .Values.model.displayName }}
+    openshift.io/display-name: "{{ .Values.model.displayName }}"
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
@@ -41,9 +41,9 @@ metadata:
   annotations:
     opendatahub.io/accelerator-name: migrated-gpu
     opendatahub.io/apiProtocol: {{ .Values.model.apiProtocol }}
-    opendatahub.io/template-display-name: {{ .Values.model.runtime.templateDisplayName }}
-    opendatahub.io/template-name: {{ .Values.model.runtime.templateName }}
-    openshift.io/display-name: {{ .Values.model.displayName }}
+    opendatahub.io/template-display-name: "{{ .Values.model.runtime.templateDisplayName }}"
+    opendatahub.io/template-name: "{{ .Values.model.runtime.templateName }}"
+    openshift.io/display-name: "{{ .Values.model.displayName }}"
   name: {{ .Values.model.name }}
   labels:
     opendatahub.io/dashboard: 'true'
