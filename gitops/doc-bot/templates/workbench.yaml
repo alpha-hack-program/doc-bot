@@ -24,10 +24,10 @@ spec:
       containers:
         - resources:
             limits:
-              cpu: {{ .Values.workbench.resources.limits.cpu }}
+              cpu: '{{ .Values.workbench.resources.limits.cpu }}'
               memory: {{ .Values.workbench.resources.limits.memory }}
             requests:
-              cpu: {{ .Values.workbench.resources.requests.cpu }}
+              cpu: '{{ .Values.workbench.resources.requests.cpu }}'
               memory: {{ .Values.workbench.resources.requests.memory }}
           readinessProbe:
             failureThreshold: 3
