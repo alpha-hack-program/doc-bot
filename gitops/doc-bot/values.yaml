@@ -1,6 +1,36 @@
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 
+model:
+  name: mistral
+  displayName: Mistral
+  maxReplicas: 1
+  format: pytorch
+  apiProtocol: REST
+  runtime:
+    name: mistral-7b
+    displayName: Mistral 7b
+    templateName: vllm-mistral-7b-serving-template
+    templateDisplayName: vLLM Mistral 7B
+    image: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2
+    resources:
+      limits:
+        cpu: '8'
+        memory: 24Gi
+      requests:
+        cpu: '6'
+        memory: 24Gi
+  accelerator:
+    max: '1'
+    min: '1'
+    productName: NVIDIA-A10G
+  connection:
+    name: llm
+    path: mistralai/Mistral-7B-Instruct-v0.2
+  volumes:
+    shm:
+      sizeLimit: 2Gi
+
 workbench:
   name: rag-workbench
   displayName: RAG Workbench
