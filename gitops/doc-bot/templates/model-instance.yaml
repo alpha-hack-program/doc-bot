@@ -8,7 +8,7 @@ metadata:
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
   name: {{ .Values.model.name }}
-  namspace: {{ .Values.dataScienceProjectNamespace }}
+  namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     opendatahub.io/dashboard: 'true'
 spec:
