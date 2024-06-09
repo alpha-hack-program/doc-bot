@@ -24,7 +24,7 @@ spec:
           nvidia.com/gpu: '{{ .Values.model.accelerator.max }}'
         requests:
           nvidia.com/gpu: '{{ .Values.model.accelerator.min }}'
-      runtime: {{ model.runtime.name }}
+      runtime: {{ .Values.model.runtime.name }}
       storage:
         key: aws-connection-{{ .Values.model.connection.name }}
         path: {{ .Values.model.connection.path }}
