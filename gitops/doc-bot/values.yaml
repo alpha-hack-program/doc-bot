@@ -64,6 +64,10 @@ pipelinesConnection:
   awsS3Bucket: pipelines
   awsS3Endpoint: minio.ic-shared-minio.svc:9000
 
+minio:
+  name: minio
+  namespace: ic-shared-minio
+
 application:
   name: my-app
   namespace: argocd

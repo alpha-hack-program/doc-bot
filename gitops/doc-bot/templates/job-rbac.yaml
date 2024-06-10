@@ -21,11 +21,15 @@ subjects:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: demo-setup-route-reader-binding-user0
+  name: demo-setup-route-reader-binding
 subjects:
 - kind: ServiceAccount
   name: demo-setup
   namespace: {{ .Values.dataScienceProjectNamespace }}
+subjects:
+- kind: ServiceAccount
+  name: demo-setup
+  namespace: {{ .Values.minio.namespace }}
 roleRef:
   kind: ClusterRole
   name: route-reader
