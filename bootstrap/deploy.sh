@@ -36,6 +36,8 @@ kind: Application
 metadata:
   name: doc-bot
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   project: default
   destination:
@@ -55,6 +57,7 @@ spec:
       selfHeal: true
 EOF
 
+    
 
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application

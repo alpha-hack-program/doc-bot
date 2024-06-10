@@ -38,9 +38,11 @@ workbench:
     limits:
       cpu: '2'
       memory: 8Gi
+      nvidiaGpu: '1'
     requests:
       cpu: '1'
       memory: 6Gi
+      nvidiaGpu: '1'
     
 modelConnection:
   name: llm

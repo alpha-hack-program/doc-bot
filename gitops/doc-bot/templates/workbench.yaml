@@ -28,9 +28,15 @@ spec:
             limits:
               cpu: '{{ .Values.workbench.resources.limits.cpu }}'
               memory: {{ .Values.workbench.resources.limits.memory }}
+              {{- if .Values.workbench.resources.limits.nvidiaGpu }}
+              nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
+              {{- end }}
             requests:
               cpu: '{{ .Values.workbench.resources.requests.cpu }}'
               memory: {{ .Values.workbench.resources.requests.memory }}
+              {{- if .Values.workbench.resources.requests.nvidiaGpu }}
+              nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
+              {{- end }}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -163,6 +169,14 @@ spec:
               --logout-url=$DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
       enableServiceLinks: false
       serviceAccountName: {{ .Values.workbench.name }}
+      # If .Values.workbench.resources.requests.nvidia.com/gpu or .Values.workbench.resources.limit.nvidia.com/gpu are set then set the tolerations and nodeSelector
+      {{- if or .Values.workbench.resources.requests.nvidiaGpu .Values.workbench.resources.limits.nvidiaGpu }}
+      tolerations:
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
+      {{- end }}
+      
       volumes:
         - name: {{ .Values.workbench.name }}
           persistentVolumeClaim:
