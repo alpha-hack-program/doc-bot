@@ -25,6 +25,7 @@ spec:
           DASHBOARD_ROUTE=https://$(oc get route rhods-dashboard -n redhat-ods-applications -o jsonpath='{.spec.host}')
 
           cat << EOF | oc apply -f-
+          ---
           apiVersion: v1
           kind: Secret
           metadata:
@@ -32,7 +33,7 @@ spec:
             namespace: {{ .Values.dataScienceProjectNamespace }}
           stringData:
             odh_dsp.json: '{"display_name": "Data Science Pipeline", "metadata": {"tags": [],
-              "display_name": "Data Science Pipeline", "engine": "Tekton", "auth_type": "KUBERNETES_SERVICE_ACCOUNT_TOKEN",
+              "display_name": "Data Science Pipeline", "engine": "Argo", "auth_type": "KUBERNETES_SERVICE_ACCOUNT_TOKEN",
               "api_endpoint": "$PIPELINE_ROUTE",
               "public_api_endpoint": "$DASHBOARD_ROUTE/pipelineRuns/{{ .Values.dataScienceProjectNamespace }}/pipelineRun/view/",
               "cos_auth_type": "KUBERNETES_SECRET", "cos_secret": "dashboard-dspa-secret",
@@ -40,6 +41,19 @@ spec:
               "cos_username": "$MINIO_ROOT_USER", "cos_password": "$MINIO_ROOT_PASSWORD",
               "runtime_type": "KUBEFLOW_PIPELINES"}, "schema_name": "kfp"}'
           type: Opaque
+          ---
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: ds-pipeline-config
+            namespace: {{ .Values.dataScienceProjectNamespace }}
+            labels:
+              opendatahub.io/dashboard: 'true'
+          stringData:
+            AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+            AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+            type: Opaque
+          dashboard-dspa-secret
           EOF
         command:
         - /bin/bash
