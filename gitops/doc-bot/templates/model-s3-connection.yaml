@@ -15,6 +15,6 @@ stringData:
   AWS_SECRET_ACCESS_KEY: {{ .Values.modelConnection.awsSecretAccessKey }}
   AWS_DEFAULT_REGION: {{ .Values.modelConnection.awsDefaultRegion }}
   AWS_S3_BUCKET: {{ .Values.modelConnection.awsS3Bucket }}
-  AWS_S3_ENDPOINT: {{ .Values.modelConnection.awsS3Endpoint }}
+  AWS_S3_ENDPOINT: {{ printf "%s://%s" .Values.modelConnection.scheme .Values.modelConnection.awsS3Endpoint }}
   
 type: Opaque

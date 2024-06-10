@@ -15,6 +15,6 @@ stringData:
   AWS_SECRET_ACCESS_KEY: {{ .Values.pipelinesConnection.awsSecretAccessKey }}
   AWS_DEFAULT_REGION: {{ .Values.pipelinesConnection.awsDefaultRegion }}
   AWS_S3_BUCKET: {{ .Values.pipelinesConnection.awsS3Bucket }}
-  AWS_S3_ENDPOINT: {{ .Values.pipelinesConnection.awsS3Endpoint }}
+  AWS_S3_ENDPOINT: {{ printf "%s://%s" .Values.pipelinesConnection.scheme .Values.pipelinesConnection.awsS3Endpoint }}
   
 type: Opaque

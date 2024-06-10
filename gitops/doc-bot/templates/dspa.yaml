@@ -54,7 +54,7 @@ spec:
         accessKey: AWS_ACCESS_KEY_ID
         secretKey: AWS_SECRET_ACCESS_KEY
         secretName: aws-connection-{{ .Values.pipelinesConnection.name }}
-      scheme: http
+      scheme: {{ .Values.pipelinesConnection.scheme }}
   persistenceAgent:
     deploy: true
     numWorkers: 2
