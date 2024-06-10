@@ -25,7 +25,7 @@ spec:
           value: "false"
   syncPolicy:
     automated:
-      prune: true
+      # prune: true
       selfHeal: true
 EOF
 
@@ -51,7 +51,7 @@ spec:
           value: "false"
   syncPolicy:
     automated:
-      prune: true
+      # prune: true
       selfHeal: true
 EOF
 
