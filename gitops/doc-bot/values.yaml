@@ -68,6 +68,14 @@ minio:
   name: minio
   namespace: ic-shared-minio
 
+milvus:
+  name: milvus
+  namespace: ic-shared-milvus
+  username: root
+  password: Milvus
+  port: '19530'
+  host: vectordb-milvus
+
 application:
   name: my-app
   namespace: argocd
