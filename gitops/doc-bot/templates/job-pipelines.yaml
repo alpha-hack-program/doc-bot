@@ -45,7 +45,7 @@ spec:
           apiVersion: v1
           kind: Secret
           metadata:
-            name: ds-pipeline-config
+            name: dashboard-dspa-secret
             namespace: {{ .Values.dataScienceProjectNamespace }}
             labels:
               opendatahub.io/dashboard: 'true'
@@ -53,7 +53,6 @@ spec:
             AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
             AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
             type: Opaque
-          dashboard-dspa-secret
           EOF
         command:
         - /bin/bash
