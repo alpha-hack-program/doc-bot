@@ -4,6 +4,8 @@ kind: Job
 metadata:
   name: job-pipeline-secret
   namespace: {{ .Values.dataScienceProjectNamespace }}
+  annotations:
+    job.kubernetes.io/disabled: "true"
 spec:
   selector: {}
   template:
