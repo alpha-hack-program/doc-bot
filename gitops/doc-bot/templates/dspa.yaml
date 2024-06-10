@@ -19,7 +19,7 @@ kind: DataSciencePipelinesApplication
 metadata:
   name: dspa
   namespace: {{ .Values.dataScienceProjectNamespace }}
-  annotation:
+  annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
