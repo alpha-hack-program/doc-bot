@@ -26,7 +26,6 @@ subjects:
 - kind: ServiceAccount
   name: demo-setup
   namespace: {{ .Values.dataScienceProjectNamespace }}
-subjects:
 - kind: ServiceAccount
   name: demo-setup
   namespace: {{ .Values.minio.namespace }}
