@@ -757,3 +757,10 @@ Dataset Embeddings:
 
 Uninstall RHOAI:
 - https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.8/html/installing_and_uninstalling_openshift_ai_self-managed/uninstalling-openshift-ai-self-managed_uninstalling-openshift-ai-self-managed
+
+# Pipelines KFP
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+```

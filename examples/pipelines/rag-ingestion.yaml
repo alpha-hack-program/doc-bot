@@ -1,0 +1,193 @@
+# PIPELINE DEFINITION
+# Name: download-and-load-pdfs-from-minio-pipeline
+# Description: A pipeline to download and load PDFs from a MinIO instance.
+components:
+  comp-download-files:
+    executorLabel: exec-download-files
+    outputDefinitions:
+      parameters:
+        download_path:
+          parameterType: STRING
+  comp-load-files:
+    executorLabel: exec-load-files
+    inputDefinitions:
+      parameters:
+        download_path:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-download-files:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - download_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.7.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'boto3' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef download_files(download_path: OutputPath(str)):\n    import os\n\
+          \    import boto3\n    from botocore.client import Config\n\n    aws_access_key_id\
+          \ = os.environ.get('AWS_ACCESS_KEY_ID')\n    aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')\n\
+          \    endpoint_url = os.environ.get('AWS_S3_ENDPOINT')\n    bucket_name =\
+          \ os.environ.get('AWS_S3_BUCKET')\n\n    # Create download path if it doesn't\
+          \ exist\n    os.makedirs(download_path, exist_ok=True)\n\n    # Create an\
+          \ S3 client with MinIO configuration\n    s3 = boto3.client(\n        's3',\n\
+          \        endpoint_url=endpoint_url,\n        aws_access_key_id=aws_access_key_id,\n\
+          \        aws_secret_access_key=aws_secret_access_key,\n        config=Config(signature_version='s3v4')\n\
+          \    )\n\n    # List all the objects in the bucket and filter out the PDFs\n\
+          \    response = s3.list_objects_v2(Bucket=bucket_name)\n    pdf_keys = [obj['Key']\
+          \ for obj in response['Contents'] if obj['Key'].endswith('.pdf')]\n\n  \
+          \  # Download files\n    for key in pdf_keys:\n        file_name = os.path.basename(key)\n\
+          \        local_file_path = os.path.join(download_path, file_name)\n    \
+          \    s3.download_file(bucket_name, key, local_file_path)\n\n        # Rename\
+          \ the file in S3 to mark it as done\n        s3.copy_object(Bucket=bucket_name,\
+          \ CopySource={'Bucket': bucket_name, 'Key': key}, Key=f\"{key}.done\")\n\
+          \        s3.delete_object(Bucket=bucket_name, Key=key)\n\n"
+        image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+    exec-load-files:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - load_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.7.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'boto3' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef load_files(download_path: InputPath(str)):\n    import os\n \
+          \   from langchain.document_loaders import PyPDFDirectoryLoader, WebBaseLoader\n\
+          \    from langchain.text_splitter import RecursiveCharacterTextSplitter\n\
+          \    from langchain.embeddings.huggingface import HuggingFaceEmbeddings\n\
+          \    from langchain_community.vectorstores import Milvus\n\n    # Process\
+          \ the downloaded PDFs\n    pdfs_to_urls = {}\n    for file_name in os.listdir(download_path):\n\
+          \        if file_name.endswith('.pdf'):\n            file_path = os.path.join(download_path,\
+          \ file_name)\n            print(f\"Processing file: {file_path}\")\n   \
+          \         # Add the url of the PDF in the S3 bucket to pdfs_to_urls dictionary\n\
+          \            pdfs_to_urls[file_name] = f\"{file_path}\"\n\n    # Load PDFs\n\
+          \    pdf_loader = PyPDFDirectoryLoader(download_path)\n    pdf_docs = pdf_loader.load()\n\
+          \n    # Inject metadata\n    from pathlib import Path\n\n    for doc in\
+          \ pdf_docs:\n        doc.metadata[\"source\"] = pdfs_to_urls[Path(doc.metadata[\"\
+          source\"]).stem]\n\n    # Split documents into chunks with some overlap\n\
+          \    text_splitter = RecursiveCharacterTextSplitter()\n    all_splits =\
+          \ text_splitter.split_documents(pdf_docs)\n\n    # Create the index and\
+          \ ingest the documents\n    model_kwargs = {'trust_remote_code': True, 'device':\
+          \ 'cuda'}\n    embeddings = HuggingFaceEmbeddings(\n        model_name=\"\
+          nomic-ai/nomic-embed-text-v1\",\n        model_kwargs=model_kwargs,\n  \
+          \      show_progress=True\n    )\n\n    milvus_host = os.getenv('MILVUS_HOST')\n\
+          \    milvus_port = os.getenv('MILVUS_PORT')\n    milvus_username = os.getenv('MILVUS_USERNAME')\n\
+          \    milvus_password = os.getenv('MILVUS_PASSWORD')\n    milvus_collection\
+          \ = \"collection_nomicai_embeddings\"\n\n    db = Milvus(\n        embedding_function=embeddings,\n\
+          \        connection_args={\"host\": milvus_host, \"port\": milvus_port,\
+          \ \"user\": milvus_username, \"password\": milvus_password},\n        collection_name=milvus_collection,\n\
+          \        metadata_field=\"metadata\",\n        text_field=\"page_content\"\
+          ,\n        auto_id=True,\n        drop_old=True\n    )\n\n    db.add_documents(all_splits)\n\
+          \n    print(\"done\")\n\n"
+        image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+pipelineInfo:
+  description: A pipeline to download and load PDFs from a MinIO instance.
+  name: download-and-load-pdfs-from-minio-pipeline
+root:
+  dag:
+    tasks:
+      download-files:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-download-files
+        taskInfo:
+          name: download-files
+      load-files:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-load-files
+        dependentTasks:
+        - download-files
+        inputs:
+          parameters:
+            download_path:
+              taskOutputParameter:
+                outputParameterKey: download_path
+                producerTask: download-files
+        taskInfo:
+          name: load-files
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.7.0
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-download-files:
+          secretAsEnv:
+          - keyToEnv:
+            - envVar: AWS_ACCESS_KEY_ID
+              secretKey: AWS_ACCESS_KEY_ID
+            - envVar: AWS_SECRET_ACCESS_KEY
+              secretKey: AWS_SECRET_ACCESS_KEY
+            - envVar: AWS_DEFAULT_REGION
+              secretKey: AWS_DEFAULT_REGION
+            - envVar: AWS_S3_BUCKET
+              secretKey: AWS_S3_BUCKET
+            - envVar: AWS_S3_ENDPOINT
+              secretKey: AWS_S3_ENDPOINT
+            secretName: aws-connection-documents
+        exec-load-files:
+          secretAsEnv:
+          - keyToEnv:
+            - envVar: AWS_ACCESS_KEY_ID
+              secretKey: AWS_ACCESS_KEY_ID
+            - envVar: AWS_SECRET_ACCESS_KEY
+              secretKey: AWS_SECRET_ACCESS_KEY
+            - envVar: AWS_DEFAULT_REGION
+              secretKey: AWS_DEFAULT_REGION
+            - envVar: AWS_S3_BUCKET
+              secretKey: AWS_S3_BUCKET
+            - envVar: AWS_S3_ENDPOINT
+              secretKey: AWS_S3_ENDPOINT
+            secretName: aws-connection-documents
+          - keyToEnv:
+            - envVar: MILVUS_HOST
+              secretKey: MILVUS_HOST
+            - envVar: MILVUS_PORT
+              secretKey: MILVUS_PORT
+            - envVar: MILVUS_USERNAME
+              secretKey: MILVUS_USERNAME
+            - envVar: MILVUS_PASSWORD
+              secretKey: MILVUS_PASSWORD
+            secretName: milvus-connection-documents

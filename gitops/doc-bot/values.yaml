@@ -55,6 +55,17 @@ modelConnection:
   awsS3Bucket: models
   awsS3Endpoint: minio.ic-shared-minio.svc:9000
 
+documentsConnection:
+  name: documents
+  displayName: documents
+  type: s3
+  scheme: http
+  awsAccessKeyId: minio
+  awsSecretAccessKey: minio123
+  awsDefaultRegion: none
+  awsS3Bucket: documents
+  awsS3Endpoint: minio.ic-shared-minio.svc:9000
+
 pipelinesConnection:
   name: pipelines
   displayName: pipelines
@@ -69,6 +80,10 @@ pipelinesConnection:
 minio:
   name: minio
   namespace: ic-shared-minio
+
+documentsMilvusConnection:
+  name: documents
+  collectionName: documents
 
 milvus:
   name: milvus

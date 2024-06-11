@@ -169,14 +169,12 @@ spec:
               --logout-url=$DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
       enableServiceLinks: false
       serviceAccountName: {{ .Values.workbench.name }}
-      # If .Values.workbench.resources.requests.nvidia.com/gpu or .Values.workbench.resources.limit.nvidia.com/gpu are set then set the tolerations and nodeSelector
       {{- if or .Values.workbench.resources.requests.nvidiaGpu .Values.workbench.resources.limits.nvidiaGpu }}
       tolerations:
         - effect: NoSchedule
           key: nvidia.com/gpu
           operator: Exists
       {{- end }}
-      
       volumes:
         - name: {{ .Values.workbench.name }}
           persistentVolumeClaim:
