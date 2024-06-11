@@ -10,10 +10,10 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1" # Set sync-wave to -1 to avoid conflicts with other resources
     openshift.io/display-name: {{ .Values.documentsMilvusConnection.name }}
 stringData:
-  MILVUS_HOST: {{ .Values.milvus.host }}.{{ .Values.milvus.namespace }}.svc.cluster.local
-  MILVUS_PORT: {{ .Values.milvus.port }}
-  MILVUS_USERNAME: {{ .Values.milvus.username }}
-  MILVUS_PASSWORD: {{ .Values.milvus.password }}
-  MILVUS_COLLECTION_NAME: {{ .Values.documentsMilvusConnection.collectionName }}
+  MILVUS_HOST: '{{ .Values.milvus.host }}.{{ .Values.milvus.namespace }}.svc.cluster.local'
+  MILVUS_PORT: '{{ .Values.milvus.port }}'
+  MILVUS_USERNAME: '{{ .Values.milvus.username }}'
+  MILVUS_PASSWORD: '{{ .Values.milvus.password }}'
+  MILVUS_COLLECTION_NAME: '{{ .Values.documentsMilvusConnection.collectionName }}'
   
 type: Opaque
