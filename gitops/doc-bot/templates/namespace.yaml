@@ -6,8 +6,7 @@ metadata:
   name: {{ .Values.dataScienceProjectNamespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "-1" # Set sync-wave to -1 to avoid conflicts with other resources
-    openshift.io/description: |
-      This namespace is for the project '{{ .Values.dataScienceProjectDisplayName }}'.
+    openshift.io/description: '{{ .Values.dataScienceProjectDisplayName }}'.
     openshift.io/display-name: "{{ .Values.dataScienceProjectDisplayName }}"
   labels:
     argocd.argoproj.io/managed-by: openshift-gitops #argocd instance ns

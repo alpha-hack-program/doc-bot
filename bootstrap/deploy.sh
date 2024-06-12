@@ -21,8 +21,8 @@ spec:
     targetRevision: main
     helm:
       parameters:
-        - name: test
-          value: "false"
+        - name: milvusNamespace
+          value: "${MILVUS_NAMESPACE}"
   syncPolicy:
     automated:
       # prune: true
@@ -49,8 +49,10 @@ spec:
     targetRevision: main
     helm:
       parameters:
-        - name: test
-          value: "false"
+        - name: dataScienceProjectDisplayName
+          value: "Project ${DATA_SCIENCE_PROJECT_NAMESPACE}"
+        - name: dataScienceProjectNamespace
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}"
   syncPolicy:
     automated:
       # prune: true
