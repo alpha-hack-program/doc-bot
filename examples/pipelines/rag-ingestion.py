@@ -1,7 +1,6 @@
 from kfp import compiler
 from kfp import dsl
 from kfp.dsl import InputPath, OutputPath, component, pipeline
-
 from kfp import kubernetes
 
 @component(
@@ -44,13 +43,14 @@ def download_files(download_path: OutputPath(str)):
         s3.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': key}, Key=f"{key}.done")
         s3.delete_object(Bucket=bucket_name, Key=key)
 
+
 @component(
     base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301",
-    packages_to_install=["boto3"]
+    packages_to_install=["boto3", "langchain", "langchain-community"]
 )
 def load_files(download_path: InputPath(str)):
     import os
-    from langchain.document_loaders import PyPDFDirectoryLoader, WebBaseLoader
+    from langchain.document_loaders import PyPDFDirectoryLoader
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain.embeddings.huggingface import HuggingFaceEmbeddings
     from langchain_community.vectorstores import Milvus
@@ -62,7 +62,7 @@ def load_files(download_path: InputPath(str)):
             file_path = os.path.join(download_path, file_name)
             print(f"Processing file: {file_path}")
             # Add the url of the PDF in the S3 bucket to pdfs_to_urls dictionary
-            pdfs_to_urls[file_name] = f"{file_path}"
+            pdfs_to_urls[file_name] = file_path
             
     # Load PDFs
     pdf_loader = PyPDFDirectoryLoader(download_path)

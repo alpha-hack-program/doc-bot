@@ -76,8 +76,8 @@ deploymentSpec:
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
           \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.7.0'\
           \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
-          \  python3 -m pip install --quiet --no-warn-script-location 'boto3' && \"\
-          $0\" \"$@\"\n"
+          \  python3 -m pip install --quiet --no-warn-script-location 'boto3' 'langchain'\
+          \ 'langchain-community' && \"$0\" \"$@\"\n"
         - sh
         - -ec
         - 'program_path=$(mktemp -d)
@@ -90,16 +90,16 @@ deploymentSpec:
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
           \ *\n\ndef load_files(download_path: InputPath(str)):\n    import os\n \
-          \   from langchain.document_loaders import PyPDFDirectoryLoader, WebBaseLoader\n\
-          \    from langchain.text_splitter import RecursiveCharacterTextSplitter\n\
-          \    from langchain.embeddings.huggingface import HuggingFaceEmbeddings\n\
-          \    from langchain_community.vectorstores import Milvus\n\n    # Process\
-          \ the downloaded PDFs\n    pdfs_to_urls = {}\n    for file_name in os.listdir(download_path):\n\
+          \   from langchain.document_loaders import PyPDFDirectoryLoader\n    from\
+          \ langchain.text_splitter import RecursiveCharacterTextSplitter\n    from\
+          \ langchain.embeddings.huggingface import HuggingFaceEmbeddings\n    from\
+          \ langchain_community.vectorstores import Milvus\n\n    # Process the downloaded\
+          \ PDFs\n    pdfs_to_urls = {}\n    for file_name in os.listdir(download_path):\n\
           \        if file_name.endswith('.pdf'):\n            file_path = os.path.join(download_path,\
           \ file_name)\n            print(f\"Processing file: {file_path}\")\n   \
           \         # Add the url of the PDF in the S3 bucket to pdfs_to_urls dictionary\n\
-          \            pdfs_to_urls[file_name] = f\"{file_path}\"\n\n    # Load PDFs\n\
-          \    pdf_loader = PyPDFDirectoryLoader(download_path)\n    pdf_docs = pdf_loader.load()\n\
+          \            pdfs_to_urls[file_name] = file_path\n\n    # Load PDFs\n  \
+          \  pdf_loader = PyPDFDirectoryLoader(download_path)\n    pdf_docs = pdf_loader.load()\n\
           \n    # Inject metadata\n    from pathlib import Path\n\n    for doc in\
           \ pdf_docs:\n        doc.metadata[\"source\"] = pdfs_to_urls[Path(doc.metadata[\"\
           source\"]).stem]\n\n    # Split documents into chunks with some overlap\n\
@@ -111,7 +111,7 @@ deploymentSpec:
           \      show_progress=True\n    )\n\n    milvus_host = os.getenv('MILVUS_HOST')\n\
           \    milvus_port = os.getenv('MILVUS_PORT')\n    milvus_username = os.getenv('MILVUS_USERNAME')\n\
           \    milvus_password = os.getenv('MILVUS_PASSWORD')\n    milvus_collection\
-          \ = \"collection_nomicai_embeddings\"\n\n    db = Milvus(\n        embedding_function=embeddings,\n\
+          \ = os.getenv('MILVUS_COLLECTION_NAME')\n\n    db = Milvus(\n        embedding_function=embeddings,\n\
           \        connection_args={\"host\": milvus_host, \"port\": milvus_port,\
           \ \"user\": milvus_username, \"password\": milvus_password},\n        collection_name=milvus_collection,\n\
           \        metadata_field=\"metadata\",\n        text_field=\"page_content\"\
@@ -190,4 +190,6 @@ platforms:
               secretKey: MILVUS_USERNAME
             - envVar: MILVUS_PASSWORD
               secretKey: MILVUS_PASSWORD
+            - envVar: MILVUS_COLLECTION_NAME
+              secretKey: MILVUS_COLLECTION_NAME
             secretName: milvus-connection-documents
