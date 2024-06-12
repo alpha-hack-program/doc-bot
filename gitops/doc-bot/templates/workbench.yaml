@@ -78,14 +78,21 @@ spec:
               value: /etc/pki/tls/custom-certs/ca-bundle.crt
             - name: PIP_CERT
               value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: MILVUS_HOST
-              value: {{ .Values.milvus.host }}
-            - name: MILVUS_PORT
-              value: '{{ .Values.milvus.port }}'
-            - name: MILVUS_USERNAME
-              value: {{ .Values.milvus.username }}
-            - name: MILVUS_PASSWORD
-              value: {{ .Values.milvus.password }}
+            # - name: MILVUS_HOST
+            #   value: {{ .Values.milvus.host }}
+            # - name: MILVUS_PORT
+            #   value: '{{ .Values.milvus.port }}'
+            # - name: MILVUS_USERNAME
+            #   value: {{ .Values.milvus.username }}
+            # - name: MILVUS_PASSWORD
+            #   value: {{ .Values.milvus.password }}
+            # - name: MILVUS_COLLECTION_NAME
+            #   value: {{ .Values.documentsMilvusConnection.collectionName }}
+
+          envFrom:
+            - secretRef:
+                name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
+
           ports:
             - containerPort: 8888
               name: notebook-port
