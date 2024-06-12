@@ -92,6 +92,8 @@ spec:
           envFrom:
             - secretRef:
                 name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
+            - secretRef:
+                name: aws-connection-{{ .Values.documentsConnection.name }}
 
           ports:
             - containerPort: 8888

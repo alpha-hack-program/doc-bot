@@ -43,24 +43,8 @@ deploymentSpec:
 
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef download_files(download_path: OutputPath(str)):\n    import os\n\
-          \    import boto3\n    from botocore.client import Config\n\n    aws_access_key_id\
-          \ = os.environ.get('AWS_ACCESS_KEY_ID')\n    aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')\n\
-          \    endpoint_url = os.environ.get('AWS_S3_ENDPOINT')\n    bucket_name =\
-          \ os.environ.get('AWS_S3_BUCKET')\n\n    # Create download path if it doesn't\
-          \ exist\n    os.makedirs(download_path, exist_ok=True)\n\n    # Create an\
-          \ S3 client with MinIO configuration\n    s3 = boto3.client(\n        's3',\n\
-          \        endpoint_url=endpoint_url,\n        aws_access_key_id=aws_access_key_id,\n\
-          \        aws_secret_access_key=aws_secret_access_key,\n        config=Config(signature_version='s3v4')\n\
-          \    )\n\n    # List all the objects in the bucket and filter out the PDFs\n\
-          \    response = s3.list_objects_v2(Bucket=bucket_name)\n    pdf_keys = [obj['Key']\
-          \ for obj in response['Contents'] if obj['Key'].endswith('.pdf')]\n\n  \
-          \  # Download files\n    for key in pdf_keys:\n        file_name = os.path.basename(key)\n\
-          \        local_file_path = os.path.join(download_path, file_name)\n    \
-          \    s3.download_file(bucket_name, key, local_file_path)\n\n        # Rename\
-          \ the file in S3 to mark it as done\n        s3.copy_object(Bucket=bucket_name,\
-          \ CopySource={'Bucket': bucket_name, 'Key': key}, Key=f\"{key}.done\")\n\
-          \        s3.delete_object(Bucket=bucket_name, Key=key)\n\n"
+          \ *\n\ndef download_files(download_path: OutputPath(str)):\n    download_files_func(download_path)\n\
+          \n"
         image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
     exec-load-files:
       container:
@@ -89,34 +73,8 @@ deploymentSpec:
 
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef load_files(download_path: InputPath(str)):\n    import os\n \
-          \   from langchain.document_loaders import PyPDFDirectoryLoader\n    from\
-          \ langchain.text_splitter import RecursiveCharacterTextSplitter\n    from\
-          \ langchain.embeddings.huggingface import HuggingFaceEmbeddings\n    from\
-          \ langchain_community.vectorstores import Milvus\n\n    # Process the downloaded\
-          \ PDFs\n    pdfs_to_urls = {}\n    for file_name in os.listdir(download_path):\n\
-          \        if file_name.endswith('.pdf'):\n            file_path = os.path.join(download_path,\
-          \ file_name)\n            print(f\"Processing file: {file_path}\")\n   \
-          \         # Add the url of the PDF in the S3 bucket to pdfs_to_urls dictionary\n\
-          \            pdfs_to_urls[file_name] = file_path\n\n    # Load PDFs\n  \
-          \  pdf_loader = PyPDFDirectoryLoader(download_path)\n    pdf_docs = pdf_loader.load()\n\
-          \n    # Inject metadata\n    from pathlib import Path\n\n    for doc in\
-          \ pdf_docs:\n        doc.metadata[\"source\"] = pdfs_to_urls[Path(doc.metadata[\"\
-          source\"]).stem]\n\n    # Split documents into chunks with some overlap\n\
-          \    text_splitter = RecursiveCharacterTextSplitter()\n    all_splits =\
-          \ text_splitter.split_documents(pdf_docs)\n\n    # Create the index and\
-          \ ingest the documents\n    model_kwargs = {'trust_remote_code': True, 'device':\
-          \ 'cuda'}\n    embeddings = HuggingFaceEmbeddings(\n        model_name=\"\
-          nomic-ai/nomic-embed-text-v1\",\n        model_kwargs=model_kwargs,\n  \
-          \      show_progress=True\n    )\n\n    milvus_host = os.getenv('MILVUS_HOST')\n\
-          \    milvus_port = os.getenv('MILVUS_PORT')\n    milvus_username = os.getenv('MILVUS_USERNAME')\n\
-          \    milvus_password = os.getenv('MILVUS_PASSWORD')\n    milvus_collection\
-          \ = os.getenv('MILVUS_COLLECTION_NAME')\n\n    db = Milvus(\n        embedding_function=embeddings,\n\
-          \        connection_args={\"host\": milvus_host, \"port\": milvus_port,\
-          \ \"user\": milvus_username, \"password\": milvus_password},\n        collection_name=milvus_collection,\n\
-          \        metadata_field=\"metadata\",\n        text_field=\"page_content\"\
-          ,\n        auto_id=True,\n        drop_old=True\n    )\n\n    db.add_documents(all_splits)\n\
-          \n    print(\"done\")\n\n"
+          \ *\n\ndef load_files(download_path: InputPath(str)):\n    load_files_func(download_path)\n\
+          \n"
         image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
 pipelineInfo:
   description: A pipeline to download and load PDFs from a MinIO instance.
