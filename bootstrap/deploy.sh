@@ -50,7 +50,7 @@ spec:
     helm:
       parameters:
         - name: instanceName
-          value: "vllm-mistral-7b-2x-t4"
+          value: "vllm-mistral-7b"
         - name: dataScienceProjectDisplayName
           value: "Project ${DATA_SCIENCE_PROJECT_NAMESPACE}"
         - name: dataScienceProjectNamespace
