@@ -60,6 +60,11 @@ spec:
         - '8080'
         - '--max-model-len'
         - '6144'
+        {{- if eq .Values.model.accelerator.productName "Tesla-T4" }}
+        - '--dtype'
+        - float16
+        - '--tensor-parallel-size={{ .Values.model.accelerator.max }}'
+        {{- end }}
       image: '{{ .Values.model.runtime.image }}'
       name: kserve-container
       ports:
