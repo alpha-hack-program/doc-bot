@@ -3,7 +3,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: route-reader
+  name: route-reader-{{ .Values.instanceName }}
 rules:
 - apiGroups: ["route.openshift.io"]
   resources: ["routes"]
@@ -31,7 +31,7 @@ subjects:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: demo-setup-route-reader-binding
+  name: demo-setup-route-reader-binding-{{ .Values.instanceName }}
 subjects:
 - kind: ServiceAccount
   name: demo-setup

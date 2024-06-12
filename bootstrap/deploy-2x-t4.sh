@@ -49,6 +49,8 @@ spec:
     targetRevision: main
     helm:
       parameters:
+        - name: instanceName
+          value: "vllm-mistral-7b-2x-t4"
         - name: dataScienceProjectNamespace
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-2x-t4"
         - name: dataScienceProjectDisplayName
