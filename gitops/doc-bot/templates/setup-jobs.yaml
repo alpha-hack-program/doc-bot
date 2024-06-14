@@ -20,17 +20,11 @@ spec:
                 sleep 5
               done; echo
               
-              # Configure git-lfs
-              git config --global filter.lfs.clean "git-lfs clean -- %f"
-              git config --global filter.lfs.smudge "git-lfs smudge -- %f"
-              git config --global filter.lfs.process "git-lfs filter-process"
-
               HF_USERNAME=$(oc get secret hf-creds -o jsonpath='{.data.HF_USERNAME}' | base64 -d)
               HF_TOKEN=$(oc get secret hf-creds -o jsonpath='{.data.HF_TOKEN}' | base64 -d)
               MODEL_ROOT="{{ .Values.model.root }}"
               MODEL_ID="{{ .Values.model.id }}"
 
-              git lfs install
               git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
 
               MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
