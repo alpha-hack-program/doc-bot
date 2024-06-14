@@ -98,4 +98,4 @@ milvus:
   host: vectordb-milvus
 
 setup:
-  image: quay.io/atarazana/hf-utils:0.0.1
+  image: quay.io/atarazana/hf-utils:latest

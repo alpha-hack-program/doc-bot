@@ -2,11 +2,15 @@ ARG FROM_IMAGE
 FROM ${FROM_IMAGE} AS BASE
 
 # Install git, curl, and necessary dependencies
-RUN microdnf install -y git curl findutils openssh-clients jq && \
+RUN microdnf install -y git curl findutils openssh-clients jq tar gzip && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash && \
     microdnf install -y git-lfs && \
     git lfs install && \
     microdnf clean all
+
+# Install the latest version of the OC CLI
+ENV OC_VERSION=4.14.27
+RUN curl -o /tmp/oc.tar.gz -L https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OC_VERSION}/openshift-client-linux-${OC_VERSION}.tar.gz && cd /usr/bin && tar -xvzf /tmp/oc.tar.gz && chmod a+x /usr/bin/oc && chmod a+x /usr/bin/kubectl && rm -f /tmp/oc.tar.gz
 
 # Set the working directory
 WORKDIR /workspace

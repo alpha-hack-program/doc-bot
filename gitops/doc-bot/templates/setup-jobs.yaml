@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job-pipeline-secret
+  name: job-{{ .Values.model.name }}-model-setup
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
     job.kubernetes.io/disabled: "true"
@@ -14,7 +14,7 @@ spec:
         - args:
             - -ec
             - |-
-              echo -n 'Waiting for ds-pipeline-dspa route'
+              echo -n 'Waiting for hf-creds secret'
               while ! oc get secret hf-creds 2>/dev/null; do
                 echo -n .
                 sleep 5
