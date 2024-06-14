@@ -32,4 +32,4 @@ def download_files(download_path: str):
 
         # Rename the file in S3 to mark it as done
         s3.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': key}, Key=f"{key}.done")
-        s3.delete_object(Bucket=bucket_name, Key=key)
+        # s3.delete_object(Bucket=bucket_name, Key=key)

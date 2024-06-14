@@ -4,6 +4,8 @@ dataScienceProjectNamespace: vllm-mistral-7b
 instanceName: vllm-mistral-7b
 
 model:
+  root: mistralai
+  id: Mistral-7B-Instruct-v0.2
   name: mistral-7b
   displayName: Mistral 7b
   maxReplicas: 1

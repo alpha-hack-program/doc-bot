@@ -11,9 +11,11 @@ def load_files(download_path: str):
         if file_name.endswith('.pdf'):
             file_path = os.path.join(download_path, file_name)
             print(f"Processing file: {file_path}")
+            # Remove extension from file name
+            file_name = file_name.replace('.pdf', '')
             # Add the url of the PDF in the S3 bucket to pdfs_to_urls dictionary
             pdfs_to_urls[file_name] = file_path
-            
+        
     # Load PDFs
     pdf_loader = PyPDFDirectoryLoader(download_path)
     pdf_docs = pdf_loader.load()

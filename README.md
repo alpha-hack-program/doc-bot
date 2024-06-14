@@ -67,7 +67,6 @@ Now, in order to deploy `KServe` using the same certificate OpenShift cluster is
 Get the name of the secret used for routing tasks in your OpenShift cluster:
 
 ```sh
-# export INGRESS_SECRET_NAME=$(kubectl get secrets -n openshift-ingress | grep certs | grep Opaque | awk '{print $1}')
 export INGRESS_SECRET_NAME=$(oc get ingresscontroller default -n openshift-ingress-operator -o json | jq -r .spec.defaultCertificate.name)
 
 oc get secret ${INGRESS_SECRET_NAME} -n openshift-ingress -o yaml > rhods-internal-primary-cert-bundle-secret.yaml
@@ -703,6 +702,15 @@ Several example notebooks are available to show how to use Milvus:
 - Collection creation and document ingestion using Langchain with Nomic AI Embeddings: [Langchain-Milvus-Ingest-nomic.ipynb](../../examples/notebooks/langchain/Langchain-Milvus-Ingest-nomic.ipynb)
 - Query a collection using Langchain: [Langchain-Milvus-Query.ipynb](../../examples/notebooks/langchain/Langchain-Milvus-Query.ipynb)
 - Query a collection using Langchain with Nomic AI Embeddings: [Langchain-Milvus-Query-nomic.ipynb](../../examples/notebooks/langchain/Langchain-Milvus-Query-nomic.ipynb)
+
+# GitOps Deployment of Doc Bot
+
+> **NOTE:** Install OpenShift GitOps prior to run the following commands.
+
+> **TODO! NOTE:** This procedure deploys Milvus and all the other assets needed but the bucket models needs to be in place in the minio instance in `ic-shared-minio` namespace... 
+
+
+
 
 
 # QA

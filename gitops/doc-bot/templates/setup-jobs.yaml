@@ -1,0 +1,55 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-pipeline-secret
+  namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  annotations:
+    job.kubernetes.io/disabled: "true"
+spec:
+  selector: {}
+  template:
+    spec:
+      containers:
+        - args:
+            - -ec
+            - |-
+              echo -n 'Waiting for ds-pipeline-dspa route'
+              while ! oc get secret hf-creds 2>/dev/null; do
+                echo -n .
+                sleep 5
+              done; echo
+
+              HF_USERNAME=$(oc get secret hf-creds -o jsonpath='{.data.HF_USERNAME}' | base64 -d)
+              HF_TOKEN=$(oc get secret hf-creds -o jsonpath='{.data.HF_TOKEN}' | base64 -d)
+              MODEL_ROOT="{{ .Values.model.root }}"
+              MODEL_ID="{{ .Values.model.id }}"
+
+              git lfs install
+              git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
+
+              MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
+              MINIO_ROOT_PASSWORD={{ .Values.pipelinesConnection.awsSecretAccessKey }}
+              MINIO_HOST={{ .Values.pipelinesConnection.scheme }}://{{ .Values.pipelinesConnection.awsS3Endpoint }}
+
+              AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
+              AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
+              AWS_SECRET_ACCESS_KEY={{ .Values.modelConnection.awsSecretAccessKey }}
+              AWS_DEFAULT_REGION={{ .Values.modelConnection.awsDefaultRegion }}
+              AWS_S3_ENDPOINT={{ .Values.modelConnection.awsS3Endpoint }}
+              AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
+              AWS_S3_USE_PATH_STYLE=1
+
+              # Create a bucket
+              aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
+
+              # Upload the model to files folder in the bucket
+              aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+          command:
+            - /bin/bash
+          image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:95b359257a7716b5f8d3a672081a84600218d8f58ca720f46229f7bb893af2ab
+          imagePullPolicy: IfNotPresent
+          name: create-ds-connections
+      restartPolicy: Never
+      serviceAccount: setup-job
+      serviceAccountName: setup-job

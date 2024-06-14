@@ -12,13 +12,13 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: demo-setup
+  name: setup-job
   namespace: {{ .Values.dataScienceProjectNamespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: demo-setup-edit
+  name: setup-job-edit
   namespace: {{ .Values.dataScienceProjectNamespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -26,15 +26,15 @@ roleRef:
   name: edit
 subjects:
 - kind: ServiceAccount
-  name: demo-setup
+  name: setup-job
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: demo-setup-route-reader-binding-{{ .Values.instanceName }}
+  name: setup-job-route-reader-binding-{{ .Values.instanceName }}
 subjects:
 - kind: ServiceAccount
-  name: demo-setup
+  name: setup-job
   namespace: {{ .Values.dataScienceProjectNamespace }}
 roleRef:
   kind: ClusterRole
