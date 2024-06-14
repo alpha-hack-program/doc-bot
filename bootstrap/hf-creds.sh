@@ -3,6 +3,12 @@
 # Load environment variables
 . .env
 
+# Check if namespace exists
+if ! kubectl get namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} > /dev/null 2>&1; then
+  echo "Namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} does not exist"
+  exit 1
+fi
+
 # Check if .hf-creds file exists and if not, exit with an error
 if [ ! -f .hf-creds ]; then
   echo "Please create a .hf-creds file with the Hugging Face API key"
