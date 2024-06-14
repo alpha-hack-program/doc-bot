@@ -1,0 +1,12 @@
+ARG FROM_IMAGE
+FROM ${FROM_IMAGE} AS BASE
+
+# Install git, curl, and necessary dependencies
+RUN microdnf install -y git curl findutils openssh-clients jq && \
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash && \
+    microdnf install -y git-lfs && \
+    git lfs install && \
+    microdnf clean all
+
+# Set the working directory
+WORKDIR /workspace

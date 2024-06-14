@@ -47,7 +47,7 @@ spec:
               aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
-          image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:95b359257a7716b5f8d3a672081a84600218d8f58ca720f46229f7bb893af2ab
+          image: {{ .Values.setup.image }}
           imagePullPolicy: IfNotPresent
           name: create-ds-connections
       restartPolicy: Never

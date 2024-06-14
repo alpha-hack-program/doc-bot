@@ -8,3 +8,6 @@ mlruns
 *.old
 old/
 .env
+*.*-creds
+rhods-internal-primary-cert-bundle-secret.yaml
+__pycache__/
