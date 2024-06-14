@@ -54,6 +54,11 @@ spec:
               AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
               AWS_S3_USE_PATH_STYLE=1
 
+              # Configure the AWS CLI
+              aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+              aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+              aws configure set default.region ${AWS_DEFAULT_REGION}
+
               # Create a bucket
               aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
 
