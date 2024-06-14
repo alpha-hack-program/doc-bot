@@ -25,7 +25,7 @@ spec:
               MODEL_ROOT="{{ .Values.model.root }}"
               MODEL_ID="{{ .Values.model.id }}"
 
-              cd /tmp
+              cd /mnt/models
 
               git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
 
@@ -49,8 +49,30 @@ spec:
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: create-ds-connections
+          volumeMounts:
+            - name: models-volume
+              mountPath: /mnt/models
       restartPolicy: Never
       serviceAccount: setup-job
       serviceAccountName: setup-job
+      volumes:
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: models-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: models-pvc
+  labels:
+    app: models-pvc
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
