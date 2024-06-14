@@ -18,5 +18,12 @@ RUN curl -o /tmp/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86
     /tmp/aws/install && \
     rm -rf /tmp/awscliv2.zip  /tmp/aws
 
+# Create the directory and set permissions
+RUN mkdir -p /scratch && \
+    chown -R 1001:0 /scratch && \
+    chmod -R g+rwX /scratch
+
+ENV AWS_CONFIG_FILE=/scratch/.aws/config
+
 # Set the working directory
 WORKDIR /workspace

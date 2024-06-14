@@ -45,7 +45,8 @@ spec:
               MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
               MINIO_ROOT_PASSWORD={{ .Values.pipelinesConnection.awsSecretAccessKey }}
               MINIO_HOST={{ .Values.pipelinesConnection.scheme }}://{{ .Values.pipelinesConnection.awsS3Endpoint }}
-
+              
+              AWS_CONFIG_FILE=/scratch/.aws/config
               AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
               AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
               AWS_SECRET_ACCESS_KEY={{ .Values.modelConnection.awsSecretAccessKey }}
