@@ -5,7 +5,7 @@ FROM ${FROM_IMAGE} AS BASE
 RUN microdnf install -y git curl findutils openssh-clients jq tar gzip && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash && \
     microdnf install -y git-lfs && \
-    git lfs install && \
+    git lfs install --system && \
     microdnf clean all
 
 # Install the latest version of the OC CLI
