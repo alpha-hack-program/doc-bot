@@ -25,6 +25,8 @@ spec:
               MODEL_ROOT="{{ .Values.model.root }}"
               MODEL_ID="{{ .Values.model.id }}"
 
+              cd /tmp
+
               git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
 
               MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
