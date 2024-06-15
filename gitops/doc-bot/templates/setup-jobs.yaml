@@ -62,6 +62,10 @@ spec:
               region = $REGION
               EOF
 
+              echo "AWS Config file:"
+              cat ${AWS_CONFIG_FILE}
+
+              echo "Creating S3 bucket..."
               # Configure the AWS CLI
               aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
               aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
