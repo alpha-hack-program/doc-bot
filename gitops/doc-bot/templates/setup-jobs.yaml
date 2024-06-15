@@ -20,31 +20,24 @@ spec:
                 echo -n .
                 sleep 5
               done; echo
-              
+
+              MODELS_MOUNT_PATH=/mnt/models              
               HF_USERNAME=$(oc get secret hf-creds -o jsonpath='{.data.HF_USERNAME}' | base64 -d)
               HF_TOKEN=$(oc get secret hf-creds -o jsonpath='{.data.HF_TOKEN}' | base64 -d)
               MODEL_ROOT="{{ .Values.model.root }}"
               MODEL_ID="{{ .Values.model.id }}"
 
-              cd /mnt/models
-
-              # Check if the directory exists
-              if [ -d "${MODEL_ID}" ]; then
-                  echo "Directory '${MODEL_ID}' already exists. Pulling latest changes..."
-
-                  # Navigate into the directory
-                  cd "${MODEL_ID}"
-
-                  # Pull latest changes from remote repository
-                  git pull
-                  git lfs pull
-              else
-                echo "Directory '${MODEL_ID}' does not exist. Cloning repository..."
-              
-                git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
-                git lfs pull
+              # Check if MODELS_MOUNT_PATH exists and fail if it doesn't
+              if [ ! -d "${MODELS_MOUNT_PATH}" ]; then
+                  echo "Directory '${MODELS_MOUNT_PATH}' does not exist. Exiting..."
+                  exit 1
               fi
 
+
+              huggingface-cli download ${MODEL_ROOT}/${MODEL_ID} --token ${HF_TOKEN} \
+                --local-dir ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID}
+
+              # Set up AWS CLI
               AWS_CONFIG_FILE=/scratch/aws-config
               AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
               AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
@@ -58,12 +51,8 @@ spec:
               [default]
               aws_access_key_id = ${AWS_ACCESS_KEY_ID}
               aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
-              default.region = ${AWS_DEFAULT_REGION}
               region = ${AWS_DEFAULT_REGION}
               EOF
-
-              echo "AWS Config file:"
-              cat ${AWS_CONFIG_FILE}
 
               # Check if the bucket exists and create it if it doesn't
               echo ">>>>>> Checking if S3 bucket exists..."
@@ -76,7 +65,7 @@ spec:
 
               # Upload the model to files folder in the bucket
               echo ">>>>>> Syncing model files to S3..."
-              aws s3 sync /mnt/models/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --exclude ".git/*" --exclude ".git" --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
+              aws s3 sync ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --exclude ".git/*" --exclude ".git" --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
