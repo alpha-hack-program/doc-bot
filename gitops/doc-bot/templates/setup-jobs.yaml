@@ -66,7 +66,7 @@ spec:
               echo "AWS Config file:"
               cat ${AWS_CONFIG_FILE}
 
-              echo "Creating S3 bucket..."
+              echo ">> Creating S3 bucket..."
               # Create a bucket
               output=$(aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}")
               echo "Output: $output"
