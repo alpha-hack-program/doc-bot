@@ -43,10 +43,6 @@ spec:
                 git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
               fi
 
-              # MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
-              # MINIO_ROOT_PASSWORD={{ .Values.pipelinesConnection.awsSecretAccessKey }}
-              # MINIO_HOST={{ .Values.pipelinesConnection.scheme }}://{{ .Values.pipelinesConnection.awsS3Endpoint }}
-
               AWS_CONFIG_FILE=/scratch/aws-config
               AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
               AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
@@ -78,7 +74,7 @@ spec:
 
               # Upload the model to files folder in the bucket
               echo ">>>>>> Syncing model files to S3..."
-              aws s3 sync ./${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+              aws s3 sync /mnt/models/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
