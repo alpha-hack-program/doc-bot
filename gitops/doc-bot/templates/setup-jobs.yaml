@@ -45,8 +45,8 @@ spec:
               MINIO_ROOT_USER={{ .Values.pipelinesConnection.awsAccessKeyId }}
               MINIO_ROOT_PASSWORD={{ .Values.pipelinesConnection.awsSecretAccessKey }}
               MINIO_HOST={{ .Values.pipelinesConnection.scheme }}://{{ .Values.pipelinesConnection.awsS3Endpoint }}
-              
-              AWS_CONFIG_FILE=/scratch/.aws/config
+
+              AWS_CONFIG_FILE=/scratch/aws-config
               AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
               AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
               AWS_SECRET_ACCESS_KEY={{ .Values.modelConnection.awsSecretAccessKey }}
@@ -54,6 +54,13 @@ spec:
               AWS_S3_ENDPOINT={{ .Values.modelConnection.awsS3Endpoint }}
               AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
               AWS_S3_USE_PATH_STYLE=1
+
+              cat << EOF > ${AWS_CONFIG_FILE}
+              [default]
+              aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+              aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+              region = $REGION
+              EOF
 
               # Configure the AWS CLI
               aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
