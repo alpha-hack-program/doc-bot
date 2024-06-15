@@ -60,20 +60,16 @@ spec:
               aws_access_key_id = ${AWS_ACCESS_KEY_ID}
               aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
               default.region = ${AWS_DEFAULT_REGION}
-              region = $REGION
+              region = ${AWS_DEFAULT_REGION}
               EOF
 
               echo "AWS Config file:"
               cat ${AWS_CONFIG_FILE}
 
               echo "Creating S3 bucket..."
-              # Configure the AWS CLI
-              # aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
-              # aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
-              # aws configure set default.region ${AWS_DEFAULT_REGION}
-
               # Create a bucket
               output=$(aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}")
+              echo "Output: $output"
 
               # Check for the specific error
               if echo "${output}" | grep -q "BucketAlreadyOwnedByYou"; then
