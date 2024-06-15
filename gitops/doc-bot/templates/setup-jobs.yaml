@@ -35,6 +35,7 @@ spec:
 
 
               huggingface-cli download ${MODEL_ROOT}/${MODEL_ID} --token ${HF_TOKEN} \
+                --cache-dir ${MODELS_MOUNT_PATH}/.cache \
                 --local-dir ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID}
 
               # Set up AWS CLI
@@ -96,4 +97,4 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 50Gi
+      storage: 100Gi
