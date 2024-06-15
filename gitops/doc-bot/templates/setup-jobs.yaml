@@ -6,6 +6,7 @@ metadata:
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
     job.kubernetes.io/disabled: "true"
+    argocd.argoproj.io/sync-options: Replace=true
 spec:
   selector: {}
   template:
@@ -77,7 +78,7 @@ spec:
 
               # Upload the model to files folder in the bucket
               echo ">>>>>> Syncing model files to S3..."
-              aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+              aws s3 sync ./${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
