@@ -74,7 +74,7 @@ spec:
 
               # Upload the model to files folder in the bucket
               echo ">>>>>> Syncing model files to S3..."
-              aws s3 sync /mnt/models/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
+              aws s3 sync /mnt/models/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
