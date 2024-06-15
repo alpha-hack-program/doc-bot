@@ -73,7 +73,17 @@ spec:
               # aws configure set default.region ${AWS_DEFAULT_REGION}
 
               # Create a bucket
-              aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
+              output=$(aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}")
+
+              # Check for the specific error
+              if echo "${output}" | grep -q "BucketAlreadyOwnedByYou"; then
+                  echo "Bucket ${AWS_S3_BUCKET} already owned by you. Continuing..."
+              elif echo "${output}" | grep -q "Error"; then
+                  echo "Failed to create bucket ${AWS_S3_BUCKET}. Error: $output"
+                  exit 1
+              else
+                  echo "Bucket ${AWS_S3_BUCKET} created successfully."
+              fi
 
               # Upload the model to files folder in the bucket
               aws s3 sync ${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --endpoint-url "https://${AWS_S3_ENDPOINT}" 
