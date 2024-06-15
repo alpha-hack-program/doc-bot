@@ -37,10 +37,12 @@ spec:
 
                   # Pull latest changes from remote repository
                   git pull origin main
+                  git lfs pull origin main
               else
                 echo "Directory '${MODEL_ID}' does not exist. Cloning repository..."
               
                 git clone https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/${MODEL_ROOT}/${MODEL_ID}
+                git lfs pull origin main
               fi
 
               AWS_CONFIG_FILE=/scratch/aws-config
