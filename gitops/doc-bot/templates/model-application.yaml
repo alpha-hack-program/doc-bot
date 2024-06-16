@@ -17,6 +17,8 @@ spec:
     targetRevision: main
     helm:
       parameters:
+        - name: crateNamespace
+          value: "false"
         - name: instanceName
           value: "{{ .Values.model.name }}"
         - name: dataScienceProjectNamespace
