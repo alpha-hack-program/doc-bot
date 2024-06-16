@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.model.name }}
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  source:
+    path: .
+    repoURL: https://github.com/alpha-hack-program/model-server.git
+    targetRevision: main
+    helm:
+      parameters:
+        - name: instanceName
+          value: "{{ .Values.model.name }}"
+        - name: dataScienceProjectNamespace
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+        - name: dataScienceProjectDisplayName
+          value: "{{ .Values.dataScienceProjectDisplayName }}"
+        - name: model.root
+          value: "{{ .Values.model.root }}"
+        - name: model.id
+          value: "{{ .Values.model.id }}"
+        - name: model.name
+          value: "{{ .Values.model.name }}"
+        - name: model.displayName
+          value: "{{ .Values.model.displayName }}"
+        - name: model.accelerator.productName
+          value: "{{ .Values.model.accelerator.productName }}"
+        - name: model.accelerator.min
+          value: '{{ .Values.model.accelerator.min }}'
+        - name: model.accelerator.max
+          value: '{{ .Values.model.accelerator.max }}'
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
