@@ -17,7 +17,7 @@ spec:
     targetRevision: main
     helm:
       parameters:
-        - name: crateNamespace
+        - name: createNamespace
           value: "false"
         - name: instanceName
           value: "{{ .Values.model.name }}"
