@@ -772,3 +772,66 @@ Uninstall RHOAI:
 python3 -m venv .venv
 source .venv/bin/activate
 ```
+
+## Curl Examples
+
+```sh
+export NAMESPACE_NAME="vllm-mistral-7b"
+export PIPELINE_NAME="rag-ingestion"
+# NAMESPACE_NAME="fraud-detection"
+# export PIPELINE_NAME="fraud"
+export SVC="https://ds-pipeline-dspa-${NAMESPACE_NAME}.apps.cluster-hxbsq.sandbox1380.opentlc.com"
+
+export AUTH_HEADER="Bearer $(oc whoami -t)"
+export METHOD="GET"
+export CONTENT_TYPE="application/json"
+export REQUEST_BODY="{}"
+
+export PIPELINES=$(curl -s -X "${METHOD}" -H "Authorization: ${AUTH_HEADER}" ${SVC}/apis/v2beta1/pipelines)
+echo $PIPELINES | jq .
+
+PIPELINE=$(echo ${PIPELINES} | jq --arg name ${PIPELINE_NAME} '.pipelines[] | select(.display_name == $name)')
+echo ${PIPELINE} | jq .
+export PIPELINE_ID=$(echo ${PIPELINE} | jq -r .pipeline_id)
+echo ${PIPELINE_ID}
+```
+
+```sh
+CONTENT_TYPE="application/json"
+REQUEST_BODY="{}"
+
+# PIPELINE=$(curl -s -X "GET" -H "Authorization: ${AUTH_HEADER}" ${SVC}/apis/v2beta1/pipelines/${PIPELINE_ID} | jq)
+# PIPELINE_NAME=$(echo ${PIPELINE} | jq -r .display_name)
+
+PIPELINE_RUN=$(
+curl -s -H "Content-Type: ${CONTENT_TYPE}" -H "Authorization: ${AUTH_HEADER}" -X POST ${SVC}/apis/v1beta1/runs \
+-d @- << EOF
+{
+   "name":"${PIPELINE_NAME}_run",
+   "pipeline_spec":{
+      "pipeline_id":"${PIPELINE_ID}"
+   }
+}
+EOF
+)
+
+PIPELINE_RUN=$(
+curl -s -H "Content-Type: ${CONTENT_TYPE}" -H "Authorization: ${AUTH_HEADER}" -X POST ${SVC}/apis/v2beta1/runs \
+-d @- << EOF
+{
+   "display_name":"${PIPELINE_NAME}_run",
+   "description":"This is run from curl",
+   "runtime_config": {
+      "parameters": {}
+    },
+   "pipeline_version_reference":{
+      "pipeline_id":"${PIPELINE_ID}"
+   }
+}
+EOF
+)
+
+echo ${PIPELINE_RUN} | jq .
+
+PIPELINE_RUN_ID=$(echo ${PIPELINE_RUN} | jq -r .run_id)
+```
