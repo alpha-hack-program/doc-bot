@@ -15,8 +15,8 @@ spec:
     server: 'https://kubernetes.default.svc'
     namespace: vllm-mistral-7b
   source:
-    path: .
-    repoURL: https://github.com/alpha-hack-program/model-server.git
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/doc-bot.git
     targetRevision: main
     helm:
       parameters:
@@ -67,8 +67,8 @@ spec:
     server: 'https://kubernetes.default.svc'
     namespace: vllm-llama-3-8b
   source:
-    path: .
-    repoURL: https://github.com/alpha-hack-program/model-server.git
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/doc-bot.git
     targetRevision: main
     helm:
       parameters:
@@ -123,8 +123,8 @@ spec:
     server: 'https://kubernetes.default.svc'
     namespace: vllm-granite-8b
   source:
-    path: .
-    repoURL: https://github.com/alpha-hack-program/model-server.git
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/doc-bot.git
     targetRevision: main
     helm:
       parameters:
