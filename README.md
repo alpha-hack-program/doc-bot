@@ -862,9 +862,9 @@ spec:
         - name: instanceName
           value: vllm-mistral-7b
         - name: dataScienceProjectDisplayName
-          value: GENEVA
+          value: vllm-mistral-7b
         - name: dataScienceProjectNamespace
-          value: geneva
+          value: vllm-mistral-7b
     path: gitops/doc-bot
     repoURL: 'git@github.com:alpha-hack-program/doc-bot.git'
     targetRevision: main
