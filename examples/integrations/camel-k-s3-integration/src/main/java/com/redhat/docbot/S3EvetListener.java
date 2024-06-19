@@ -14,7 +14,7 @@ public class S3EvetListener extends RouteBuilder {
                 String bucketName = "{{bucketName}}";
 
                 // Log the S3 object key
-                log.info("Processing file: " + key);
+                log.info("Processing file: " + key + " from bucket: " + bucketName);
 
                 // Download the file (the file content is in the message body)
                 byte[] fileContent = exchange.getIn().getBody(byte[].class);
