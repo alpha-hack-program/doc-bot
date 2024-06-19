@@ -1,3 +1,8 @@
+modelApplication:
+  repoURL: https://github.com/alpha-hack-program/doc-bot.git
+  path: gitops/model
+  targetRevision: main
+
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 
