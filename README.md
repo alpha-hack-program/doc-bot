@@ -840,3 +840,35 @@ echo ${PIPELINE_RUN} | jq .
 
 PIPELINE_RUN_ID=$(echo ${PIPELINE_RUN} | jq -r .run_id)
 ```
+
+# ArgoCD Deployment
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  name: doc-bot
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: vllm-mistral-7b
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    helm:
+      parameters:
+        - name: instanceName
+          value: vllm-mistral-7b
+        - name: dataScienceProjectDisplayName
+          value: GENEVA
+        - name: dataScienceProjectNamespace
+          value: geneva
+    path: gitops/doc-bot
+    repoURL: 'git@github.com:alpha-hack-program/doc-bot.git'
+    targetRevision: main
+  syncPolicy:
+    automated:
+      selfHeal: true
+```
