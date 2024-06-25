@@ -8,6 +8,7 @@ metadata:
     app: models-pvc
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "0"
 spec:
   accessModes:
