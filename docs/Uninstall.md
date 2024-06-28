@@ -67,7 +67,35 @@ redhat-ods-operator
 rhods-notebooks
 
 ```sh
-oc get namespaces | grep -e redhat-ods* -e rhods*
+for ns in $(oc get ns | grep -i redhat-ods | awk '{print $1}'); do
+  oc delete ns $ns
+done
+for ns in $(oc get ns | grep -i rhods | awk '{print $1}'); do
+  oc delete ns $ns
+done
+```
+
+Check:
+
+```sh
+oc get namespaces | grep -i redhat-ods
+oc get namespaces | grep -i rhods
+```
+
+Delete DCSs:
+
+```sh
+for dsc in $(oc get dsc | awk '{print $1}'); do
+  oc delete dsc $dsc
+done
+```
+
+Delete CRDs
+
+```sh
+for crd in $(oc get crd | grep opendatahub.io | awk '{print $1}'); do
+  oc delete crd $crd
+done
 ```
 
 # Unless it's needed and shared by other elements

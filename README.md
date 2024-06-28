@@ -101,23 +101,66 @@ oc get secret rhods-internal-primary-cert-bundle-secret -n istio-system
 
 Install OpenShift AI operator.
 
+```sh
+cat << EOF| oc create -f -
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redhat-ods-operator
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: rhods-operator
+  namespace: redhat-ods-operator
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: rhods-operator
+  namespace: redhat-ods-operator 
+spec:
+  name: rhods-operator
+  channel: stable-2.8
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+EOF
+```
+
+```sh
+oc get installplans -n redhat-ods-operator -o name
+```
+
+```sh
+for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
+  oc patch $installplan -n redhat-ods-operator --type merge --patch '{"spec":{"approved":true}}'
+done
+```
+
 Finally create the `DSC` object (RHOAI CRD) which should look like [this](./examples/cluster/default-dsc.yaml):
 
 ```sh
 cat << EOF| oc create -f -
-apiVersion: datasciencecluster.opendatahub.io/v1
+---
 kind: DataScienceCluster
+apiVersion: datasciencecluster.opendatahub.io/v1
 metadata:
-  labels:
-    app.kubernetes.io/created-by: rhods-operator
-    app.kubernetes.io/instance: default-dsc
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/name: datasciencecluster
-    app.kubernetes.io/part-of: rhods-operator
   name: default-dsc
+  labels:
+    app.kubernetes.io/name: datasciencecluster
+    app.kubernetes.io/instance: default-dsc
+    app.kubernetes.io/part-of: rhods-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: rhods-operator
 spec:
   components:
     codeflare:
+      managementState: Removed
+    dashboard:
+      managementState: Managed
+    datasciencepipelines:
       managementState: Managed
     kserve:
       managementState: Managed
@@ -130,19 +173,13 @@ spec:
             type: Provided
         managementState: Managed
         name: knative-serving
-    trustyai:
-      managementState: Removed
-    ray:
-      managementState: Managed
-    kueue:
-      managementState: Managed
-    workbenches:
-      managementState: Managed
-    dashboard:
-      managementState: Managed
     modelmeshserving:
       managementState: Managed
-    datasciencepipelines:
+    kueue:
+      managementState: Removed
+    ray:
+      managementState: Removed
+    workbenches:
       managementState: Managed
 EOF
 ```
