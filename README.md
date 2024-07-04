@@ -122,7 +122,7 @@ metadata:
   namespace: redhat-ods-operator 
 spec:
   name: rhods-operator
-  channel: stable-2.8
+  channel: stable-2.10
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Manual
@@ -157,7 +157,7 @@ metadata:
 spec:
   components:
     codeflare:
-      managementState: Removed
+      managementState: Managed
     dashboard:
       managementState: Managed
     datasciencepipelines:
@@ -176,9 +176,9 @@ spec:
     modelmeshserving:
       managementState: Managed
     kueue:
-      managementState: Removed
+      managementState: Managed
     ray:
-      managementState: Removed
+      managementState: Managed
     workbenches:
       managementState: Managed
 EOF
