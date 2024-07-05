@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    argocd.argoproj.io/compare-options: |
+    argocd.argoproj.io/compare-options: >
       ContainerImage:
         ignoreDifferences: |
           jsonPointers:
