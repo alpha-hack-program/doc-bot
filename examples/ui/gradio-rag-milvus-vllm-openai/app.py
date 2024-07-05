@@ -1,3 +1,4 @@
+from ast import If
 import json
 import os
 import random
@@ -6,6 +7,8 @@ from collections.abc import Generator
 from queue import Empty, Queue
 from threading import Thread
 from typing import Optional, List, Dict, Any
+
+from kubernetes import client, config
 
 import gradio as gr
 from dotenv import load_dotenv
@@ -22,12 +25,57 @@ from milvus_retriever_with_score_threshold import MilvusRetrieverWithScoreThresh
 
 load_dotenv()
 
+# Load in-cluster Kubernetes configuration but if it fails, load local configuration
+try:
+    config.load_incluster_config()
+except config.config_exception.ConfigException:
+    config.load_kube_config()
+
+# Get prediction URL by name and namespace
+def get_predictor_url(namespace="default", predictor_name="mistral-7b-predictor"):
+    api_instance = client.CustomObjectsApi()
+    try:
+        predictor = api_instance.get_namespaced_custom_object(
+            group="serving.kserve.io",
+            version="v1alpha1",
+            namespace=namespace,
+            plural="inferenceservices",
+            name=predictor_name
+        )
+        return f"http://{predictor['status']['url']}"
+    except Exception as e:
+        print(f"Error retrieving predictor {predictor_name} in namespace {namespace}: {e}")
+        return None
+
+# Get NAMESPACE from environment
+NAMESPACE = os.getenv('NAMESPACE')
+if not NAMESPACE:
+    # Get the current namespace or error if not found
+    try:
+        with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
+            NAMESPACE = f.read().strip()
+    except FileNotFoundError:
+        raise ValueError("NAMESPACE environment variable not set and could not get current namespace.")
+
+# Get PREDICTOR_NAME from environment
+PREDICTOR_NAME = os.getenv('PREDICTOR_NAME')
+if not PREDICTOR_NAME:
+    raise ValueError("PREDICTOR_NAME environment variable not set.")
+
+# Get INFERENCE_SERVER_URL from environment
+INFERENCE_SERVER_URL = os.getenv('INFERENCE_SERVER_URL')
+if not INFERENCE_SERVER_URL:
+    predictor_url = get_predictor_url(namespace=NAMESPACE, predictor_name="mistral-7b-predictor")
+    if predictor_url:
+        INFERENCE_SERVER_URL = predictor_url
+    else:
+        raise ValueError("INFERENCE_SERVER_URL environment variable or my-route URL not set.")
+
 # Parameters
 
 APP_TITLE = os.getenv('APP_TITLE', 'Chat with your Knowledge Base!')
 SHOW_TITLE_IMAGE = os.getenv('SHOW_TITLE_IMAGE', 'True')
 
-INFERENCE_SERVER_URL = os.getenv('INFERENCE_SERVER_URL')
 MODEL_NAME = os.getenv('MODEL_NAME')
 MAX_TOKENS = int(os.getenv('MAX_TOKENS', 512))
 TOP_P = float(os.getenv('TOP_P', 0.95))

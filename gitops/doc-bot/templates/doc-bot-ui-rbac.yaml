@@ -5,8 +5,8 @@ kind: Role
 metadata:
   name: doc-bot-ui
 rules:
-- apiGroups: ["route.openshift.io"]
-  resources: ["routes"]
+- apiGroups: ["erving.kserve.io"]
+  resources: ["inferenceservices"]
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1

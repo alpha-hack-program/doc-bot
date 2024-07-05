@@ -7,3 +7,4 @@ text-generation
 python-dotenv
 langchain_community
 openai
+kubernetes
