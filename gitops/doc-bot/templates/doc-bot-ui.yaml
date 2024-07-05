@@ -6,7 +6,7 @@ metadata:
     app.openshift.io/route-disabled: "false"
     app.openshift.io/vcs-ref: {{ .Values.vcs.ref }}
     app.openshift.io/vcs-uri: {{ .Values.vcs.uri }}
-    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"doc-bot:latest","namespace":"{{ .Values.dataScienceProjectNamespace }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"doc-bot\")].image","pause":"false"}]'
+    # image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"doc-bot:latest","namespace":"{{ .Values.dataScienceProjectNamespace }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"doc-bot\")].image","pause":"false"}]'
   labels:
     app: doc-bot
     app.kubernetes.io/component: doc-bot
