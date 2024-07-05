@@ -1,3 +1,10 @@
+vcs:
+  uri: https://github.com/alpha-hack-program/doc-bot.git
+  ref: https://github.com/alpha-hack-program/doc-bot.git
+
+paths:
+  ui: examples/ui/gradio-rag-milvus-vllm-openai
+
 modelApplication:
   repoURL: https://github.com/alpha-hack-program/doc-bot.git
   path: gitops/model
