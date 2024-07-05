@@ -89,7 +89,7 @@ spec:
   type: ClusterIP
 ---
 apiVersion: v1
-data:
+stringData:
   APP_TITLE: "Chat with your Knowledge Base!"
   SHOW_TITLE_IMAGE: "True"
   INFERENCE_SERVER_URL: "https://mistral-7b-vllm-mistral-7b.apps.cluster-pwkqj.sandbox2852.opentlc.com/v1"
