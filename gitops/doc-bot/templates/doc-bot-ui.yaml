@@ -112,6 +112,7 @@ stringData:
   PROMPT_FILE: "default_prompt.txt"
   MAX_RETRIEVED_DOCS: "4"
   SCORE_THRESHOLD: "0.99"
+  PREDICTOR_NAME: "{{ .Values.model.name }}"
 kind: Secret
 metadata:
   labels:
