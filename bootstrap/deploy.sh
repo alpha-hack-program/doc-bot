@@ -59,6 +59,13 @@ spec:
     automated:
       # prune: true
       selfHeal: true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: doc-bot
+      jqPathExpressions:
+        - '.spec.template.spec.containers[].image'
+      
 EOF
 
     
