@@ -1,12 +1,11 @@
 ---
 # Cluster Role named route-reader that can reader openshift routes
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "0"
-  name: route-reader-{{ .Values.instanceName }}
+  # annotations:
+  #   argocd.argoproj.io/hook: PreSync
+  name: route-reader
 rules:
 - apiGroups: ["route.openshift.io"]
   resources: ["routes"]
@@ -15,17 +14,16 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  annotations:
-    argocd.argoproj.io/hook: PreSync
+  # annotations:
+  #   argocd.argoproj.io/hook: PreSync
   name: setup-job
   namespace: {{ .Values.dataScienceProjectNamespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "0"
+  # annotations:
+  #   argocd.argoproj.io/hook: PreSync
   name: setup-job-edit
   namespace: {{ .Values.dataScienceProjectNamespace }}
 roleRef:
@@ -36,13 +34,13 @@ subjects:
 - kind: ServiceAccount
   name: setup-job
 ---
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "0"
-  name: setup-job-route-reader-binding-{{ .Values.instanceName }}
+  # annotations:
+  #   argocd.argoproj.io/hook: PreSync
+  name: setup-job-route-reader-binding
+  namespace: {{ .Values.dataScienceProjectNamespace }}
 subjects:
 - kind: ServiceAccount
   name: setup-job

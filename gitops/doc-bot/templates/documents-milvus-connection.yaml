@@ -7,7 +7,6 @@ metadata:
     opendatahub.io/dashboard: 'true'
     opendatahub.io/managed: 'true'
   annotations:
-    argocd.argoproj.io/sync-wave: "-1" # Set sync-wave to -1 to avoid conflicts with other resources
     openshift.io/display-name: {{ .Values.documentsMilvusConnection.name }}
 stringData:
   MILVUS_HOST: '{{ .Values.milvus.host }}.{{ .Values.milvus.namespace }}.svc.cluster.local'

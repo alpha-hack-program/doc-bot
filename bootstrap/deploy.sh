@@ -3,7 +3,7 @@
 # Load environment variables
 . .env
 
-# Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/doc-bot
+# Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/milvus
 cat <<EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -36,8 +36,8 @@ kind: Application
 metadata:
   name: doc-bot
   namespace: openshift-gitops
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  # annotations:
+  #   argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   project: default
   destination:
@@ -68,23 +68,3 @@ spec:
       
 EOF
 
-    
-
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: {{ .Values.application.name }}
-#   namespace: {{ .Values.application.namespace }}
-# spec:
-#   project: {{ .Values.application.project }}
-#   source:
-#     repoURL: {{ .Values.application.source.repoURL }}
-#     path: {{ .Values.application.source.path }}
-#     targetRevision: {{ .Values.application.source.targetRevision }}
-#   destination:
-#     server: {{ .Values.application.destination.server }}
-#     namespace: {{ .Values.application.destination.namespace }}
-#   syncPolicy:
-#     {{- if .Values.application.syncPolicy.automated }}
-#     automated: {}
-#     {{- end }}

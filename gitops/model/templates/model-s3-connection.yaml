@@ -7,7 +7,6 @@ metadata:
     opendatahub.io/dashboard: 'true'
     opendatahub.io/managed: 'true'
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
     opendatahub.io/connection-type: {{ .Values.modelConnection.type }}
     openshift.io/display-name: {{ .Values.modelConnection.displayName }}
 stringData:

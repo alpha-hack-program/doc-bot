@@ -5,7 +5,7 @@ kind: Namespace
 metadata:
   name: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
-    argocd.argoproj.io/sync-wave: "-1" # Set sync-wave to -1 to avoid conflicts with other resources
+    argocd.argoproj.io/sync-wave: "-1"
     openshift.io/description: "{{ .Values.dataScienceProjectDisplayName }}"
     openshift.io/display-name: '{{ .Values.dataScienceProjectDisplayName }}'
   labels:

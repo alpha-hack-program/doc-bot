@@ -5,9 +5,9 @@ metadata:
   name: job-{{ .Values.model.name }}-model-setup
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: "0"
+    # argocd.argoproj.io/sync-wave: "0"
+    # argocd.argoproj.io/hook: PreSync
+    # argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   selector: {}
   backoffLimit: 10

@@ -6,10 +6,9 @@ metadata:
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   labels:
     app: models-pvc
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
-    argocd.argoproj.io/sync-wave: "0"
+  # annotations:
+  #   argocd.argoproj.io/hook: PreSync
+  #   argocd.argoproj.io/hook-delete-policy: HookFailed
 spec:
   accessModes:
   - ReadWriteOnce
