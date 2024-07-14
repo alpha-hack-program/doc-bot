@@ -129,9 +129,13 @@ spec:
 EOF
 ```
 
+There should be only one install plan!
+
 ```sh
 oc get installplans -n redhat-ods-operator -o name
 ```
+
+Patch it in order to approve it:
 
 ```sh
 for installplan in $(oc get installplans -n redhat-ods-operator -o name); do

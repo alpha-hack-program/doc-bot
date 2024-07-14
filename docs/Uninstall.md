@@ -125,3 +125,11 @@ And check if they're all gone.
 ```sh
 oc get servicemeshcontrolplane -n istio-system -o name
 ```
+
+Delete installplans of the operator if found:
+
+```sh
+for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
+  kubectl delete $installplan -n redhat-ods-operator
+done
+```
