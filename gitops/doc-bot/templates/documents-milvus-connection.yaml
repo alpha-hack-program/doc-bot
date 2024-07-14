@@ -3,11 +3,11 @@ apiVersion: v1
 metadata:
   name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
-  labels:
-    opendatahub.io/dashboard: 'true'
-    opendatahub.io/managed: 'true'
-  annotations:
-    openshift.io/display-name: {{ .Values.documentsMilvusConnection.name }}
+  # labels:
+  #   opendatahub.io/dashboard: 'true'
+  #   opendatahub.io/managed: 'true'
+  # annotations:
+  #   openshift.io/display-name: {{ .Values.documentsMilvusConnection.name }}
 stringData:
   MILVUS_HOST: '{{ .Values.milvus.host }}.{{ .Values.milvus.namespace }}.svc.cluster.local'
   MILVUS_PORT: '{{ .Values.milvus.port }}'
