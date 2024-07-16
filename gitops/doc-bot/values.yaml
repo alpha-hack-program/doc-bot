@@ -103,7 +103,7 @@ documentsMilvusConnection:
 
 milvus:
   name: milvus
-  namespace: ic-shared-milvus
+  namespace: milvus
   username: root
   password: Milvus
   port: '19530'
