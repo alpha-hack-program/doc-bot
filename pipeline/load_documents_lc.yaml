@@ -1,8 +1,8 @@
 # PIPELINE DEFINITION
 # Name: load-documents-lc
 # Inputs:
-#    accuracy_threshold: float [Default: 0.95]
 #    enable_caching: bool [Default: False]
+#    model_name: str [Default: 'nomic-ai/nomic-embed-text-v1']
 components:
   comp-add-chunks-to-milvus:
     executorLabel: exec-add-chunks-to-milvus
@@ -12,6 +12,9 @@ components:
           artifactType:
             schemaTitle: system.Dataset
             schemaVersion: 0.0.1
+      parameters:
+        model_name:
+          parameterType: STRING
   comp-get-chunks-from-documents:
     executorLabel: exec-get-chunks-from-documents
     outputDefinitions:
@@ -50,30 +53,31 @@ deploymentSpec:
 
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef add_chunks_to_milvus(\n    chunks_input_dataset: Input[Dataset]\n\
-          ):\n    import os\n    import pickle\n    from langchain_huggingface import\
-          \ HuggingFaceEmbeddings\n    from langchain_milvus import Milvus\n    from\
-          \ langchain_core.documents import Document\n\n    # Get the Mivus connection\
-          \ details\n    milvus_host = os.environ.get('MILVUS_HOST')\n    milvus_port\
-          \ = os.environ.get('MILVUS_PORT')\n    milvus_username = os.environ.get('MILVUS_USERNAME')\n\
-          \    milvus_password = os.environ.get('MILVUS_PASSWORD')\n    milvus_collection\
-          \ = os.environ.get('MILVUS_COLLECTION')\n\n    # Print the connection details\n\
-          \    print(f\"milvus_host: {milvus_host}\")\n    print(f\"milvus_port: {milvus_port}\"\
-          )\n    print(f\"milvus_collection: {milvus_collection}\")\n\n    # Get the\
-          \ chunks from the input dataset\n     # Try to load the chunks from the\
-          \ input dataset\n    try:\n        print(f\"Loading chunks from {chunks_input_dataset.path}\"\
-          )\n        with open(chunks_input_dataset.path, 'rb') as f:\n          \
-          \  chunks = pickle.load(f)\n    except Exception as e:\n        print(f\"\
-          Failed to load chunks: {e}\")\n\n    # Check if the variable exists and\
-          \ is of the correct type\n    if chunks is None:\n        raise ValueError(\"\
-          Chunks not loaded successfully.\")\n\n    if not isinstance(chunks, list)\
-          \ or not all(isinstance(doc, Document) for doc in chunks):\n        raise\
-          \ TypeError(\"The loaded data is not a List[langchain_core.documents.Document].\"\
-          )\n\n    print(f\"Loaded {len(chunks)} chunks\")\n\n    # If you don't want\
+          \ *\n\ndef add_chunks_to_milvus(\n    model_name: str,\n    chunks_input_dataset:\
+          \ Input[Dataset]\n):\n    import os\n    import pickle\n    from langchain_huggingface\
+          \ import HuggingFaceEmbeddings\n    from langchain_milvus import Milvus\n\
+          \    from langchain_core.documents import Document\n\n    # Get the Mivus\
+          \ connection details\n    milvus_host = os.environ.get('MILVUS_HOST')\n\
+          \    milvus_port = os.environ.get('MILVUS_PORT')\n    milvus_username =\
+          \ os.environ.get('MILVUS_USERNAME')\n    milvus_password = os.environ.get('MILVUS_PASSWORD')\n\
+          \    milvus_collection = os.environ.get('MILVUS_COLLECTION')\n\n    # Print\
+          \ the connection details\n    print(f\"milvus_host: {milvus_host}\")\n \
+          \   print(f\"milvus_port: {milvus_port}\")\n    print(f\"milvus_collection:\
+          \ {milvus_collection}\")\n\n    # Get the chunks from the input dataset\n\
+          \     # Try to load the chunks from the input dataset\n    try:\n      \
+          \  print(f\"Loading chunks from {chunks_input_dataset.path}\")\n       \
+          \ with open(chunks_input_dataset.path, 'rb') as f:\n            chunks =\
+          \ pickle.load(f)\n    except Exception as e:\n        print(f\"Failed to\
+          \ load chunks: {e}\")\n\n    # Check if the variable exists and is of the\
+          \ correct type\n    if chunks is None:\n        raise ValueError(\"Chunks\
+          \ not loaded successfully.\")\n\n    if not isinstance(chunks, list) or\
+          \ not all(isinstance(doc, Document) for doc in chunks):\n        raise TypeError(\"\
+          The loaded data is not a List[langchain_core.documents.Document].\")\n\n\
+          \    print(f\"Loaded {len(chunks)} chunks\")\n\n    # If you don't want\
           \ to use a GPU, you can remove the 'device': 'cuda' argument\n    # model_kwargs\
           \ = {'trust_remote_code': True, 'device': 'cuda'}\n    model_kwargs = {'trust_remote_code':\
-          \ True}\n    model_name = \"sentence-transformers/all-MiniLM-L6-v2\"\n \
-          \   # model_name = \"nomic-ai/nomic-embed-text-v1\"\n    embeddings_model\
+          \ True}\n    # model_name = \"sentence-transformers/all-MiniLM-L6-v2\"\n\
+          \    # model_name = \"nomic-ai/nomic-embed-text-v1\"\n    embeddings_model\
           \ = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)\n\
           \n    Milvus.from_documents(\n        documents=chunks,\n        embedding=embeddings_model,\n\
           \        connection_args={\"host\": milvus_host, \"port\": milvus_port,\
@@ -168,6 +172,9 @@ root:
               taskOutputArtifact:
                 outputArtifactKey: chunks_output_dataset
                 producerTask: get-chunks-from-documents
+          parameters:
+            model_name:
+              componentInputParameter: model_name
         taskInfo:
           name: add-chunks-to-milvus
       get-chunks-from-documents:
@@ -178,14 +185,14 @@ root:
           name: get-chunks-from-documents
   inputDefinitions:
     parameters:
-      accuracy_threshold:
-        defaultValue: 0.95
-        isOptional: true
-        parameterType: NUMBER_DOUBLE
       enable_caching:
         defaultValue: false
         isOptional: true
         parameterType: BOOLEAN
+      model_name:
+        defaultValue: nomic-ai/nomic-embed-text-v1
+        isOptional: true
+        parameterType: STRING
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.8.0
 ---

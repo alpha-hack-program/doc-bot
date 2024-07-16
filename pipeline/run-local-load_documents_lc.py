@@ -35,5 +35,5 @@ os.environ['MILVUS_PASSWORD'] = 'Milvus'
 # get_chunks_from_documents_task = get_chunks_from_documents()
 
 # run pipeline
-pipeline_task = pipeline(accuracy_threshold=0.9)
+pipeline_task = pipeline(model_name="sentence-transformers/all-MiniLM-L6-v2")
 

@@ -118,6 +118,7 @@ def get_chunks_from_documents(
     packages_to_install=["langchain-milvus", "langchain-huggingface", "sentence-transformers", "pymilvus", "einops", "openai", "transformers"]
 )
 def add_chunks_to_milvus(
+    model_name: str,
     chunks_input_dataset: Input[Dataset]
 ):
     import os
@@ -159,7 +160,7 @@ def add_chunks_to_milvus(
     # If you don't want to use a GPU, you can remove the 'device': 'cuda' argument
     # model_kwargs = {'trust_remote_code': True, 'device': 'cuda'}
     model_kwargs = {'trust_remote_code': True}
-    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    # model_name = "sentence-transformers/all-MiniLM-L6-v2"
     # model_name = "nomic-ai/nomic-embed-text-v1"
     embeddings_model = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
     
@@ -176,12 +177,13 @@ def add_chunks_to_milvus(
 # This pipeline will download evaluation data, download the model, test the model and if it performs well, 
 # upload the model to the runtime S3 bucket and refresh the runtime deployment.
 @dsl.pipeline(name=os.path.basename(__file__).replace('.py', ''))
-def pipeline(accuracy_threshold: float = 0.95,  enable_caching: bool = False):
+def pipeline(model_name: str = "nomic-ai/nomic-embed-text-v1",  enable_caching: bool = False):
     # Get all the PDFs from the S3 bucket
     get_chunks_from_documents_task = get_chunks_from_documents().set_caching_options(False)
 
     # Add chunks to vector store
     add_chunks_to_vector_store_task = add_chunks_to_milvus(
+        model_name=model_name,
         chunks_input_dataset=get_chunks_from_documents_task.outputs["chunks_output_dataset"]
     ).set_caching_options(False)
         
