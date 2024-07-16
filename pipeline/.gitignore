@@ -1,0 +1,8 @@
+local*
+*.local
+
+.venv
+.ipynb_checkpoints
+*.old
+old/
+__pycache__/

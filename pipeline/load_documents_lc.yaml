@@ -1,0 +1,221 @@
+# PIPELINE DEFINITION
+# Name: load-documents-lc
+# Inputs:
+#    accuracy_threshold: float [Default: 0.95]
+#    enable_caching: bool [Default: False]
+components:
+  comp-add-chunks-to-milvus:
+    executorLabel: exec-add-chunks-to-milvus
+    inputDefinitions:
+      artifacts:
+        chunks_input_dataset:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-get-chunks-from-documents:
+    executorLabel: exec-get-chunks-from-documents
+    outputDefinitions:
+      artifacts:
+        chunks_output_dataset:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-add-chunks-to-milvus:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - add_chunks_to_milvus
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.8.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'langchain-milvus'\
+          \ 'langchain-huggingface' 'sentence-transformers' 'pymilvus' 'einops' 'openai'\
+          \ 'transformers' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef add_chunks_to_milvus(\n    chunks_input_dataset: Input[Dataset]\n\
+          ):\n    import os\n    import pickle\n    from langchain_huggingface import\
+          \ HuggingFaceEmbeddings\n    from langchain_milvus import Milvus\n    from\
+          \ langchain_core.documents import Document\n\n    # Get the Mivus connection\
+          \ details\n    milvus_host = os.environ.get('MILVUS_HOST')\n    milvus_port\
+          \ = os.environ.get('MILVUS_PORT')\n    milvus_username = os.environ.get('MILVUS_USERNAME')\n\
+          \    milvus_password = os.environ.get('MILVUS_PASSWORD')\n    milvus_collection\
+          \ = os.environ.get('MILVUS_COLLECTION')\n\n    # Print the connection details\n\
+          \    print(f\"milvus_host: {milvus_host}\")\n    print(f\"milvus_port: {milvus_port}\"\
+          )\n    print(f\"milvus_collection: {milvus_collection}\")\n\n    # Get the\
+          \ chunks from the input dataset\n     # Try to load the chunks from the\
+          \ input dataset\n    try:\n        print(f\"Loading chunks from {chunks_input_dataset.path}\"\
+          )\n        with open(chunks_input_dataset.path, 'rb') as f:\n          \
+          \  chunks = pickle.load(f)\n    except Exception as e:\n        print(f\"\
+          Failed to load chunks: {e}\")\n\n    # Check if the variable exists and\
+          \ is of the correct type\n    if chunks is None:\n        raise ValueError(\"\
+          Chunks not loaded successfully.\")\n\n    if not isinstance(chunks, list)\
+          \ or not all(isinstance(doc, Document) for doc in chunks):\n        raise\
+          \ TypeError(\"The loaded data is not a List[langchain_core.documents.Document].\"\
+          )\n\n    print(f\"Loaded {len(chunks)} chunks\")\n\n    # If you don't want\
+          \ to use a GPU, you can remove the 'device': 'cuda' argument\n    # model_kwargs\
+          \ = {'trust_remote_code': True, 'device': 'cuda'}\n    model_kwargs = {'trust_remote_code':\
+          \ True}\n    model_name = \"sentence-transformers/all-MiniLM-L6-v2\"\n \
+          \   # model_name = \"nomic-ai/nomic-embed-text-v1\"\n    embeddings_model\
+          \ = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)\n\
+          \n    Milvus.from_documents(\n        documents=chunks,\n        embedding=embeddings_model,\n\
+          \        connection_args={\"host\": milvus_host, \"port\": milvus_port,\
+          \ \"user\": milvus_username, \"password\": milvus_password},\n        collection_name=milvus_collection,\n\
+          \        metadata_field=\"metadata\",\n        text_field=\"page_content\"\
+          ,\n        drop_old=True\n        )\n\n"
+        env:
+        - name: MILVUS_COLLECTION
+          value: documents
+        image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+    exec-get-chunks-from-documents:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - get_chunks_from_documents
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.8.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'boto3' 'botocore'\
+          \ 'langchain-community' 'pypdf' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef get_chunks_from_documents(\n    chunks_output_dataset: Output[Dataset]\n\
+          ):\n    import os\n    import re\n    import pickle\n\n    import boto3\n\
+          \    import botocore\n\n    from langchain_community.document_loaders import\
+          \ PyPDFDirectoryLoader\n    from langchain.text_splitter import RecursiveCharacterTextSplitter\n\
+          \n    # Get the S3 bucket connection details\n    aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')\n\
+          \    aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')\n \
+          \   endpoint_url = os.environ.get('AWS_S3_ENDPOINT')\n    region_name =\
+          \ os.environ.get('AWS_DEFAULT_REGION')\n    bucket_name = os.environ.get('AWS_S3_BUCKET')\n\
+          \n    # Connect to the S3 bucket\n    session = boto3.session.Session(\n\
+          \        aws_access_key_id=aws_access_key_id,\n        aws_secret_access_key=aws_secret_access_key\n\
+          \    )\n\n    s3_resource = session.resource(\n        's3',\n        config=botocore.client.Config(signature_version='s3v4'),\n\
+          \        endpoint_url=endpoint_url,\n        region_name=region_name\n \
+          \   )\n\n    bucket = s3_resource.Bucket(bucket_name)\n\n    # Check if\
+          \ the bucket exists, and create it if it doesn't\n    if not bucket.creation_date:\n\
+          \        s3_resource.create_bucket(Bucket=bucket_name)\n\n    # Define a\
+          \ temporary directory to store the PDFs\n    local_tmp_dir = '/tmp/pdfs'\n\
+          \    print(f\"local_tmp_dir: {local_tmp_dir}\")\n\n    # Ensure local_tmp_dir\
+          \ exists\n    if not os.path.exists(local_tmp_dir):\n        os.makedirs(local_tmp_dir)\n\
+          \n    # Get all objects from the bucket\n    objects = bucket.objects.all()\n\
+          \    print(f\"objects found: {objects}\")\n\n    # Filter and download PDF\
+          \ files\n    for obj in objects:\n        key = obj.key\n        if key.endswith('.pdf'):\n\
+          \            # Define the local file path\n            local_file_path =\
+          \ os.path.join(local_tmp_dir, os.path.basename(key))\n\n            # Download\
+          \ the file\n            bucket.download_file(key, local_file_path)\n   \
+          \         print(f'Downloaded {key} to {local_file_path}')\n\n    # Load\
+          \ PDFs from the local directory\n    pdf_loader = PyPDFDirectoryLoader(local_tmp_dir)\n\
+          \    pdf_docs = pdf_loader.load()\n    print(f\"Loaded {len(pdf_docs)} PDF\
+          \ documents\")\n\n    # Define a regular expression pattern to match \"\
+          <ID>-<TYPE>*.pdf\"\n    pattern = re.compile(r'^' + re.escape(local_tmp_dir\
+          \ + '/') + r'([0-9]+)-(.*)\\.pdf$', re.IGNORECASE)\n    for doc in pdf_docs:\n\
+          \        match = pattern.match(doc.metadata[\"source\"])\n        if match:\n\
+          \            doc.metadata[\"dossier\"] = match.group(1)\n\n    # Split the\
+          \ documents\n    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024,\n\
+          \                                               chunk_overlap=40)\n    chunks\
+          \ = text_splitter.split_documents(pdf_docs)\n    print(f\"Split {len(pdf_docs)}\
+          \ PDF documents into {len(chunks)} chunks\")\n\n    # Save the chunks to\
+          \ the output dataset path\n    print(f\"Dumping chunks to {chunks_output_dataset.path}\"\
+          )\n    with open(chunks_output_dataset.path, \"wb\") as f:\n        pickle.dump(chunks,\
+          \ f)\n\n"
+        image: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+pipelineInfo:
+  name: load-documents-lc
+root:
+  dag:
+    tasks:
+      add-chunks-to-milvus:
+        cachingOptions: {}
+        componentRef:
+          name: comp-add-chunks-to-milvus
+        dependentTasks:
+        - get-chunks-from-documents
+        inputs:
+          artifacts:
+            chunks_input_dataset:
+              taskOutputArtifact:
+                outputArtifactKey: chunks_output_dataset
+                producerTask: get-chunks-from-documents
+        taskInfo:
+          name: add-chunks-to-milvus
+      get-chunks-from-documents:
+        cachingOptions: {}
+        componentRef:
+          name: comp-get-chunks-from-documents
+        taskInfo:
+          name: get-chunks-from-documents
+  inputDefinitions:
+    parameters:
+      accuracy_threshold:
+        defaultValue: 0.95
+        isOptional: true
+        parameterType: NUMBER_DOUBLE
+      enable_caching:
+        defaultValue: false
+        isOptional: true
+        parameterType: BOOLEAN
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.8.0
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-add-chunks-to-milvus:
+          secretAsEnv:
+          - keyToEnv:
+            - envVar: MILVUS_HOST
+              secretKey: MILVUS_HOST
+            - envVar: MILVUS_PORT
+              secretKey: MILVUS_PORT
+            - envVar: MILVUS_USERNAME
+              secretKey: MILVUS_USERNAME
+            - envVar: MILVUS_PASSWORD
+              secretKey: MILVUS_PASSWORD
+            secretName: milvus-connection-documents
+        exec-get-chunks-from-documents:
+          secretAsEnv:
+          - keyToEnv:
+            - envVar: AWS_ACCESS_KEY_ID
+              secretKey: AWS_ACCESS_KEY_ID
+            - envVar: AWS_SECRET_ACCESS_KEY
+              secretKey: AWS_SECRET_ACCESS_KEY
+            - envVar: AWS_DEFAULT_REGION
+              secretKey: AWS_DEFAULT_REGION
+            - envVar: AWS_S3_BUCKET
+              secretKey: AWS_S3_BUCKET
+            - envVar: AWS_S3_ENDPOINT
+              secretKey: AWS_S3_ENDPOINT
+            secretName: aws-connection-documents
