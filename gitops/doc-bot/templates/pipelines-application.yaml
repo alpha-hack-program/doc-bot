@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values.model.name }}
+  name: {{ .Values.pipelinesApplication.name }}
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -12,9 +12,9 @@ spec:
     server: 'https://kubernetes.default.svc'
     namespace: "{{ .Values.dataScienceProjectNamespace }}"
   source:
-    path: "{{ .Values.modelApplication.path }}"
-    repoURL: "{{ .Values.modelApplication.repoURL }}"
-    targetRevision: "{{ .Values.modelApplication.targetRevision }}"
+    path: "{{ .Values.pipelinesApplication.path }}"
+    repoURL: "{{ .Values.pipelinesApplication.repoURL }}"
+    targetRevision: "{{ .Values.pipelinesApplication.targetRevision }}"
     helm:
       parameters:
         - name: createNamespace
