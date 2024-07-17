@@ -11,3 +11,6 @@ instanceName: vllm-mistral-7b
 createNamespace: true
 
 kfpUpsertTektonPipelineName: kfp-upsert-pl
+
+setup:
+  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
