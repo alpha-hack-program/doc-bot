@@ -7,6 +7,7 @@ paths:
   ui: examples/ui/gradio-rag-milvus-vllm-openai
 
 modelApplication:
+  name: mistral-7b
   repoURL: https://github.com/alpha-hack-program/doc-bot.git
   path: gitops/model
   targetRevision: main
