@@ -1,5 +1,7 @@
 # DOCS: https://www.kubeflow.org/docs/components/pipelines/user-guides/components/ 
 
+# Pipeline to load documents from an S3 bucket into Milvus using llamaindex => li
+
 import os
 import re
 import sys

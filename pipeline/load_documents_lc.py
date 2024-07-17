@@ -1,5 +1,7 @@
 # DOCS: https://www.kubeflow.org/docs/components/pipelines/user-guides/components/ 
 
+# Pipeline to load documents from an S3 bucket into Milvus using langchain => lc
+
 import os
 import sys
 

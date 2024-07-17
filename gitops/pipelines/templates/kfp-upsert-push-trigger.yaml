@@ -211,5 +211,19 @@ spec:
       workspaces:
         - name: workspace-source
           persistentVolumeClaim:
-            claimName: "{{ .Values.instanceName }}-source-pvc"
+            claimName: "{{ .Values.kfpUpsertTektonPipelineName }}-source-pvc"
 
+{{- if .Values.pipelinesWorkspaceDefaultSize }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-source-pvc"
+  namespace: "{{ .Values.dataScienceProjectNamespace }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pipelinesWorkspaceDefaultSize }}
+{{- end }}

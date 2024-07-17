@@ -12,5 +12,7 @@ createNamespace: true
 
 kfpUpsertTektonPipelineName: kfp-upsert-pl
 
+pipelinesWorkspaceDefaultSize: 2Gi
+
 setup:
   image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
