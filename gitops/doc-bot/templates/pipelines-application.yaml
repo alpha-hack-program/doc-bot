@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.model.name }}
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  source:
+    path: "{{ .Values.modelApplication.path }}"
+    repoURL: "{{ .Values.modelApplication.repoURL }}"
+    targetRevision: "{{ .Values.modelApplication.targetRevision }}"
+    helm:
+      parameters:
+        - name: createNamespace
+          value: "false"
+        - name: instanceName
+          value: "{{ .Values.model.name }}"
+        - name: dataScienceProjectNamespace
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+        - name: dataScienceProjectDisplayName
+          value: "{{ .Values.dataScienceProjectDisplayName }}"
+        - name: vcs.uri
+          value: "{{ .Values.vcs.uri }}"
+        - name: vcs.ref
+          value: "{{ .Values.vcs.ref }}"
+        - name: vcs.name
+          value: "{{ .Values.vcs.name }}"
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
