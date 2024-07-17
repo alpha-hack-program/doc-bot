@@ -1,0 +1,79 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: {{ .Values.kfpUpsertTektonPipelineName }}
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  labels:
+    app.kubernetes.io/instance: {{ .Values.kfpUpsertTektonPipelineName }}
+    pipeline.openshift.io/runtime: quarkus
+    pipeline.openshift.io/type: knative
+spec:
+  params:
+    - name: APP_NAME
+      type: string
+      default: "{{ .Values.kfpUpsertTektonPipelineName }}"
+    - name: GIT_PROVIDER
+      type: string
+      default: github
+    - name: GIT_REPO
+      type: string
+      default: "{{ .Values.vcs.uri }}"
+    - name: GIT_REVISION
+      type: string
+      default: "{{ .Values.vcs.ref }}"
+    - name: GIT_SSL_VERIFY
+      type: string
+      default: '{{ .Values.gitSslVerify }}'
+    - name: ADDED_FILES
+      type: string
+      default: '[]'
+    - name: REMOVED_FILES
+      type: string
+      default: '[]'
+    - name: MODIFIED_FILES
+      type: string
+      default: '[]'
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: deleteExisting
+          value: 'true'
+        - name: sslVerify
+          value: $(params.GIT_SSL_VERIFY)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: workspace-source
+    - name: kfp-upload
+      runAfter:
+        - fetch-repository
+      params:
+        - name: TASK_IMAGE
+          value: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+        - name: PIPELINE_NAME
+          value: deploy
+        - name: REQUIREMENTS_FILE
+          value: requirements.txt
+        - name: PIPELINES_PATH
+          value: pipeline
+        - name: ADDED_FILES
+          value: $(params.ADDED_FILES)
+        - name: REMOVED_FILES
+          value: $(params.REMOVED_FILES)
+        - name: MODIFIED_FILES
+          value: $(params.MODIFIED_FILES)
+      taskRef:
+        kind: Task
+        name: kfp-upload
+      workspaces:
+        - name: source
+          workspace: workspace-source
+  workspaces:
+    - name: workspace-source
+

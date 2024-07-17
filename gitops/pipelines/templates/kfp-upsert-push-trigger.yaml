@@ -1,0 +1,215 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-github"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+spec:
+  serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
+  triggers:
+    - name: github-listener
+      interceptors:
+        - ref:
+            name: github
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+            - name: eventTypes
+              value:
+                - push
+      bindings:
+        - kind: TriggerBinding
+          ref: "{{ .Values.kfpUpsertTektonPipelineName }}-github-trigger-binding"
+      template:
+        ref: "{{ .Values.kfpUpsertTektonPipelineName }}-trigger-template"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-github-trigger-binding"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  params:
+  - name: gitRepositoryUrl
+    value: $(body.repository.clone_url)
+  - name: gitRepository
+    value: $(body.repository.full_name)
+  - name: gitRevision
+    value: $(body.after)
+  - name: contentType
+    value: $(header.Content-Type)
+  - name: gitId
+    value: $(body.after)
+  - name: added
+    value: $(body.commits[0].added[*])
+  - name: removed
+    value: $(body.commits[0].removed[*])
+  - name: modified
+    value: $(body.commits[0].modified[*])
+  - name: gitProvider
+    value: github
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-gitea"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+spec:
+  serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
+  triggers:
+    - name: github-listener
+      interceptors:
+        - ref:
+            name: github
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+            - name: eventTypes
+              value:
+                - push
+      bindings:
+        - kind: TriggerBinding
+          ref: "{{ .Values.kfpUpsertTektonPipelineName }}-gitea-trigger-binding"
+      template:
+        ref: "{{ .Values.kfpUpsertTektonPipelineName }}-trigger-template"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-gitea-trigger-binding"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  params:
+  - name: gitRepositoryUrl
+    value: $(body.repository.clone_url)
+  - name: gitRepository
+    value: $(body.repository.full_name)
+  - name: gitRevision
+    value: $(body.after)
+  - name: contentType
+    value: $(header.Content-Type)
+  - name: gitId
+    value: $(body.after)
+  - name: added
+    value: $(body.commits[0].added[*])
+  - name: removed
+    value: $(body.commits[0].removed[*])
+  - name: modified
+    value: $(body.commits[0].modified[*])
+  - name: gitProvider
+    value: gitea
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-gitlab"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+spec:
+  serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
+  triggers:
+    - name: gitlab-listener
+      interceptors:
+        - ref:
+            name: gitlab
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+            - name: eventTypes
+              value:
+                - push
+      bindings:
+        - kind: TriggerBinding
+          ref: "{{ .Values.kfpUpsertTektonPipelineName }}-gitlab-trigger-binding"
+      template:
+        ref: "{{ .Values.kfpUpsertTektonPipelineName }}-trigger-template"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-gitlab-trigger-binding"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  params:
+  - name: gitRepositoryUrl
+    value: $(body.repository.clone_url)
+  - name: gitRepository
+    value: $(body.repository.full_name)
+  - name: gitRevision
+    value: $(body.after)
+  - name: contentType
+    value: $(header.Content-Type)
+  - name: gitId
+    value: $(body.after)
+  - name: added
+    value: $(body.commits[0].added[*])
+  - name: removed
+    value: $(body.commits[0].removed[*])
+  - name: modified
+    value: $(body.commits[0].modified[*])
+  - name: gitProvider
+    value: gitlab
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-trigger-template"
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  params:
+  - name: gitRepositoryUrl
+  - name: gitRepository
+  - name: gitRevision
+  - name: gitId
+  - name: added
+  - name: removed
+  - name: modified
+  - name: gitProvider
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: "{{ .Values.kfpUpsertTektonPipelineName }}-plr-"
+      namespace: {{ .Values.dataScienceProjectNamespace }}
+      labels:
+        app.kubernetes.io/instance: "{{ .Values.instanceName }}"
+        pipeline.openshift.io/runtime: quarkus
+        pipeline.openshift.io/type: knative
+        tekton.dev/pipeline: {{ .Values.kfpUpsertTektonPipelineName }}
+    spec:
+      params:
+        - name: APP_NAME
+          value: "{{ .Values.kfpUpsertTektonPipelineName }}"
+        - name: GIT_PROVIDER
+          value: $(tt.params.gitProvider)
+        - name: GIT_REPO
+          value: $(tt.params.gitRepositoryUrl)
+        - name: GIT_REPO_NAME
+          value: $(tt.params.gitRepository)
+        - name: GIT_REVISION
+          value: $(tt.params.gitRevision)
+        - name: IMAGE_TAG
+          value: $(tt.params.gitRevision)
+        - name: REVISION_NAME
+          value: v1
+        - name: ADDED_FILES
+          value: $(tt.params.added)
+        - name: REMOVED_FILES
+          value: $(tt.params.removed)
+        - name: MODIFIED_FILES
+          value: $(tt.params.modified)
+      pipelineRef:
+        name: {{ .Values.kfpUpsertTektonPipelineName }}
+      # serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
+      timeout: 1h0m0s
+      workspaces:
+        - name: workspace-source
+          persistentVolumeClaim:
+            claimName: "{{ .Values.instanceName }}-source-pvc"
+

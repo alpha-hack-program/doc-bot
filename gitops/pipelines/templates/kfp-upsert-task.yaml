@@ -1,0 +1,93 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/displayName: Upload a Pipeline to a KFP cluster
+    tekton.dev/pipelines.minVersion: '0.19'
+    tekton.dev/tags: 'kfp'
+  name: kfp-upload
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  labels:
+    app.kubernetes.io/version: '0.1'
+    operator.tekton.dev/provider-type: redhat
+spec:
+  description: >-
+    These Task will compile and upload a Pipeline to a KFP cluster
+  params:
+    - description: The image used where python is installed
+      name: TASK_IMAGE
+      type: string
+      default: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+    - description: The pipeline python script to compile
+      name: PIPELINE_NAME
+      type: string
+      default: deploy
+    - description: The requiretments file to install
+      name: REQUIREMENTS_FILE
+      type: string
+      default: requirements.txt
+    - description: The path to the pipeline python script
+      name: PIPELINES_PATH
+      type: string
+      default: pipeline
+    - description: Added files in the current commit
+      name: ADDED_FILES
+      type: string
+      default: '[]'
+    - description: Removed files in the current commit
+      name: REMOVED_FILES
+      type: string
+      default: '[]'
+    - description: Modified files in the current commit
+      name: MODIFIED_FILES
+      type: string
+      default: '[]'
+  results:
+    - description: The Pipeline Id of the kfp pipeline uploaded
+      name: PIPELINE_ID
+  steps:
+    - image: $(params.TASK_IMAGE)
+      name: compile
+      resources: {}
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: PIPELINE_NAME
+          value: $(params.PIPELINE_NAME)
+        - name: PIPELINES_PATH
+          value: $(params.PIPELINES_PATH)
+        - name: ADDED_FILES
+          value: $(params.ADDED_FILES)
+        - name: REMOVED_FILES
+          value: $(params.REMOVED_FILES)
+        - name: MODIFIED_FILES
+          value: $(params.MODIFIED_FILES)
+      script: |
+        #!/bin/sh
+
+        echo "Compiling pipeline $(params.PIPELINE_NAME).yaml"
+
+        echo "Current directory"
+        pwd
+
+        echo "List files"
+        ls -lstrh
+
+        echo "ADDED_FILES=$(params.ADDED_FILES)"
+        echo "REMOVED_FILES=$(params.REMOVED_FILES)"
+        echo "MODIFIED_FILES=$(params.MODIFIED_FILES)"
+
+        cd $(params.PIPELINES_PATH)
+
+        pip install -r $(params.REQUIREMENTS_FILE)
+
+        # Upload the pipeline
+        export NAMESPACE_NAME="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
+        export TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+        export PIPELINE_NAME="$(params.PIPELINE_NAME)"
+
+        echo "NAMESPACE_NAME: $NAMESPACE_NAME PIPELINE_NAME: $PIPELINE_NAME TOKEN: $TOKEN"
+
+        python $(params.PIPELINE_NAME).py
+  workspaces:
+    - mountPath: /workspace/source
+      name: source

@@ -1,0 +1,13 @@
+vcs:
+  uri: https://github.com/alpha-hack-program/doc-bot.git
+  ref: main
+  name: alpha-hack-program/doc-bot
+
+dataScienceProjectDisplayName: vllm-mistral-7b
+dataScienceProjectNamespace: vllm-mistral-7b
+
+instanceName: vllm-mistral-7b
+
+createNamespace: true
+
+kfpUpsertTektonPipelineName: kfp-upsert-pl

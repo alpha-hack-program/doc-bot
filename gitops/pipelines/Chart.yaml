@@ -1,0 +1,5 @@
+apiVersion: v2
+name: pipelines
+description: A Helm chart to deploy KFP v2 pipelines using RHOAI
+version: 0.1.0
+appVersion: "1.0"
