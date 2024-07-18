@@ -35,6 +35,69 @@ spec:
       name: PIPELINE_ID
   steps:
     - image: $(params.TASK_IMAGE)
+      name: git-log
+      resources: {}
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+
+        REPO_PATH='.'
+
+        pip install gitpython
+
+        python <<EOF
+        import os
+        import sys
+        import git
+
+        workspace_path = '/workspace/source'
+
+        # Ensure the workspace directory exists
+        os.makedirs(workspace_path, exist_ok=True)
+
+        # Define the file paths
+        added_file_path = os.path.join(workspace_path, 'added')
+        modified_file_path = os.path.join(workspace_path, 'modified')
+        removed_file_path = os.path.join(workspace_path, 'removed')
+
+        # Initialize lists to hold file paths
+        added_files = []
+        modified_files = []
+        removed_files = []
+
+        # Path to your git repository
+        repo_path = os.environ.get('REPO_PATH')
+
+        # Open the repository
+        repo = git.Repo(repo_path)
+
+        # Get the latest commit
+        commit = repo.head.commit
+
+        # Process the files in the latest commit
+        for diff in commit.diff('HEAD~1'):
+            if diff.change_type == 'A':
+                added_files.append(diff.b_path)
+            elif diff.change_type == 'M':
+                modified_files.append(diff.b_path)
+            elif diff.change_type == 'R':
+                removed_files.append(diff.b_path)
+
+        # Write the file paths to the respective files
+        with open(added_file_path, 'w') as f:
+            f.write(','.join(added_files))
+
+        with open(modified_file_path, 'w') as f:
+            f.write(','.join(modified_files))
+
+        with open(removed_file_path, 'w') as f:
+            f.write(','.join(removed_files))
+
+        print("Files written successfully.")
+
+        EOF
+
+    - image: $(params.TASK_IMAGE)
       name: compile
       resources: {}
       workingDir: $(workspaces.source.path)
@@ -45,6 +108,10 @@ spec:
           value: $(params.PIPELINES_PATH)
       script: |
         #!/bin/sh
+
+        MODIFIED_FILES=$(cat /workspace/source/modified)
+        ADDED_FILES=$(cat /workspace/source/added)
+        REMOVED_FILES=$(cat /workspace/source/removed)
 
         echo "Compiling pipeline $(params.PIPELINE_NAME).yaml"
 
