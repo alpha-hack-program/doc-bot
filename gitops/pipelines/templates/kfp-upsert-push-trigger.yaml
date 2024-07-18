@@ -41,12 +41,6 @@ spec:
     value: $(header.Content-Type)
   - name: gitId
     value: $(body.after)
-  - name: added
-    value: $(body.commits[0].added[*])
-  - name: removed
-    value: $(body.commits[0].removed[*])
-  - name: modified
-    value: $(body.commits[0].modified[*])
   - name: gitProvider
     value: github
 ---
@@ -93,12 +87,6 @@ spec:
     value: $(header.Content-Type)
   - name: gitId
     value: $(body.after)
-  - name: added
-    value: $(body.commits[0].added[*])
-  - name: removed
-    value: $(body.commits[0].removed[*])
-  - name: modified
-    value: $(body.commits[0].modified[*])
   - name: gitProvider
     value: gitea
 ---
@@ -145,12 +133,6 @@ spec:
     value: $(header.Content-Type)
   - name: gitId
     value: $(body.after)
-  - name: added
-    value: $(body.commits[0].added[*])
-  - name: removed
-    value: $(body.commits[0].removed[*])
-  - name: modified
-    value: $(body.commits[0].modified[*])
   - name: gitProvider
     value: gitlab
 ---
@@ -167,9 +149,6 @@ spec:
   - name: gitRepository
   - name: gitRevision
   - name: gitId
-  - name: added
-  - name: removed
-  - name: modified
   - name: gitProvider
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
@@ -198,12 +177,6 @@ spec:
           value: $(tt.params.gitRevision)
         - name: REVISION_NAME
           value: v1
-        - name: ADDED_FILES
-          value: $(tt.params.added)
-        - name: REMOVED_FILES
-          value: $(tt.params.removed)
-        - name: MODIFIED_FILES
-          value: $(tt.params.modified)
       pipelineRef:
         name: {{ .Values.kfpUpsertTektonPipelineName }}
       # serviceAccountName: {{ .Values.pipelinesServiceAccountName }}

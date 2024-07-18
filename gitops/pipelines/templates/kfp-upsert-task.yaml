@@ -30,18 +30,6 @@ spec:
       name: PIPELINES_PATH
       type: string
       default: pipeline
-    - description: Added files in the current commit
-      name: ADDED_FILES
-      type: string
-      default: '[]'
-    - description: Removed files in the current commit
-      name: REMOVED_FILES
-      type: string
-      default: '[]'
-    - description: Modified files in the current commit
-      name: MODIFIED_FILES
-      type: string
-      default: '[]'
   results:
     - description: The Pipeline Id of the kfp pipeline uploaded
       name: PIPELINE_ID
@@ -55,12 +43,6 @@ spec:
           value: $(params.PIPELINE_NAME)
         - name: PIPELINES_PATH
           value: $(params.PIPELINES_PATH)
-        - name: ADDED_FILES
-          value: $(params.ADDED_FILES)
-        - name: REMOVED_FILES
-          value: $(params.REMOVED_FILES)
-        - name: MODIFIED_FILES
-          value: $(params.MODIFIED_FILES)
       script: |
         #!/bin/sh
 
@@ -71,10 +53,6 @@ spec:
 
         echo "List files"
         ls -lstrh
-
-        echo "ADDED_FILES=$(params.ADDED_FILES)"
-        echo "REMOVED_FILES=$(params.REMOVED_FILES)"
-        echo "MODIFIED_FILES=$(params.MODIFIED_FILES)"
 
         cd $(params.PIPELINES_PATH)
 

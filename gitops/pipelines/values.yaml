@@ -3,6 +3,8 @@ vcs:
   ref: main
   name: alpha-hack-program/doc-bot
 
+gitSslVerify: true
+
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 

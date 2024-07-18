@@ -62,12 +62,6 @@ spec:
           value: requirements.txt
         - name: PIPELINES_PATH
           value: pipeline
-        - name: ADDED_FILES
-          value: $(params.ADDED_FILES)
-        - name: REMOVED_FILES
-          value: $(params.REMOVED_FILES)
-        - name: MODIFIED_FILES
-          value: $(params.MODIFIED_FILES)
       taskRef:
         kind: Task
         name: kfp-upload
