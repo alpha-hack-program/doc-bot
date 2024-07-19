@@ -41,7 +41,7 @@ spec:
       script: |
         #!/bin/sh
 
-        REPO_PATH=$(params.REPO_PATH)
+        REPO_PATH=$(workspaces.source.path)
 
         git config --global --add safe.directory ${REPO_PATH}
 
