@@ -14,7 +14,6 @@ from kfp.dsl import Input, Output, Dataset
 from kfp import kubernetes
 
 from kubernetes import client, config
-from sympy import im
 
 # This component downloads all the PDFs in an S3 bucket and load them and saves them to the correspoding output paths.
 # The connection to the S3 bucket is created using this environment variables:
