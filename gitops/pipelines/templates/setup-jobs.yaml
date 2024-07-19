@@ -22,7 +22,12 @@ spec:
                 sleep 5
               done; echo
 
-              NUMBER_OF_PLR=$(oc get pipelinerun | jq '.items | length')
+              # NUMBER_OF_PLR=$(oc get pipelinerun | jq '.items | length')
+              NUMBER_OF_PLR=$(oc get pipelinerun --no-headers 2>/dev/null | wc -l)
+              # Check if the kubectl command succeeded
+              if [ $? -ne 0 ]; then
+                NUMBER_OF_PLR=0
+              fi
 
               if [ "$NUMBER_OF_PLR" -eq 0 ]; then
                 echo "No existing PipelineRuns found. Creating a new PipelineRun."
