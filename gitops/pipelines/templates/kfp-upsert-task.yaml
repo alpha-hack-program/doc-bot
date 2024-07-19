@@ -39,6 +39,10 @@ spec:
     - description: Modified files
       name: MODIFIED_FILES
       type: string
+    - description: Force upsert
+      name: FORCE_UPSERT
+      type: string
+      default: 'false'
   results:
     - description: Pipelines files to upsert 
       name: PIPELINE_FILES_TO_UPSERT
@@ -62,6 +66,10 @@ spec:
           value: $(params.REMOVED_FILES)
         - name: MODIFIED_FILES
           value: $(params.MODIFIED_FILES)
+        - name: REQUIREMENTS_FILE
+          value: $(params.REQUIREMENTS_FILE)
+        - name: FORCE_UPSERT
+          value: $(params.FORCE_UPSERT)
       script: |
         #!/bin/sh
 
@@ -87,6 +95,14 @@ spec:
 
         pipeline_files_to_upsert_file_path="$(results.PIPELINE_FILES_TO_UPSERT.path)"
         pipeline_files_to_remove_file_path="$(results.PIPELINE_FILES_TO_REMOVE.path)"
+
+        # If FORCE_UPSERT is true, list all python files in the pipelines directory
+        force_upsert = "${FORCE_UPSERT}"
+        if force_upsert == 'true':
+            import os
+            added_files = ' '.join([
+                os.path.join(dp, f) for dp, dn, filenames in os.walk(pipelines_dir) for f in filenames if f.endswith('.py')
+            ])
 
         # Function to filter and clean file paths
         def filter_pipelines_files(files_str, pipelines_dir):

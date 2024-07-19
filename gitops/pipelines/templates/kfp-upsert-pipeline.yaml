@@ -33,6 +33,9 @@ spec:
     - name: MODIFIED_FILES
       type: string
       default: '[]'
+    - name: FORCE_UPSERT
+      type: string
+      default: 'false'
   tasks:
     - name: fetch-repository
       params:
@@ -68,6 +71,8 @@ spec:
           value: $(tasks.fetch-repository.results.removed)
         - name: MODIFIED_FILES
           value:  $(tasks.fetch-repository.results.modified)
+        - name: FORCE_UPSERT
+          value: $(params.FORCE_UPSERT)
       taskRef:
         kind: Task
         name: kfp-upload
