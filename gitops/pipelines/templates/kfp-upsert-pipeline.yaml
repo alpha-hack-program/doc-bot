@@ -62,6 +62,12 @@ spec:
           value: requirements.txt
         - name: PIPELINES_PATH
           value: pipeline
+        - name: ADDED_FILES
+          value: $(tasks.fetch-repository.results.added)
+        - name: REMOVED_FILES
+          value: $(tasks.fetch-repository.results.removed)
+        - name: MODIFIED_FILES
+          value:  $(tasks.fetch-repository.results.modified)
       taskRef:
         kind: Task
         name: kfp-upload

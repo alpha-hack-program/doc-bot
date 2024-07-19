@@ -30,6 +30,15 @@ spec:
       name: PIPELINES_PATH
       type: string
       default: pipeline
+    - description: Added files
+      name: ADDED_FILES
+      type: string
+    - description: Removed files
+      name: REMOVED_FILES
+      type: string
+    - description: Modified files
+      name: MODIFIED_FILES
+      type: string
   results:
     - description: The Pipeline Id of the kfp pipeline uploaded
       name: PIPELINE_ID
