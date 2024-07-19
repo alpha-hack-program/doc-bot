@@ -43,6 +43,8 @@ spec:
 
         REPO_PATH=$(params.REPO_PATH)
 
+        git config --global --add safe.directory ${REPO_PATH}
+
         pip install gitpython
 
         python <<EOF
@@ -66,7 +68,8 @@ spec:
         removed_files = []
 
         # Path to your git repository
-        repo_path = os.environ.get('REPO_PATH')
+        # repo_path = os.environ.get('REPO_PATH')
+        repo_path = '${REPO_PATH}'
 
         # Open the repository
         repo = git.Repo(repo_path)
