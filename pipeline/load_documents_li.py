@@ -1,22 +1,22 @@
 # DOCS: https://www.kubeflow.org/docs/components/pipelines/user-guides/components/ 
 
-# Pipeline to load documents from an S3 bucket into Milvus using `llamaindex` => li
+# Pipeline to load documents from an S3 bucket into Milvus using `langchain` => lc
 
 import os
-import re
 import sys
 
 import kfp
 
 from kfp import compiler
 from kfp import dsl
-from kfp.dsl import Input, Output, Dataset, Model, Metrics, OutputPath
+from kfp.dsl import Input, Output, Dataset
 
 from kfp import kubernetes
 
 from kubernetes import client, config
+from sympy import im
 
-# This component downloads the evaluation data, scaler and model from an S3 bucket and saves it to the correspoding output paths.
+# This component downloads all the PDFs in an S3 bucket and load them and saves them to the correspoding output paths.
 # The connection to the S3 bucket is created using this environment variables:
 # - AWS_ACCESS_KEY_ID
 # - AWS_SECRET_ACCESS_KEY
@@ -26,33 +26,31 @@ from kubernetes import client, config
 # - SCALER_S3_KEY
 # - EVALUATION_DATA_S3_KEY
 # - MODEL_S3_KEY
-# The data is in pickel format and the file name is passed as an environment variable S3_KEY.
 @dsl.component(
     base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301",
-    packages_to_install=["boto3", "botocore"]
+    packages_to_install=["boto3", "botocore", "langchain-community","pypdf"]
 )
-def get_evaluation_kit(
-    evaluation_data_output_dataset: Output[Dataset],
-    scaler_output_model: Output[Model],
-    model_output_model: Output[Model]
+def get_chunks_from_documents(
+    chunks_output_dataset: Output[Dataset]
 ):
+    import os
+    import re
+    import pickle
+
     import boto3
     import botocore
-    import os
-    import zipfile
-    import shutil
-
+    
+    from langchain_community.document_loaders import PyPDFDirectoryLoader
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    
+    # Get the S3 bucket connection details
     aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
     aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
     endpoint_url = os.environ.get('AWS_S3_ENDPOINT')
     region_name = os.environ.get('AWS_DEFAULT_REGION')
     bucket_name = os.environ.get('AWS_S3_BUCKET')
-    evaluation_kit_s3_key = os.environ.get('EVALUATION_KIT_S3_KEY')
 
-    evaluation_data_zip_path = os.environ.get('EVALUATION_DATA_ZIP_PATH')
-    scaler_zip_path = os.environ.get('SCALER_ZIP_PATH')
-    model_zip_path = os.environ.get('MODEL_ZIP_PATH')
-
+    # Connect to the S3 bucket
     session = boto3.session.Session(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key
@@ -67,218 +65,135 @@ def get_evaluation_kit(
 
     bucket = s3_resource.Bucket(bucket_name)
 
-    # Create a temporary directory to store the evaluation kit
-    
-    local_tmp_dir = '/tmp/get_evaluation_kit'
+    # Check if the bucket exists, and create it if it doesn't
+    if not bucket.creation_date:
+        s3_resource.create_bucket(Bucket=bucket_name)
+
+    # Define a temporary directory to store the PDFs
+    local_tmp_dir = '/tmp/pdfs'
     print(f"local_tmp_dir: {local_tmp_dir}")
     
     # Ensure local_tmp_dir exists
     if not os.path.exists(local_tmp_dir):
         os.makedirs(local_tmp_dir)
 
-    # Get the file name from the S3 key
-    file_name = os.path.basename(evaluation_kit_s3_key)    
-    # Download the evaluation kit
-    local_file_path = f'{local_tmp_dir}/{file_name}'
-    print(f"Downloading {evaluation_kit_s3_key} to {local_file_path}")
-    bucket.download_file(evaluation_kit_s3_key, local_file_path)
-    print(f"Downloaded {evaluation_kit_s3_key}")
+    # Get all objects from the bucket
+    objects = bucket.objects.all()
+    print(f"objects found: {objects}")
 
-    # Unzip the evaluation kit using zipfile module
-    extraction_dir = f'{local_tmp_dir}/evaluation_kit'
-    print(f"Extracting {local_file_path} in {extraction_dir}")
-    with zipfile.ZipFile(local_file_path, 'r') as zip_ref:
-        zip_ref.extractall(extraction_dir)
-    print(f"Extracted {local_file_path} in {extraction_dir}")
+    # Filter and download PDF files
+    for obj in objects:
+        key = obj.key
+        if key.endswith('.pdf'):
+            # Define the local file path
+            local_file_path = os.path.join(local_tmp_dir, os.path.basename(key))
+            
+            # Download the file
+            bucket.download_file(key, local_file_path)
+            print(f'Downloaded {key} to {local_file_path}')
 
-     # Copy the evaluation evaluation_kit/model.onnx to the model output path
-    print(f"Copying {extraction_dir}/{model_zip_path} to {model_output_model.path}")
-    shutil.copy(f'{extraction_dir}/{model_zip_path}', model_output_model.path)
-    
-    # Copy the evaluation evaluation_kit/scaler.pkl to the scaler output path
-    print(f"Copying {extraction_dir}/{scaler_zip_path} to {scaler_output_model.path}")
-    shutil.copy(f'{extraction_dir}/{scaler_zip_path}', scaler_output_model.path)
+    # Load PDFs from the local directory
+    pdf_loader = PyPDFDirectoryLoader(local_tmp_dir)
+    pdf_docs = pdf_loader.load()
+    print(f"Loaded {len(pdf_docs)} PDF documents")
 
-    # Copy the evaluation evaluation_kit/evaluation_data.pkl to the evaluation data output path
-    print(f"Copying {extraction_dir}/{evaluation_data_zip_path} to {evaluation_data_output_dataset.path}")
-    shutil.copy(f'{extraction_dir}/{evaluation_data_zip_path}', evaluation_data_output_dataset.path)
+    # Define a regular expression pattern to match "<ID>-<TYPE>*.pdf"
+    pattern = re.compile(r'^' + re.escape(local_tmp_dir + '/') + r'([0-9]+)-(.*)\.pdf$', re.IGNORECASE)
+    for doc in pdf_docs:
+        match = pattern.match(doc.metadata["source"])
+        if match:
+            doc.metadata["dossier"] = match.group(1)
+
+    # Split the documents
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024,
+                                               chunk_overlap=40)
+    chunks = text_splitter.split_documents(pdf_docs)
+    print(f"Split {len(pdf_docs)} PDF documents into {len(chunks)} chunks")
+
+    # Save the chunks to the output dataset path
+    print(f"Dumping chunks to {chunks_output_dataset.path}")
+    with open(chunks_output_dataset.path, "wb") as f:
+        pickle.dump(chunks, f)
 
 @dsl.component(
     base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301",
-    packages_to_install=["onnx==1.16.1", "onnxruntime==1.18.0", "scikit-learn==1.5.0", "numpy==1.24.3", "pandas==2.2.2"]
+    packages_to_install=["langchain-milvus", "langchain-huggingface", "sentence-transformers", "pymilvus", "einops", "openai", "transformers"]
 )
-def test_model(
-    evaluation_data_input_dataset: Input[Dataset],
-    scaler_input_model: Input[Model],
-    model_input_model: Input[Model],
-    results_output_metrics: Output[Metrics]
+def add_chunks_to_milvus(
+    model_name: str,
+    chunks_input_dataset: Input[Dataset]
 ):
-    import numpy as np
-    import pickle
-    import onnxruntime as rt
-
-    # Load the evaluation data and scaler
-    with open(evaluation_data_input_dataset.path, 'rb') as handle:
-        (X_test, y_test) = pickle.load(handle)
-    with open(scaler_input_model.path, 'rb') as handle:
-        scaler = pickle.load(handle)
-
-    sess = rt.InferenceSession(model_input_model.path, providers=rt.get_available_providers())
-    input_name = sess.get_inputs()[0].name
-    output_name = sess.get_outputs()[0].name
-    y_pred_temp = sess.run([output_name], {input_name: scaler.transform(X_test.values).astype(np.float32)}) 
-    y_pred_temp = np.asarray(np.squeeze(y_pred_temp[0]))
-    threshold = 0.995
-    y_pred = np.where(y_pred_temp > threshold, 1, 0)
-
-    accuracy = np.sum(np.asarray(y_test) == y_pred) / len(y_pred)
-    # print("Accuracy: " + str(accuracy))
-
-    results_output_metrics.log_metric("accuracy", accuracy)
-
-# This component parses the metrics and extracts the accuracy
-@dsl.component(
-    base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301"
-)
-def parse_metrics(metrics_input: Input[Metrics], accuracy_output: OutputPath(float)):
-    print(f"metrics_input: {dir(metrics_input)}")
-    accuracy = metrics_input.metadata["accuracy"]
-    with open(accuracy_output, 'w') as f:
-        f.write(str(accuracy))
-
-# This component uploads the model to an S3 bucket. The connection to the S3 bucket is created using this environment variables:
-# - AWS_ACCESS_KEY_ID
-# - AWS_SECRET_ACCESS_KEY
-# - AWS_DEFAULT_REGION
-# - AWS_S3_BUCKET
-# - AWS_S3_ENDPOINT
-@dsl.component(
-    base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301",
-    packages_to_install=["boto3", "botocore"]
-)
-def upload_model(input_model: Input[Model]):
     import os
-    import boto3
-    import botocore
+    import pickle
+    from langchain_huggingface import HuggingFaceEmbeddings
+    from langchain_milvus import Milvus
+    from langchain_core.documents import Document
 
-    aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    endpoint_url = os.environ.get('AWS_S3_ENDPOINT')
-    region_name = os.environ.get('AWS_DEFAULT_REGION')
-    bucket_name = os.environ.get('AWS_S3_BUCKET')
+    # Get the Mivus connection details
+    milvus_host = os.environ.get('MILVUS_HOST')
+    milvus_port = os.environ.get('MILVUS_PORT')
+    milvus_username = os.environ.get('MILVUS_USERNAME')
+    milvus_password = os.environ.get('MILVUS_PASSWORD')
+    milvus_collection = os.environ.get('MILVUS_COLLECTION')
+    
+    # Print the connection details
+    print(f"milvus_host: {milvus_host}")
+    print(f"milvus_port: {milvus_port}")
+    print(f"milvus_collection: {milvus_collection}")
 
-    s3_key = os.environ.get("MODEL_S3_KEY")
-
-    print(f"Uploading {input_model.path} to {s3_key} in {bucket_name} bucket in {endpoint_url} endpoint")
-
-    session = boto3.session.Session(aws_access_key_id=aws_access_key_id,
-                                    aws_secret_access_key=aws_secret_access_key)
-
-    s3_resource = session.resource(
-        's3',
-        config=botocore.client.Config(signature_version='s3v4'),
-        endpoint_url=endpoint_url,
-        region_name=region_name)
-
-    bucket = s3_resource.Bucket(bucket_name)
-
-    print(f"Uploading {s3_key}")
-    bucket.upload_file(input_model.path, s3_key)
-
-@dsl.component(
-    base_image="quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301",
-    packages_to_install=["kubernetes"]
-)
-def refresh_deployment(deployment_name: str):
-    import datetime
-    import kubernetes
-
-    # Use the in-cluster config
-    kubernetes.config.load_incluster_config()
-
-    # Get the current namespace
-    with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
-        namespace = f.read().strip()
-
-    # Create Kubernetes API client
-    api_instance = kubernetes.client.CustomObjectsApi()
-
-    # Define the deployment patch
-    patch = {
-        "spec": {
-            "template": {
-                "metadata": {
-                    "annotations": {
-                        "kubectl.kubernetes.io/restartedAt": f"{datetime.datetime.now(datetime.timezone.utc).isoformat()}"
-                    }
-                }
-            }
-        }
-    }
-
+    # Get the chunks from the input dataset
+     # Try to load the chunks from the input dataset
     try:
-        # Patch the deployment
-        api_instance.patch_namespaced_custom_object(
-            group="apps",
-            version="v1",
-            namespace=namespace,
-            plural="deployments",
-            name=deployment_name,
-            body=patch
-        )
-        print(f"Deployment {deployment_name} patched successfully")
+        print(f"Loading chunks from {chunks_input_dataset.path}")
+        with open(chunks_input_dataset.path, 'rb') as f:
+            chunks = pickle.load(f)
     except Exception as e:
-        print(f"Failed to patch deployment {deployment_name}: {e}")
+        print(f"Failed to load chunks: {e}")
+
+    # Check if the variable exists and is of the correct type
+    if chunks is None:
+        raise ValueError("Chunks not loaded successfully.")
+    
+    if not isinstance(chunks, list) or not all(isinstance(doc, Document) for doc in chunks):
+        raise TypeError("The loaded data is not a List[langchain_core.documents.Document].")
+
+    print(f"Loaded {len(chunks)} chunks")
+
+    # If you don't want to use a GPU, you can remove the 'device': 'cuda' argument
+    # model_kwargs = {'trust_remote_code': True, 'device': 'cuda'}
+    model_kwargs = {'trust_remote_code': True}
+    # model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    # model_name = "nomic-ai/nomic-embed-text-v1"
+    embeddings_model = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+    
+    Milvus.from_documents(
+        documents=chunks,
+        embedding=embeddings_model,
+        connection_args={"host": milvus_host, "port": milvus_port, "user": milvus_username, "password": milvus_password},
+        collection_name=milvus_collection,
+        metadata_field="metadata",
+        text_field="page_content",
+        drop_old=True
+        )
 
 # This pipeline will download evaluation data, download the model, test the model and if it performs well, 
 # upload the model to the runtime S3 bucket and refresh the runtime deployment.
 @dsl.pipeline(name=os.path.basename(__file__).replace('.py', ''))
-def pipeline(accuracy_threshold: float = 0.95, deployment_name: str = "modelmesh-serving-fraud-detection-model-server",  enable_caching: bool = False):
-    # Get the evaluation data, scaler and model
-    get_evaluation_kit_task = get_evaluation_kit().set_caching_options(False)
+def pipeline(model_name: str = "nomic-ai/nomic-embed-text-v1",  enable_caching: bool = False):
+    # Get all the PDFs from the S3 bucket
+    get_chunks_from_documents_task = get_chunks_from_documents().set_caching_options(False)
 
-    # Test the model
-    test_model_task = test_model(
-        evaluation_data_input_dataset=get_evaluation_kit_task.outputs["evaluation_data_output_dataset"],
-        scaler_input_model=get_evaluation_kit_task.outputs["scaler_output_model"], 
-        model_input_model=get_evaluation_kit_task.outputs["model_output_model"]
+    # Add chunks to vector store
+    add_chunks_to_vector_store_task = add_chunks_to_milvus(
+        model_name=model_name,
+        chunks_input_dataset=get_chunks_from_documents_task.outputs["chunks_output_dataset"]
     ).set_caching_options(False)
+        
 
-    # Parse the metrics and extract the accuracy
-    parse_metrics_task = parse_metrics(metrics_input=test_model_task.outputs["results_output_metrics"]).set_caching_options(False)
-    accuracy = parse_metrics_task.outputs["accuracy_output"]
-
-    # Use the parsed accuracy to decide if we should upload the model
-    # Doc: https://www.kubeflow.org/docs/components/pipelines/user-guides/core-functions/execute-kfp-pipelines-locally/
-    with dsl.If(accuracy >= accuracy_threshold):
-        upload_model_task = upload_model(input_model=get_evaluation_kit_task.outputs["model_output_model"]).after(parse_metrics_task).set_caching_options(False)
-
-        # Setting environment variables for upload_model_task
-        upload_model_task.set_env_variable(name="MODEL_S3_KEY", value="models/fraud/1/model.onnx")
-        kubernetes.use_secret_as_env(
-            task=upload_model_task,
-            secret_name='aws-connection-model-runtime',
-            secret_key_to_env={
-                'AWS_ACCESS_KEY_ID': 'AWS_ACCESS_KEY_ID',
-                'AWS_SECRET_ACCESS_KEY': 'AWS_SECRET_ACCESS_KEY',
-                'AWS_DEFAULT_REGION': 'AWS_DEFAULT_REGION',
-                'AWS_S3_BUCKET': 'AWS_S3_BUCKET',
-                'AWS_S3_ENDPOINT': 'AWS_S3_ENDPOINT',
-            }
-        )
-
-        # Refresh the deployment
-        refresh_deployment(deployment_name=deployment_name).after(upload_model_task).set_caching_options(False)
-
-    # Set the S3 keys for get_evaluation_kit_task and kubernetes secret to be used in the task
-    get_evaluation_kit_task.set_env_variable(name="EVALUATION_KIT_S3_KEY", value="models/evaluation_kit.zip")
-    get_evaluation_kit_task.set_env_variable(name="EVALUATION_DATA_ZIP_PATH", value="artifact/test_data.pkl")
-    get_evaluation_kit_task.set_env_variable(name="SCALER_ZIP_PATH", value="artifact/scaler.pkl")
-    get_evaluation_kit_task.set_env_variable(name="MODEL_ZIP_PATH", value="models/fraud/1/model.onnx")
-
+    # Set the kubernetes secret to be used in the get_chunks_from_documents task
     kubernetes.use_secret_as_env(
-        task=get_evaluation_kit_task,
-        secret_name='aws-connection-model-staging',
+        task=get_chunks_from_documents_task,
+        secret_name='aws-connection-documents',
         secret_key_to_env={
             'AWS_ACCESS_KEY_ID': 'AWS_ACCESS_KEY_ID',
             'AWS_SECRET_ACCESS_KEY': 'AWS_SECRET_ACCESS_KEY',
@@ -287,6 +202,18 @@ def pipeline(accuracy_threshold: float = 0.95, deployment_name: str = "modelmesh
             'AWS_S3_ENDPOINT': 'AWS_S3_ENDPOINT',
         })
 
+    # Set the kubernetes secret to be used in the add_chunks_to_milvus task
+    add_chunks_to_vector_store_task.set_env_variable(name="MILVUS_COLLECTION", value="documents")
+    kubernetes.use_secret_as_env(
+        task=add_chunks_to_vector_store_task,
+        secret_name='milvus-connection-documents',
+        secret_key_to_env={
+            'MILVUS_HOST': 'MILVUS_HOST',
+            'MILVUS_PORT': 'MILVUS_PORT',
+            'MILVUS_USERNAME': 'MILVUS_USERNAME',
+            'MILVUS_PASSWORD': 'MILVUS_PASSWORD',
+        })
+    
 def get_pipeline_by_name(client: kfp.Client, pipeline_name: str):
     import json
 
