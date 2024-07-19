@@ -77,12 +77,11 @@ spec:
       description: Log the commands that are executed during `git-clone`'s operation.
       name: verbose
       type: string
-    - default: >-
-        registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:9b14f52b21d29d8d83ea4c0e78623debc954f1a732d2be6d1a7269fbba23b1a4
+    - default:  quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
       description: The image providing the git-init binary that this Task runs.
       name: gitInitImage
       type: string
-    - default: /home/git
+    - default: /opt/app-root/src
       description: |
         Absolute path to the user's home directory.
       name: userHome
@@ -108,8 +107,6 @@ spec:
       type: string
   steps:
     - env:
-        - name: HOME
-          value: $(params.userHome)
         - name: PARAM_URL
           value: $(params.url)
         - name: PARAM_REVISION
@@ -157,7 +154,7 @@ spec:
       image: $(params.gitInitImage)
       name: clone
       resources: {}
-      script: >
+      script: |
         #!/usr/bin/env sh
 
         set -eu
@@ -216,8 +213,7 @@ spec:
 
         test -z "${PARAM_HTTP_PROXY}" || export HTTP_PROXY="${PARAM_HTTP_PROXY}"
 
-        test -z "${PARAM_HTTPS_PROXY}" || export
-        HTTPS_PROXY="${PARAM_HTTPS_PROXY}"
+        test -z "${PARAM_HTTPS_PROXY}" || export HTTPS_PROXY="${PARAM_HTTPS_PROXY}"
 
         test -z "${PARAM_NO_PROXY}" || export NO_PROXY="${PARAM_NO_PROXY}"
 
@@ -239,8 +235,9 @@ spec:
         # Checkout the revision
         git checkout "${PARAM_REVISION}"
 
-        # Clone submodules if specified
-        if [ "${PARAM_SUBMODULES}" = true ]; then
+        # Clone submodules if specified 
+        if [ "${PARAM_SUBMODULES}" = true ];
+        then
             git submodule update --init --recursive
         fi
         
@@ -254,8 +251,7 @@ spec:
 
         RESULT_COMMITTER_DATE="$(git log -1 --pretty=%ct)"
 
-        printf "%s" "${RESULT_COMMITTER_DATE}" >
-        "$(results.committer-date.path)"
+        printf "%s" "${RESULT_COMMITTER_DATE}" > "$(results.committer-date.path)"
 
         printf "%s" "${RESULT_SHA}" > "$(results.commit.path)"
 
@@ -292,25 +288,24 @@ spec:
 
         # Process the files in the latest commit
         for diff in commit.diff('HEAD~1'):
-            if diff.change_type == 'A':
-                added_files.append(diff.b_path)
-            elif diff.change_type == 'M':
-                modified_files.append(diff.b_path)
-            elif diff.change_type == 'R':
-                removed_files.append(diff.b_path)
+          if diff.change_type == 'A':
+              added_files.append(diff.b_path)
+          elif diff.change_type == 'M':
+              modified_files.append(diff.b_path)
+          elif diff.change_type == 'R':
+              removed_files.append(diff.b_path)
 
         # Write the file paths to the respective files
         with open(added_file_path, 'w') as f:
-            f.write(','.join(added_files))
+          f.write(','.join(added_files))
 
         with open(modified_file_path, 'w') as f:
-            f.write(','.join(modified_files))
+          f.write(','.join(modified_files))
 
         with open(removed_file_path, 'w') as f:
-            f.write(','.join(removed_files))
+          f.write(','.join(removed_files))
 
         print("Files written successfully.")
-
         EOF
       securityContext:
         runAsNonRoot: true
