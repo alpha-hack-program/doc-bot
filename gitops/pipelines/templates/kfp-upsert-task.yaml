@@ -30,10 +30,6 @@ spec:
       name: PIPELINES_PATH
       type: string
       default: pipeline
-    - description: The path to the repository
-      name: REPO_PATH
-      type: string
-      default: '.'
   results:
     - description: The Pipeline Id of the kfp pipeline uploaded
       name: PIPELINE_ID
@@ -54,7 +50,7 @@ spec:
         import sys
         import git
 
-        workspace_path = '/workspace/source'
+        workspace_path = '$(workspaces.source.path)'
 
         # Ensure the workspace directory exists
         os.makedirs(workspace_path, exist_ok=True)
