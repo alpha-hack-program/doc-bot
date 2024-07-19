@@ -149,13 +149,9 @@ spec:
             f.write(' '.join(pipeline_files_to_remove))
         EOF
 
-        # Upload the pipeline
-        export NAMESPACE_NAME="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
-        export TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-        echo "NAMESPACE_NAME: $NAMESPACE_NAME TOKEN: $TOKEN"
-
         # Iterate Pipeline files to upsert
-        PIPELINE_FILES_TO_UPSERT="$(cat $(results.PIPELINE_FILES_TO_UPSERT.path))"
+        PIPELINES_PATH=$(results.PIPELINE_FILES_TO_UPSERT.path)
+        PIPELINE_FILES_TO_UPSERT="$(cat ${PIPELINES_PATH})"
         for file in ${PIPELINE_FILES_TO_UPSERT}; do
           python ${file}
         done
