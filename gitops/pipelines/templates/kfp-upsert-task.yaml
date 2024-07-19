@@ -86,25 +86,28 @@ spec:
 
         pip install -r $(params.REQUIREMENTS_FILE)
 
+        echo "FORCE_UPSERT: ${FORCE_UPSERT}"
+
         python <<EOF
+
         # Example variables
+
         modified_files = "${MODIFIED_FILES}"
+
         added_files = "${ADDED_FILES}"
+
         removed_files = "${REMOVED_FILES}"
+
         pipelines_dir = "${PIPELINES_PATH}"
 
+
         pipeline_files_to_upsert_file_path="$(results.PIPELINE_FILES_TO_UPSERT.path)"
+
         pipeline_files_to_remove_file_path="$(results.PIPELINE_FILES_TO_REMOVE.path)"
 
-        # If FORCE_UPSERT is true, list all python files in the pipelines directory
-        force_upsert = "${FORCE_UPSERT}"
-        if force_upsert == 'true':
-            import os
-            added_files = ' '.join([
-                os.path.join(dp, f) for dp, dn, filenames in os.walk(pipelines_dir) for f in filenames if f.endswith('.py')
-            ])
 
         # Function to filter and clean file paths
+
         def filter_pipelines_files(files_str, pipelines_dir):
             # Split the string into a list of paths
             files_list = files_str.split()
@@ -119,7 +122,10 @@ spec:
             ]
             return filtered_files
 
-        # Function to determine if a file is a pipeline file. It looks for `dsl.pipeline` in the file.
+        # Function to determine if a file is a pipeline file. It looks for
+
+        # `dsl.pipeline` in the file.
+
         def is_pipeline_file(file_path):
             with open(file_path, 'r') as file:
                 for line in file:
@@ -129,36 +135,74 @@ spec:
             return False
                     
         # Filter each set of files
-        filtered_modified_files = filter_pipelines_files(modified_files, pipelines_dir)
-        filtered_added_files = filter_pipelines_files(added_files, pipelines_dir)
-        filtered_removed_files = filter_pipelines_files(removed_files, pipelines_dir)
+
+        filtered_modified_files = filter_pipelines_files(modified_files,
+        pipelines_dir)
+
+        filtered_added_files = filter_pipelines_files(added_files,
+        pipelines_dir)
+
+        filtered_removed_files = filter_pipelines_files(removed_files,
+        pipelines_dir)
+
 
         # Join added and modified files
-        filtered_added_modified_files = filtered_added_files + filtered_modified_files
+
+        filtered_added_modified_files = filtered_added_files +
+        filtered_modified_files
+
+        # If FORCE_UPSERT is true, list all python files
+
+        force_upsert = "${FORCE_UPSERT}"
+
+        if force_upsert == 'true':
+            import os
+
+            # List all files in the current directory
+            files_in_directory = os.listdir('.')
+
+            # Filter out only .py files and join the file names with a blank space
+            filtered_added_modified_files = ' '.join([file for file in files_in_directory if file.endswith('.py')])
+
+        print(f'{force_upsert} => {filtered_added_modified_files}')
 
         # Output the intermediate results
+
         print("Filtered Added + Modified Files:", filtered_added_modified_files)
+
         print("Filtered Removed Files:", filtered_removed_files)
 
-        # Check if the added or modified files are pipeline files and add them to a list
+
+        # Check if the added or modified files are pipeline files
+
+        # and add themto a list
+
         pipeline_files_to_upsert = []
+
         for file in filtered_added_modified_files:
             if is_pipeline_file(file):
                 pipeline_files_to_upsert.append(file)
 
         # Print the pipeline files to upsert
+
         print("Pipeline Files to Upsert:", pipeline_files_to_upsert)
 
+
         # Check if the removed files are pipeline files and add them to a list
+
         pipeline_files_to_remove = []
+
         for file in filtered_removed_files:
             if is_pipeline_file(file):
                 pipeline_files_to_remove.append(file)
 
         # Print the pipeline files to remove
+
         print("Pipeline Files to Remove:", pipeline_files_to_remove)
 
+
         # Write the file paths to the respective files
+
         with open(pipeline_files_to_upsert_file_path, 'w') as f:
             f.write(' '.join(pipeline_files_to_upsert))
         with open(pipeline_files_to_remove_file_path, 'w') as f:
