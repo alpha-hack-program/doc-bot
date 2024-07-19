@@ -45,8 +45,8 @@ spec:
         - name: sslVerify
           value: $(params.GIT_SSL_VERIFY)
       taskRef:
-        kind: ClusterTask
-        name: git-clone
+        kind: Task
+        name: kfp-git-clone
       workspaces:
         - name: output
           workspace: workspace-source
