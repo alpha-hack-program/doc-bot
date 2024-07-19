@@ -1,0 +1,79 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kickstart-plr-job
+  namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  selector: {}
+  backoffLimit: 10
+  template:
+    spec:
+      containers:
+        - args:
+            - -ec
+            - |-
+              echo -n 'Creating PipelineRun to create the first version of the KFP pipeline {{ .Values.kfpUpsertTektonPipelineName }}'
+              while ! oc get pipeline {{ .Values.kfpUpsertTektonPipelineName }} 2>/dev/null; do
+                echo -n .
+                sleep 5
+              done; echo
+
+              NUMBER_OF_PLR=$(oc get pipelinerun | jq '.items | length')
+
+              if [ "$NUMBER_OF_PLR" -eq 0 ]; then
+                echo "No existing PipelineRuns found. Creating a new PipelineRun."
+
+                cat <<EOF | oc create -f -
+                apiVersion: tekton.dev/v1beta1
+                kind: PipelineRun
+                metadata:
+                  generateName: {{ .Values.kfpUpsertTektonPipelineName }}-ks-plr-
+                  namespace: {{ .Values.dataScienceProjectNamespace }}
+                  labels:
+                    app.kubernetes.io/instance: {{ .Values.kfpUpsertTektonPipelineName }}
+                    pipeline.openshift.io/runtime: quarkus
+                    pipeline.openshift.io/type: knative
+                  annotations:
+                    argocd.argoproj.io/hook: PostSync
+                    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+                spec:
+                  params:
+                    - name: APP_NAME
+                      value: {{ .Values.kfpUpsertTektonPipelineName }}
+                    - name: GIT_PROVIDER
+                      value: github
+                    - name: GIT_REPO
+                      value: '{{ .Values.vcs.uri }}'
+                    - name: GIT_REPO_NAME
+                      value: '{{ .Values.vcs.name }}'
+                    - name: GIT_REVISION
+                      value: '{{ .Values.vcs.ref }}'
+                    - name: IMAGE_TAG
+                      value: '{{ .Values.vcs.ref }}'
+                    - name: REVISION_NAME
+                      value: v1
+                    - name: FORCE_UPSERT
+                      value: 'true'
+                  pipelineRef:
+                    name: {{ .Values.kfpUpsertTektonPipelineName }}
+                  # serviceAccountName: pipeline
+                  timeout: 0h15m0s
+                  workspaces:
+                    - name: workspace-source
+                      persistentVolumeClaim:
+                        claimName: "{{ .Values.kfpUpsertTektonPipelineName }}-source-pvc"
+                EOF
+              else
+                echo "There are existing PipelineRuns. No new PipelineRun will be created."
+              fi
+          command:
+            - /bin/bash
+          image: {{ .Values.setup.image }}
+          imagePullPolicy: Always
+          name: kickstart-plr
+      restartPolicy: Never
+      serviceAccountName: pipelines-setup-jobs
