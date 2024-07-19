@@ -40,6 +40,10 @@ spec:
       name: MODIFIED_FILES
       type: string
   results:
+    - description: Pipelines files to upsert 
+      name: PIPELINE_FILES_TO_UPSERT
+    - description: Pipelines files to remove 
+      name: PIPELINE_FILES_TO_REMOVE
     - description: The Pipeline Id of the kfp pipeline uploaded
       name: PIPELINE_ID
   steps:
@@ -61,30 +65,100 @@ spec:
       script: |
         #!/bin/sh
 
-        echo "Added files: $(params.ADDED_FILES)"
-        echo "Removed files: $(params.REMOVED_FILES)"
-        echo "Modified files: $(params.MODIFIED_FILES)"
+        echo "Added files: ${ADDED_FILES}"
+        echo "Removed files: ${REMOVED_FILES}"
+        echo "Modified files: ${MODIFIED_FILES}"
 
-        echo "Compiling pipeline $(params.PIPELINE_NAME).yaml"
-
-        echo "Current directory"
-        pwd
+        echo "Current directory $(pwd)"
 
         echo "List files"
         ls -lstrh
 
-        cd $(params.PIPELINES_PATH)
+        cd ${PIPELINES_PATH}
 
         pip install -r $(params.REQUIREMENTS_FILE)
+
+        python <<EOF
+        # Example variables
+        modified_files = "${MODIFIED_FILES}"
+        added_files = "${ADDED_FILES}"
+        removed_files = "${REMOVED_FILES}"
+        pipelines_dir = "${PIPELINES_PATH}"
+
+        pipeline_files_to_upsert_file_path="$(results.PIPELINE_FILES_TO_UPSERT.path)"
+        pipeline_files_to_remove_file_path="$(results.PIPELINE_FILES_TO_REMOVE.path)"
+
+        # Function to filter and clean file paths
+        def filter_pipelines_files(files_str, pipelines_dir):
+            # Split the string into a list of paths
+            files_list = files_str.split()
+            # Filter paths that match the pipelines directory and end with .py
+            filtered_files = [
+                file for file in files_list 
+                if file.startswith(pipelines_dir) and file.endswith('.py')
+            ]
+            # Remove the pipelines directory prefix
+            filtered_files = [
+                file[len(pipelines_dir)+1:] for file in filtered_files
+            ]
+            return filtered_files
+
+        # Function to determine if a file is a pipeline file. It looks for `@dsl.pipeline` in the file.
+        def is_pipeline_file(file_path):
+            with open(file_path, 'r') as file:
+                for line in file:
+                    # Check if the line contains the pipeline decorator
+                    if '@dsl.pipeline' in line:
+                        return True
+            return False
+                    
+        # Filter each set of files
+        filtered_modified_files = filter_pipelines_files(modified_files, pipelines_dir)
+        filtered_added_files = filter_pipelines_files(added_files, pipelines_dir)
+        filtered_removed_files = filter_pipelines_files(removed_files, pipelines_dir)
+
+        # Join added and modified files
+        filtered_added_modified_files = filtered_added_files + filtered_modified_files
+
+        # Output the intermediate results
+        print("Filtered Added + Modified Files:", filtered_added_modified_files)
+        print("Filtered Removed Files:", filtered_removed_files)
+
+        # Check if the added or modified files are pipeline files and add them to a list
+        pipeline_files_to_upsert = []
+        for file in filtered_added_modified_files:
+            if is_pipeline_file(file):
+                pipeline_files_to_upsert.append(file)
+
+        # Print the pipeline files to upsert
+        print("Pipeline Files to Upsert:", pipeline_files_to_upsert)
+
+        # Check if the removed files are pipeline files and add them to a list
+        pipeline_files_to_remove = []
+        for file in filtered_removed_files:
+            if is_pipeline_file(file):
+                pipeline_files_to_remove.append(file)
+
+        # Print the pipeline files to remove
+        print("Pipeline Files to Remove:", pipeline_files_to_remove)
+
+        # Write the file paths to the respective files
+        with open(pipeline_files_to_upsert_file_path, 'w') as f:
+            f.write(' '.join(pipeline_files_to_upsert))
+        with open(pipeline_files_to_remove_file_path, 'w') as f:
+            f.write(' '.join(pipeline_files_to_remove))
+        EOF
 
         # Upload the pipeline
         export NAMESPACE_NAME="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
         export TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-        export PIPELINE_NAME="$(params.PIPELINE_NAME)"
+        echo "NAMESPACE_NAME: $NAMESPACE_NAME TOKEN: $TOKEN"
 
-        echo "NAMESPACE_NAME: $NAMESPACE_NAME PIPELINE_NAME: $PIPELINE_NAME TOKEN: $TOKEN"
-
-        python $(params.PIPELINE_NAME).py
+        # Iterate Pipeline files to upsert
+        PIPELINE_FILES_TO_UPSERT="$(cat $(results.PIPELINE_FILES_TO_UPSERT.path))"
+        for file in ${PIPELINE_FILES_TO_UPSERT}; do
+          python ${file}
+        done
   workspaces:
     - mountPath: /workspace/source
       name: source

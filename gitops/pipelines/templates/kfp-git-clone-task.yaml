@@ -298,13 +298,13 @@ spec:
 
         # Write the file paths to the respective files
         with open(added_file_path, 'w') as f:
-          f.write(','.join(added_files))
+          f.write(' '.join(added_files))
 
         with open(modified_file_path, 'w') as f:
-          f.write(','.join(modified_files))
+          f.write(' '.join(modified_files))
 
         with open(removed_file_path, 'w') as f:
-          f.write(','.join(removed_files))
+          f.write(' '.join(removed_files))
 
         print("Files written successfully.")
         EOF
