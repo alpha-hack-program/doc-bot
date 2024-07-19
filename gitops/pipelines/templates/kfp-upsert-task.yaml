@@ -30,6 +30,10 @@ spec:
       name: PIPELINES_PATH
       type: string
       default: pipeline
+    - description: The path to the repository
+      name: REPO_PATH
+      type: string
+      default: '.'
   results:
     - description: The Pipeline Id of the kfp pipeline uploaded
       name: PIPELINE_ID
@@ -41,7 +45,7 @@ spec:
       script: |
         #!/bin/sh
 
-        REPO_PATH='.'
+        REPO_PATH=$(params.REPO_PATH)
 
         pip install gitpython
 
