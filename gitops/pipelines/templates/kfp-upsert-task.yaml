@@ -119,12 +119,12 @@ spec:
             ]
             return filtered_files
 
-        # Function to determine if a file is a pipeline file. It looks for `@dsl.pipeline` in the file.
+        # Function to determine if a file is a pipeline file. It looks for `dsl.pipeline` in the file.
         def is_pipeline_file(file_path):
             with open(file_path, 'r') as file:
                 for line in file:
                     # Check if the line contains the pipeline decorator
-                    if '@dsl.pipeline' in line:
+                    if 'dsl.pipeline' in line:
                         return True
             return False
                     
