@@ -1,5 +1,7 @@
 # DOCS: https://www.kubeflow.org/docs/components/pipelines/user-guides/components/ 
 
+# pip install -r requirements-local.txt
+
 import os
 
 from kfp import local
