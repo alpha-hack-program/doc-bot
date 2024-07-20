@@ -70,16 +70,19 @@ spec:
           value: $(params.REQUIREMENTS_FILE)
         - name: FORCE_UPSERT
           value: $(params.FORCE_UPSERT)
-      script: |
+      script: >
         #!/bin/sh
 
         echo "Added files: ${ADDED_FILES}"
+
         echo "Removed files: ${REMOVED_FILES}"
+        
         echo "Modified files: ${MODIFIED_FILES}"
 
         echo "Current directory $(pwd)"
 
         echo "List files"
+        
         ls -lstrh
 
         cd ${PIPELINES_PATH}
