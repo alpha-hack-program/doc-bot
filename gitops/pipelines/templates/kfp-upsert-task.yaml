@@ -111,7 +111,7 @@ spec:
 
         # Function to filter and clean file paths
 
-        def filter_pipelines_files(files_str, pipelines_dir):
+        def filter_pl_f(files_str, pipelines_dir):
             # Split the string into a list of paths
             files_list = files_str.split()
             # Filter paths that match the pipelines directory and end with .py
@@ -125,9 +125,7 @@ spec:
             ]
             return filtered_files
 
-        # Function to determine if a file is a pipeline file. It looks for
-
-        # `dsl.pipeline` in the file.
+        # Function to determine if a file is a pipeline file.
 
         def is_pipeline_file(file_path):
             with open(file_path, 'r') as file:
@@ -139,20 +137,16 @@ spec:
                     
         # Filter each set of files
 
-        filtered_modified_files = filter_pipelines_files(modified_files,
-        pipelines_dir)
+        filtered_mod = filter_pl_f(modified_files, pipelines_dir)
 
-        filtered_added_files = filter_pipelines_files(added_files,
-        pipelines_dir)
+        filtered_add = filter_pl_f(added_files, pipelines_dir)
 
-        filtered_removed_files = filter_pipelines_files(removed_files,
-        pipelines_dir)
+        filtered_rem = filter_pl_f(removed_files, pipelines_dir)
 
 
         # Join added and modified files
 
-        filtered_added_modified_files = filtered_added_files +
-        filtered_modified_files
+        filtered_add_mod = filtered_add + filtered_mod
 
         # If FORCE_UPSERT is true, list all python files
 
@@ -165,15 +159,15 @@ spec:
             files_in_directory = os.listdir('.')
 
             # Filter out only .py files and join the file names with a blank space
-            filtered_added_modified_files = ' '.join([file for file in files_in_directory if file.endswith('.py')])
+            filtered_add_mod = [file for file in files_in_directory if file.endswith('.py')]
 
-        print(f'{force_upsert} => {filtered_added_modified_files}')
+        print(f'{force_upsert} => {filtered_add_mod}')
 
         # Output the intermediate results
 
-        print("Filtered Added + Modified Files:", filtered_added_modified_files)
+        print("Filtered Added + Modified Files:", filtered_add_mod)
 
-        print("Filtered Removed Files:", filtered_removed_files)
+        print("Filtered Removed Files:", filtered_rem)
 
 
         # Check if the added or modified files are pipeline files
@@ -182,7 +176,7 @@ spec:
 
         pipeline_files_to_upsert = []
 
-        for file in filtered_added_modified_files:
+        for file in filtered_add_mod:
             if is_pipeline_file(file):
                 pipeline_files_to_upsert.append(file)
 
@@ -195,14 +189,13 @@ spec:
 
         pipeline_files_to_remove = []
 
-        for file in filtered_removed_files:
+        for file in filtered_rem:
             if is_pipeline_file(file):
                 pipeline_files_to_remove.append(file)
 
         # Print the pipeline files to remove
 
         print("Pipeline Files to Remove:", pipeline_files_to_remove)
-
 
         # Write the file paths to the respective files
 
@@ -215,6 +208,7 @@ spec:
         # Iterate Pipeline files to upsert
         PIPELINES_PATH=$(results.PIPELINE_FILES_TO_UPSERT.path)
         PIPELINE_FILES_TO_UPSERT="$(cat ${PIPELINES_PATH})"
+        
         for file in ${PIPELINE_FILES_TO_UPSERT}; do
           python ${file}
         done
