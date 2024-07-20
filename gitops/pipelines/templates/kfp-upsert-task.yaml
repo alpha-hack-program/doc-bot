@@ -199,17 +199,28 @@ spec:
 
         # Write the file paths to the respective files
 
+        print("Writing Upserts to:", pipeline_files_to_upsert_file_path)
+
         with open(pipeline_files_to_upsert_file_path, 'w') as f:
             f.write(' '.join(pipeline_files_to_upsert))
         with open(pipeline_files_to_remove_file_path, 'w') as f:
             f.write(' '.join(pipeline_files_to_remove))
+
+        # Print the contents of the files
+        with open(pipeline_files_to_upsert_file_path, 'r') as f:
+            print("Upserts:", f.read())
+
         EOF
 
+        echo "About to iterate Pipeline files to upsert"
+
         # Iterate Pipeline files to upsert
-        PIPELINES_PATH=$(results.PIPELINE_FILES_TO_UPSERT.path)
-        PIPELINE_FILES_TO_UPSERT="$(cat ${PIPELINES_PATH})"
-        
-        for file in ${PIPELINE_FILES_TO_UPSERT}; do
+
+        PIPELINES_UPSERT="$(cat /tekton/results/PIPELINE_FILES_TO_UPSERT)"
+
+        echo "PIPELINES_UPSERT=${PIPELINES_UPSERT}"
+
+        for file in ${PIPELINES_UPSERT}; do
           python ${file}
         done
   workspaces:
