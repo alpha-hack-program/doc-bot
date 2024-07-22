@@ -136,7 +136,7 @@ def stream(input_text, selected_collection) -> Generator:
     # Instantiate LLM
     llm =  VLLMOpenAI(
         openai_api_key="EMPTY",
-        openai_api_base=INFERENCE_SERVER_URL,
+        openai_api_base=f'{INFERENCE_SERVER_URL}/v1',
         model_name=MODEL_NAME,
         max_tokens=MAX_TOKENS,
         top_p=TOP_P,
