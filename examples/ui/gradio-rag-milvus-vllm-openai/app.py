@@ -42,7 +42,7 @@ def get_predictor_url(namespace="default", predictor_name="mistral-7b-predictor"
             plural="inferenceservices",
             name=predictor_name
         )
-        return f"http://{predictor['status']['url']}"
+        return f"{predictor['status']['url']}"
     except Exception as e:
         print(f"Error retrieving predictor {predictor_name} in namespace {namespace}: {e}")
         return None
@@ -65,7 +65,7 @@ if not PREDICTOR_NAME:
 # Get INFERENCE_SERVER_URL from environment
 INFERENCE_SERVER_URL = os.getenv('INFERENCE_SERVER_URL')
 if not INFERENCE_SERVER_URL:
-    predictor_url = get_predictor_url(namespace=NAMESPACE, predictor_name="mistral-7b-predictor")
+    predictor_url = get_predictor_url(namespace=NAMESPACE, predictor_name=PREDICTOR_NAME)
     if predictor_url:
         INFERENCE_SERVER_URL = predictor_url
     else:
