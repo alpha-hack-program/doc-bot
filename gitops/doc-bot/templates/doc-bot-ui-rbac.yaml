@@ -5,7 +5,7 @@ kind: Role
 metadata:
   name: doc-bot-ui
 rules:
-- apiGroups: ["erving.kserve.io"]
+- apiGroups: ["serving.kserve.io"]
   resources: ["inferenceservices"]
   verbs: ["get", "list", "watch"]
 ---
