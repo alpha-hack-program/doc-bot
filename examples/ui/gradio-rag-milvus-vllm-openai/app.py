@@ -37,7 +37,7 @@ def get_predictor_url(namespace="default", predictor_name="mistral-7b-predictor"
     try:
         predictor = api_instance.get_namespaced_custom_object(
             group="serving.kserve.io",
-            version="v1alpha1",
+            version="v1beta1",
             namespace=namespace,
             plural="inferenceservices",
             name=predictor_name
@@ -69,7 +69,7 @@ if not INFERENCE_SERVER_URL:
     if predictor_url:
         INFERENCE_SERVER_URL = predictor_url
     else:
-        raise ValueError("INFERENCE_SERVER_URL environment variable or my-route URL not set.")
+        raise ValueError("INFERENCE_SERVER_URL environment variable not set.")
 
 # Parameters
 
