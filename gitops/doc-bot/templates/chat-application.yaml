@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.chatApplication.name }}
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  source:
+    path: "{{ .Values.chatApplication.path }}"
+    repoURL: "{{ .Values.chatApplication.repoURL }}"
+    targetRevision: "{{ .Values.chatApplication.targetRevision }}"
+    helm:
+      parameters:
+        - name: createNamespace
+          value: "false"
+        - name: namespace
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+        - name: model.name
+          value: "{{ .Values.model.name }}"
+        - name: vcs.uri
+          value: "https://github.com/alpha-hack-program/doc-bot.git"
+        - name: vcs.ref
+          value: "main"
+        - name: vcs.name
+          value: "alpha-hack-program/doc-bot"
+        - name: vcs.path
+          value: "examples/ui/gradio-rag-milvus-vllm-openai"
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true

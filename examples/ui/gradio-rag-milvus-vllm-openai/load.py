@@ -212,7 +212,7 @@ docs = add_metadata(docs)
 all_doc_chunks = []
 for doc in docs:
     print(f"Chunking {doc['source']}...")
-    doc_chunks = chunk_text_lc(doc, chunk_size=2048, chunk_overlap=200)
+    doc_chunks = chunk_text_lc(doc, chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     print(f"Chunked {len(doc_chunks)} chunks from {doc['source']}.")
     print(f"sample={doc_chunks[0]}")
     all_doc_chunks.extend(doc_chunks)
@@ -223,8 +223,15 @@ print(f"sample={all_doc_chunks[0]}")
 # Connect to Milvus
 connections.connect("default", host="localhost", port="19530", user="root", password="Milvus")
 
-# Define a collection schema
-fields = [
+# Drop collections before creating them?
+drop_before_create = True
+
+# Delete the chunks collections if it already exists and drop_before_create is True
+if utility.has_collection(chunks_collection_name) and drop_before_create:
+    utility.drop_collection(chunks_collection_name)
+
+# Define the chunks collection schema
+chunks_collection_fields = [
     FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
     FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=vector_size),
     FieldSchema(name="source", dtype=DataType.VARCHAR, max_length=255),
@@ -233,30 +240,14 @@ fields = [
     FieldSchema(name="page_end", dtype=DataType.INT16),
     FieldSchema(name="dossier", dtype=DataType.VARCHAR, max_length=128),
 ]
-
-schema = CollectionSchema(fields, "Schema for storing document chunks and summaries.")
-drop_before_create = True
-
-# Delete both chunks and summaries collections if it already exists and drop_before_create is True
-if utility.has_collection(chunks_collection_name) and drop_before_create:
-    utility.drop_collection(chunks_collection_name)
-
-if utility.has_collection(summaries_collection_name) and drop_before_create:
-    utility.drop_collection(summaries_collection_name)
+chunks_collection_schema = CollectionSchema(chunks_collection_fields, "Schema for storing document chunks.")
 
 # Create a collection for chunks
 chunks_collection = None
 if utility.has_collection(chunks_collection_name):
     chunks_collection = Collection(chunks_collection_name)
 else:
-    chunks_collection = Collection(chunks_collection_name, schema)
-
-# Create a collection for summaries
-summaries_collection = None
-if utility.has_collection(summaries_collection_name):
-    summaries_collection = Collection(summaries_collection_name)
-else:
-    summaries_collection = Collection(summaries_collection_name, schema)
+    chunks_collection = Collection(chunks_collection_name, chunks_collection_schema)
 
 # Prepare data for insertion
 vectors = [generate_embedding(doc_chunk["text"]) for doc_chunk in all_doc_chunks]
@@ -296,6 +287,29 @@ chunks_collection.create_index(field_name="vector", index_params=index_params)
 
 # Load the collection
 chunks_collection.load()
+
+# Delete the summaries collections if it already exists and drop_before_create is True
+if utility.has_collection(summaries_collection_name) and drop_before_create:
+    utility.drop_collection(summaries_collection_name)
+
+# Define the chunks collection schema
+summaries_collection_fields = [
+    FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
+    FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=vector_size),
+    FieldSchema(name="source", dtype=DataType.VARCHAR, max_length=255),
+    FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535),
+    FieldSchema(name="page_start", dtype=DataType.INT16),
+    FieldSchema(name="page_end", dtype=DataType.INT16),
+    FieldSchema(name="dossier", dtype=DataType.VARCHAR, max_length=128),
+]
+summaries_collection_schema = CollectionSchema(summaries_collection_fields, "Schema for storing summaries from chunks.")
+
+# Create a collection for summaries
+summaries_collection = None
+if utility.has_collection(summaries_collection_name):
+    summaries_collection = Collection(summaries_collection_name)
+else:
+    summaries_collection = Collection(summaries_collection_name, summaries_collection_schema)
 
 # Add an index to the collection
 index_params = {

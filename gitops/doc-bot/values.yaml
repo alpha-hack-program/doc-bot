@@ -18,6 +18,17 @@ pipelinesApplication:
   path: gitops/pipelines
   targetRevision: main
 
+chatApplication:
+  name: doc-bot-chat
+  repoURL: https://github.com/alpha-hack-program/doc-bot.git
+  path: gitops/kb-chat
+  targetRevision: main
+  vcs:
+    uri: https://github.com/alpha-hack-program/doc-bot.git
+    ref: main
+    name: alpha-hack-program/doc-bot
+    path: examples/ui/gradio-rag-milvus-vllm-openai
+
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 
