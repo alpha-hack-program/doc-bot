@@ -1,0 +1,17 @@
+dataScienceProjectDisplayName: vllm-mistral-7b
+dataScienceProjectNamespace: vllm-mistral-7b
+
+instanceName: vllm-mistral-7b
+
+createNamespace: true
+
+vcs:
+  uri: https://github.com/alpha-hack-program/doc-bot.git
+  ref: main
+  name: alpha-hack-program/doc-bot
+
+paths:
+  ui: examples/ui/gradio-rag-milvus-vllm-openai
+
+model:
+  name: mistral-7b

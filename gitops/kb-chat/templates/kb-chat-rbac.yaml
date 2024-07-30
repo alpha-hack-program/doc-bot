@@ -1,0 +1,30 @@
+---
+# Cluster Role named route-reader that can reader openshift routes
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kb-chat
+rules:
+- apiGroups: ["serving.kserve.io"]
+  resources: ["inferenceservices"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kb-chat
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kb-chat
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kb-chat
+subjects:
+- kind: ServiceAccount
+  name: kb-chat
+  namespace: {{ .Values.dataScienceProjectNamespace }}
