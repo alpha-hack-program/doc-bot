@@ -89,6 +89,7 @@ MILVUS_PASSWORD = os.getenv('MILVUS_PASSWORD')
 MILVUS_COLLECTIONS_FILE = os.getenv('MILVUS_COLLECTIONS_FILE')
 
 DEFAULT_COLLECTION = os.getenv('DEFAULT_COLLECTION')
+DEFAULT_DOSSIER = 'None'
 PROMPT_FILE = os.getenv('PROMPT_FILE', 'default_prompt.txt')
 MAX_RETRIEVED_DOCS = int(os.getenv('MAX_RETRIEVED_DOCS', 4))
 SCORE_THRESHOLD = float(os.getenv('SCORE_THRESHOLD', 0.99))
@@ -123,13 +124,14 @@ def remove_source_duplicates(input_list):
             unique_list.append(item.metadata['source'])
     return unique_list
 
-def stream(input_text, selected_collection) -> Generator:
+def stream(input_text, selected_collection, selected_dossier) -> Generator:
     # A Queue is needed for Streaming implementation
     q = Queue()
 
     print("Starting streaming")
     print("Input text: ", input_text)
     print("Selected collection: ", selected_collection)
+    print("Selected dossier: ", selected_dossier)
     print("INFERENCE_SERVER_URL: ", INFERENCE_SERVER_URL)
     print("MODEL_NAME: ", MODEL_NAME)
 
@@ -153,13 +155,16 @@ def stream(input_text, selected_collection) -> Generator:
         collection_name=selected_collection,
         collection_description="",
         collection_properties=None,
+        dossier_name=selected_dossier,
         connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT, "user": MILVUS_USERNAME, "password": MILVUS_PASSWORD},
         consistency_level="Session",
         search_params=None,
         k=MAX_RETRIEVED_DOCS,
         score_threshold=SCORE_THRESHOLD,
-        metadata_field="metadata",
-        text_field="page_content"
+        # metadata_field="metadata",
+        # text_field="page_content",
+        text_field="text",
+        vector_field="vector"
     )
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
@@ -215,19 +220,32 @@ embeddings = HuggingFaceEmbeddings(
 qa_chain_prompt = PromptTemplate.from_template(prompt_template)
 
 
+# Dossier update function
+dossier = None
+
+def update_dossier(dossier_number):
+    global dossier
+    dossier = dossier_number
+
 ####################
 # Gradio interface #
 ####################
 
 collection_options = [(collection['display_name'], collection['name']) for collection in collections_data]
+dossier_options = ['None', '3166', '3210']
 
 def select_collection(collection_name, selected_collection):
     return {
         selected_collection_var: collection_name
         }
 
-def ask_llm(message, history, selected_collection):
-    for next_token, content in stream(message, selected_collection):
+def select_dossier(dossier_name, selected_dossier):
+    return {
+        selected_dossier_var: dossier_name
+        }
+
+def ask_llm(message, history, selected_collection, selected_dossier):
+    for next_token, content in stream(message, selected_collection, selected_dossier):
         yield(content)
 
 css = """
@@ -237,6 +255,7 @@ footer {visibility: hidden}
 
 with gr.Blocks(title="Knowledge base backed Chatbot", css=css) as demo:
     selected_collection_var = gr.State(DEFAULT_COLLECTION)
+    selected_dossier_var = gr.State(DEFAULT_DOSSIER)
     with gr.Row():
         if SHOW_TITLE_IMAGE == 'True':
             gr.Markdown(f"# ![image](/file=./assets/reading-robot.png)   {APP_TITLE}")
@@ -252,7 +271,15 @@ with gr.Blocks(title="Knowledge base backed Chatbot", css=css) as demo:
                 interactive=True,
                 info="Choose the knowledge base the LLM will have access to:"
             )
-            collection.input(select_collection, inputs=[collection,selected_collection_var], outputs=[selected_collection_var]),
+            collection.input(select_collection, inputs=[collection,selected_collection_var], outputs=[selected_collection_var])
+            dossier = gr.Dropdown(
+                choices=dossier_options,
+                label="Select Dossier:",
+                value=dossier_options[0],
+                interactive=True,
+                info="Choose a dossier:"
+            )
+            dossier.input(select_dossier, inputs=[dossier,selected_dossier_var], outputs=[selected_dossier_var])
         with gr.Column(scale=4):
             chatbot = gr.Chatbot(
                 show_label=False,
@@ -262,7 +289,7 @@ with gr.Blocks(title="Knowledge base backed Chatbot", css=css) as demo:
                 )
             gr.ChatInterface(
                 ask_llm,
-                additional_inputs=[selected_collection_var],
+                additional_inputs=[selected_collection_var, selected_dossier_var],
                 chatbot=chatbot,
                 clear_btn=None,
                 retry_btn=None,

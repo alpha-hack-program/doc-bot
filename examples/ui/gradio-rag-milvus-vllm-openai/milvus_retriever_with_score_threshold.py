@@ -2,6 +2,7 @@
 import warnings
 from typing import Any, Dict, List, Optional
 
+from attr import fields
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -18,6 +19,7 @@ class MilvusRetrieverWithScoreThreshold(BaseRetriever):
     collection_name: str = "LangChainCollection"
     collection_description: str = ""
     collection_properties: Optional[Dict[str, Any]] = None
+    dossier_name: str = None
     connection_args: Optional[Dict[str, Any]] = None
     consistency_level: str = "Session"
     search_params: Optional[dict] = None
@@ -25,6 +27,7 @@ class MilvusRetrieverWithScoreThreshold(BaseRetriever):
     score_threshold: float = 0.99
     metadata_field: str = "metadata"
     text_field: str = "page_content"
+    vector_field: str = "vector"
 
     store: Milvus
     retriever: BaseRetriever
@@ -39,8 +42,9 @@ class MilvusRetrieverWithScoreThreshold(BaseRetriever):
             collection_properties=values["collection_properties"],
             connection_args=values["connection_args"],
             consistency_level=values["consistency_level"],
-            metadata_field="metadata",
-            text_field="page_content"
+            metadata_field=values.get("metadata_field", None),
+            text_field=values.get("text_field", "page_content"),
+            vector_field=values.get("vector_field", "vector"),
         )
         values["retriever"] = values["store"].as_retriever(
             search_kwargs={"param": values["search_params"]}
@@ -65,8 +69,18 @@ class MilvusRetrieverWithScoreThreshold(BaseRetriever):
         run_manager: CallbackManagerForRetrieverRun,
         **kwargs: Any,
     ) -> List[Document]:
-        docs_and_scores = self.store.similarity_search_with_score(query, k=self.k, return_metadata=True)
-        docs_and_scores = [(doc, score) for doc, score in docs_and_scores if score < self.score_threshold]
+        expr = None
+        if self.dossier_name:
+            print(f"Using dossier: {self.dossier_name}")
+            expr = f"dossier == '{self.dossier_name}'" 
+            print(f"expr={expr}")
+        docs_and_scores = self.store.similarity_search_with_score(query, k=self.k, return_metadata=True, expr=expr)
+        print(f"docs_and_scores (1)={docs_and_scores}")
+
+        # docs_and_scores = [(doc, score) for doc, score in docs_and_scores if score < self.score_threshold]
+
+        print(f"docs_and_scores (2)={docs_and_scores}")
+
         for doc, score in docs_and_scores:
             doc.metadata = {**doc.metadata, **{"score": score}}
         return [doc for (doc, _) in docs_and_scores]
