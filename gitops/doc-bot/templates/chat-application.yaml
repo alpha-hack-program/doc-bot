@@ -31,6 +31,18 @@ spec:
           value: "alpha-hack-program/doc-bot"
         - name: vcs.path
           value: "examples/ui/gradio-rag-milvus-vllm-openai"
+        - name: milvus.name
+          value: "{{ .Values.milvus.name }}"
+        - name: milvus.namespace
+          value: "{{ .Values.milvus.namespace }}"
+        - name: milvus.username
+          value: "{{ .Values.milvus.username }}"
+        - name: milvus.password
+          value: "{{ .Values.milvus.password }}"
+        - name: milvus.port
+          value: "{{ .Values.milvus.port }}"
+        - name: milvus.host
+          value: "{{ .Values.milvus.host }}"
   syncPolicy:
     automated:
       # prune: true
