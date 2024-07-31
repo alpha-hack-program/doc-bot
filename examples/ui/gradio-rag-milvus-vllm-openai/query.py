@@ -21,6 +21,19 @@ def generate_embedding(text: str):
         outputs = model(**inputs)
     return outputs.last_hidden_state.mean(dim=1).squeeze().numpy().tolist()
 
+# Connect to Milvus
+
+# import requests
+
+# # creating Session object and
+# # declaring the verify variable to False
+# session = requests.Session()
+# session.verify = False
+
+client = MilvusClient(uri="tcp://localhost:19530", user="root", password="Milvus")
+# client = MilvusClient(uri="http://localhost:19530", user="root", password="Milvus")
+# client = MilvusClient(uri="https://milvus-ia-sa.apps.ocp-ia.jccm.es", user="root", password="Milvus")
+
 # Initialize Hugging Face model and tokenizer
 # model_name = 'sentence-transformers/all-MiniLM-L6-v2'
 model_name = 'nomic-ai/nomic-embed-text-v1'
@@ -28,9 +41,6 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 # model_kwargs = {'trust_remote_code': True}
 model = AutoModel.from_pretrained(model_name, trust_remote_code=True) # TODO: Add trust_remote_code=True to avoid warnings
 vector_size = model.config.hidden_size
-
-# Connect to Milvus
-client = MilvusClient(uri="tcp://localhost:19530", user="root", password="Milvus")
 
 # Query vector
 query_vector = generate_embedding(query_text)
