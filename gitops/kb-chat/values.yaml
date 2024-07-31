@@ -10,3 +10,11 @@ vcs:
 
 model:
   name: mistral-7b
+
+milvus:
+  name: milvus
+  namespace: milvus
+  username: root
+  password: Milvus
+  port: '19530'
+  host: vectordb-milvus
