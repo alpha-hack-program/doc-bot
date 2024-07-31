@@ -39,6 +39,24 @@ spec:
           value: '{{ .Values.model.accelerator.min }}'
         - name: model.accelerator.max
           value: '{{ .Values.model.accelerator.max }}'
+        - name: modelConnection.name
+          value: "{{ .Values.modelConnection.name }}"
+        - name: modelConnection.displayName
+          value: "{{ .Values.modelConnection.displayName }}"
+        - name: modelConnection.type
+          value: "{{ .Values.modelConnection.type }}"
+        - name: modelConnection.scheme
+          value: "{{ .Values.modelConnection.scheme }}"
+        - name: modelConnection.awsAccessKeyId
+          value: "{{ .Values.modelConnection.awsAccessKeyId }}"
+        - name: modelConnection.awsSecretAccessKey
+          value: "{{ .Values.modelConnection.awsSecretAccessKey }}"
+        - name: modelConnection.awsDefaultRegion
+          value: "{{ .Values.modelConnection.awsDefaultRegion }}"
+        - name: modelConnection.awsS3Bucket
+          value: "{{ .Values.modelConnection.awsS3Bucket }}"
+        - name: modelConnection.awsS3Endpoint
+          value: "{{ .Values.modelConnection.awsS3Endpoint }}"
   syncPolicy:
     automated:
       # prune: true
