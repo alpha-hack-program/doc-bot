@@ -191,6 +191,7 @@ spec:
         - name: elyra-dsp-details
           secret:
             secretName: ds-pipeline-config
+            optional: true
         - emptyDir:
             medium: Memory
           name: shm
