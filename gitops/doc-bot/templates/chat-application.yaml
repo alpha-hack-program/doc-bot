@@ -24,13 +24,13 @@ spec:
         - name: model.name
           value: "{{ .Values.model.name }}"
         - name: vcs.uri
-          value: "https://github.com/alpha-hack-program/doc-bot.git"
+          value: "{{ .Values.chatApplication.vcs.uri }}"
         - name: vcs.ref
-          value: "main"
+          value: "{{ .Values.chatApplication.vcs.ref }}"
         - name: vcs.name
-          value: "alpha-hack-program/doc-bot"
+          value: "{{ .Values.chatApplication.vcs.name }}"
         - name: vcs.path
-          value: "examples/ui/gradio-rag-milvus-vllm-openai"
+          value: "{{ .Values.chatApplication.vcs.path }}"
         - name: milvus.name
           value: "{{ .Values.milvus.name }}"
         - name: milvus.namespace
