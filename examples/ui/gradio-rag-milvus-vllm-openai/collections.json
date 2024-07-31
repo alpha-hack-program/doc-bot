@@ -1,5 +1,5 @@
 [
     {"name":"none","display_name":"None"},
     {"name":"documents","display_name":"Documents"},
-    {"name":"pdf_chunks","display_name":"Chunks"}
+    {"name":"chunks","display_name":"Chunks"}
   ]
