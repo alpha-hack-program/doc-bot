@@ -4,7 +4,7 @@ metadata:
   name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
 stringData:
-  MILVUS_HOST: '{{ .Values.milvus.host }}.{{ .Values.milvus.namespace }}.svc.cluster.local'
+  MILVUS_HOST: '{{ .Values.milvus.host }}'
   MILVUS_PORT: '{{ .Values.milvus.port }}'
   MILVUS_USERNAME: '{{ .Values.milvus.username }}'
   MILVUS_PASSWORD: '{{ .Values.milvus.password }}'
