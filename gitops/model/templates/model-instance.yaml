@@ -64,7 +64,7 @@ spec:
         - '--max-model-len'
         - '{{ .Values.model.maxModelLen }}'
         {{- end }}
-        {{- if eq .Values.model.accelerator.productName "Tesla-T4" }}
+        {{- if eq .Values.model.accelerator.productName "Tesla-T4-SHARED" }}
         - '--dtype'
         - float16
         - '--tensor-parallel-size={{ .Values.model.accelerator.max }}'
