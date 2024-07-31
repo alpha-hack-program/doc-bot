@@ -220,6 +220,8 @@ spec:
       name: kb-chat:latest
   runPolicy: Serial
   source:
+    sourceSecret:
+      name: {{ .Values.vcs.sourceSecret }}
     contextDir: {{ .Values.vcs.path }}
     git:
       uri: {{ .Values.vcs.uri }}
