@@ -61,7 +61,7 @@ spec:
               mountPath: /opt/app-root/src/collections.json
               subPath: collections.json
             - name: kb-chat-prompts
-              mountPath: /opt/app-root/src/
+              mountPath: /opt/app-root/src/prompts
             - name: kb-chat-cacerts
               mountPath: /opt/app-root/lib/python3.11/site-packages/certifi/cacert.pem
               subPath: cacert.pem
@@ -137,7 +137,7 @@ stringData:
   MILVUS_PASSWORD: "{{ .Values.milvus.password }}"
   MILVUS_COLLECTIONS_FILE: "./collections.json"
   DEFAULT_COLLECTION: "none"
-  PROMPT_FILE: "default_prompt.txt"
+  PROMPT_FILE: "prompts/default_prompt.txt"
   MAX_RETRIEVED_DOCS: "4"
   SCORE_THRESHOLD: "0.99"
   PREDICTOR_NAME: "{{ .Values.model.name }}"
