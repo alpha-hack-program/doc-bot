@@ -75,7 +75,7 @@ spec:
             defaultMode: 420
         - name: kb-chat-prompts
           configMap:
-            name: prompt
+            name: kb-chat-prompts
             defaultMode: 420
         - name: kb-chat-cacerts
           configMap:
