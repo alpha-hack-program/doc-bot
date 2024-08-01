@@ -137,7 +137,7 @@ stringData:
   MILVUS_PASSWORD: "{{ .Values.milvus.password }}"
   MILVUS_COLLECTIONS_FILE: "./collections.json"
   DEFAULT_COLLECTION: "none"
-  PROMPT_FILE: "prompts/default_prompt.txt"
+  PROMPT_FILE: "prompts/default-prompt.txt"
   MAX_RETRIEVED_DOCS: "4"
   SCORE_THRESHOLD: "0.99"
   PREDICTOR_NAME: "{{ .Values.model.name }}"
