@@ -3,6 +3,8 @@ apiVersion: v1
 metadata:
   name: kb-chat-cacerts
   namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
 immutable: false
 data:
   cacert.pem: |
