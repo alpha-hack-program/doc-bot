@@ -20,7 +20,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat
   namespace: {{ .Values.namespace }}
 spec:
@@ -63,7 +63,7 @@ spec:
             - name: kb-chat-prompts
               mountPath: /opt/app-root/src/prompts
             - name: kb-chat-cacerts
-              mountPath: /opt/app-root/lib/python3.11/site-packages/certifi/cacert.pem
+              mountPath: /opt/app-root/lib/python{{ .Values.python }}/site-packages/certifi/cacert.pem
               subPath: cacert.pem
       volumes:
         - name: kb-chat-collections
@@ -103,7 +103,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat
   namespace: {{ .Values.namespace }}
 spec:
@@ -161,7 +161,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat-generic-webhook-secret
   namespace: {{ .Values.namespace }}
 type: Opaque
@@ -178,7 +178,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat-github-webhook-secret
   namespace: {{ .Values.namespace }}
 type: Opaque
@@ -196,7 +196,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat
   namespace: {{ .Values.namespace }}
 spec:
@@ -216,7 +216,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat
   namespace: {{ .Values.namespace }}
 spec:
@@ -238,7 +238,7 @@ spec:
     sourceStrategy:
       from:
         kind: ImageStreamTag
-        name: python:3.9-ubi8
+        name: python:{{ .Values.python }}-ubi8
         namespace: openshift
     type: Source
   successfulBuildsHistoryLimit: 5
@@ -265,7 +265,7 @@ metadata:
     app.kubernetes.io/name: kb-chat
     app.kubernetes.io/part-of: kb-chat
     app.openshift.io/runtime: python
-    app.openshift.io/runtime-version: 3.9-ubi8
+    app.openshift.io/runtime-version: {{ .Values.python }}-ubi8
   name: kb-chat
   namespace: {{ .Values.namespace }}
 spec:
