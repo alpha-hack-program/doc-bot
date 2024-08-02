@@ -17,7 +17,8 @@ spec:
     - description: The image used where python is installed
       name: TASK_IMAGE
       type: string
-      default: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+      # default: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+      default: image-registry.openshift-image-registry.svc:5000/openshift/python:{{ .Values.python }}-ubi8
     - description: The pipeline python script to compile
       name: PIPELINE_NAME
       type: string
@@ -70,6 +71,13 @@ spec:
           value: $(params.REQUIREMENTS_FILE)
         - name: FORCE_UPSERT
           value: $(params.FORCE_UPSERT)
+      {{- if .Values.mountCaCerts }}
+      volumeMounts:
+        - name: kfp-upsert-cacerts
+          mountPath: /opt/app-root/lib/python{{ .Values.python }}/site-packages/certifi/cacert.pem
+          subPath: cacert.pem
+          readOnly: true
+      {{- end }}
       script: >
         #!/bin/sh
 
@@ -226,3 +234,10 @@ spec:
   workspaces:
     - mountPath: /workspace/source
       name: source
+  # Mount if mountCaCerts is true
+  {{- if .Values.mountCaCerts }}
+  volumes:
+    - name: kfp-upsert-cacerts
+      configMap:
+        name: kfp-upsert-cacerts
+  {{- end }}

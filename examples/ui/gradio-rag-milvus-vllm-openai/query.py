@@ -3,7 +3,10 @@ import json
 from regex import P
 from transformers import AutoTokenizer, AutoModel
 import torch
+
 from pymilvus import MilvusClient
+from pymilvus import connections
+
 
 # Check that the number of arguments is correct
 if len(sys.argv) != 4:
@@ -30,9 +33,26 @@ def generate_embedding(text: str):
 # session = requests.Session()
 # session.verify = False
 
-client = MilvusClient(uri="tcp://localhost:19530", user="root", password="Milvus")
+# # Load the self-signed certificate
+# with open("/Users/cvicensa/Projects/openshift/alpha-hack-program/doc-bot/examples/ui/gradio-rag-milvus-vllm-openai/.venv/lib/python3.11/site-packages/certifi/cacert.pem", "rb") as f:
+#     server_cert = f.read()
+
+# # Establish a secure connection
+# connections.connect(
+#     alias="default",
+#     uri="https://milvus-ia-sa.apps.ocp-ia.jccm.es",
+#     user="root",
+#     password="",
+#     secure=True,
+#     ca_pem=server_cert,
+# )
+
+# print("Connected to Milvus")
+
+# client = MilvusClient(uri="tcp://localhost:19530", user="root", password="Milvus")
+client = MilvusClient(uri="tcp://localhost:19530", user="root", password="")
 # client = MilvusClient(uri="http://localhost:19530", user="root", password="Milvus")
-# client = MilvusClient(uri="https://milvus-ia-sa.apps.ocp-ia.jccm.es", user="root", password="Milvus")
+# client = MilvusClient(uri="https://milvus-ia-sa.apps.ocp-ia.jccm.es", user="root", password="", ca_pem=server_cert,)
 
 # Initialize Hugging Face model and tokenizer
 # model_name = 'sentence-transformers/all-MiniLM-L6-v2'

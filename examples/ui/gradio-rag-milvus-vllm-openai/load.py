@@ -88,6 +88,8 @@ MILVUS_USERNAME = os.getenv('MILVUS_USERNAME')
 MILVUS_PASSWORD = os.getenv('MILVUS_PASSWORD')
 # MILVUS_COLLECTIONS_FILE = os.getenv('MILVUS_COLLECTIONS_FILE')
 
+print(f"MILVUS_HOST={MILVUS_HOST}, MILVUS_PORT={MILVUS_PORT}, MILVUS_USERNAME={MILVUS_USERNAME}, MILVUS_PASSWORD={MILVUS_PASSWORD}")
+
 # Milvus collection parameters
 CHUNKS_COLLECTION = os.getenv('CHUNKS_COLLECTION', 'chunks')
 SUMMARIES_COLLECTION = os.getenv('SUMMARIES_COLLECTION', 'summaries')
@@ -221,7 +223,8 @@ print(f"Total of {len(all_doc_chunks)} chunks.")
 print(f"sample={all_doc_chunks[0]}")
 
 # Connect to Milvus
-connections.connect("default", host="localhost", port="19530", user="root", password="Milvus")
+# connections.connect("default", host="localhost", port="19530", user="root", password="Milvus")
+connections.connect("default", host=MILVUS_HOST, port=MILVUS_PORT, user=MILVUS_USERNAME, password=MILVUS_PASSWORD)
 
 # Drop collections before creating them?
 drop_before_create = True

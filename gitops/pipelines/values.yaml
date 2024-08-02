@@ -16,5 +16,9 @@ kfpUpsertTektonPipelineName: kfp-upsert-pl
 
 pipelinesWorkspaceDefaultSize: 2Gi
 
+python: "3.9"
+
+mountCaCerts: false
+
 setup:
   image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
