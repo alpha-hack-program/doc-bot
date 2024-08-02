@@ -130,3 +130,5 @@ milvus:
 
 setup:
   image: quay.io/atarazana/hf-cli:latest
+
+mountCaCerts: false

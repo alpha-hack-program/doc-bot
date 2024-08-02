@@ -31,6 +31,8 @@ spec:
           value: "{{ .Values.vcs.ref }}"
         - name: vcs.name
           value: "{{ .Values.vcs.name }}"
+        - name: mountCaCerts
+          value: "{{ .Values.mountCaCerts }}"
   syncPolicy:
     automated:
       # prune: true
