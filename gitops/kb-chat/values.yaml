@@ -21,3 +21,5 @@ milvus:
   password: Milvus
   port: '19530'
   host: vectordb-milvus
+
+mountCaCerts: "false"

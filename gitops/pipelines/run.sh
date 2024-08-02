@@ -15,4 +15,5 @@ helm template . --name-template ${ARGOCD_APP_NAME} \
   --set model.accelerator.productName="NVIDIA-A10G" \
   --set model.accelerator.min=1 \
   --set model.accelerator.max=1 \
+  --set mountCaCerts="true" \
   --include-crds

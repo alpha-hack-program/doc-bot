@@ -6,4 +6,5 @@ DATA_SCIENCE_PROJECT_NAMESPACE="vllm-mistral-7b-instruct-v0.2"
 
 helm template . --name-template ${ARGOCD_APP_NAME} \
   --set namespace=${DATA_SCIENCE_PROJECT_NAMESPACE} \
+  --set mountCaCerts="true" \
   --include-crds

@@ -1,3 +1,5 @@
+# Create a ConfigMap with the CA certificates if the `mountCaCerts` value is set to `true`
+{{- if .Values.mountCaCerts }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -4874,3 +4876,4 @@ data:
     hriSqHKvoflShx8xpfywgVcvzfTO3PYkz6fiNJBonf6q8amaEsybwMbDqKWwIX7e
     SPY=
     -----END CERTIFICATE-----
+{{- end }}
