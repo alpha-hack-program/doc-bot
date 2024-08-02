@@ -4876,5 +4876,3 @@ data:
     SPY=
     -----END CERTIFICATE-----
 {{- end }}
-`
-)
