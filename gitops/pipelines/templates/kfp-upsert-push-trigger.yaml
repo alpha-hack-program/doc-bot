@@ -108,6 +108,7 @@ spec:
             - name: eventTypes
               value:
                 - push
+                - "Push Hook"
       bindings:
         - kind: TriggerBinding
           ref: "{{ .Values.kfpUpsertTektonPipelineName }}-gitlab-trigger-binding"
