@@ -1,6 +1,6 @@
 # DOCS: https://www.kubeflow.org/docs/components/pipelines/user-guides/components/ 
 
-# Pipeline to load documents from an S3 bucket into Milvus using langchain => lc
+# Pipeline to load documents from an S3 bucket into Milvus using pymilvus => mv
 
 import os
 import sys
@@ -241,7 +241,6 @@ def add_chunks_to_milvus(
     # Print the connection details
     print(f"milvus_host: {milvus_host}")
     print(f"milvus_port: {milvus_port}")
-    print(f"milvus_collection: {milvus_collection_name}")
 
     # Initialize Hugging Face model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
