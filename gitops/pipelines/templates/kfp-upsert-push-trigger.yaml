@@ -108,7 +108,7 @@ spec:
             - name: eventTypes
               value:
                 - push
-                - "Push Hook"
+                - Push Hook
       bindings:
         - kind: TriggerBinding
           ref: "{{ .Values.kfpUpsertTektonPipelineName }}-gitlab-trigger-binding"
@@ -125,9 +125,9 @@ metadata:
 spec:
   params:
   - name: gitRepositoryUrl
-    value: $(body.repository.clone_url)
+    value: $(body.repository.git_http_url)
   - name: gitRepository
-    value: $(body.repository.full_name)
+    value: $(body.repository.name)
   - name: gitRevision
     value: $(body.after)
   - name: contentType
