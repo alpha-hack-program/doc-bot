@@ -55,6 +55,18 @@ spec:
           value: "Project ${DATA_SCIENCE_PROJECT_NAMESPACE}"
         - name: dataScienceProjectNamespace
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}"
+        - name: milvus.name
+          value: "milvus"
+        - name: milvus.namespace
+          value: "milvus"
+        - name: milvus.username
+          value: "root"
+        - name: milvus.password
+          value: "Milvus"
+        - name: milvus.port
+          value: "19530"
+        - name: milvus.host
+          value: "vectordb-milvus.milvus.svc.cluster.local"
   syncPolicy:
     automated:
       # prune: true
