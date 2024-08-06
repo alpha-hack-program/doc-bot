@@ -9,45 +9,97 @@ secrets:
 {{- if .Values.containerRegistrySecretName }}
 - name: {{ .Values.containerRegistrySecretName }}
 {{- end }}
-# ---
-# kind: RoleBinding
-# apiVersion: rbac.authorization.k8s.io/v1
-# metadata:
-#   name: pipelines-scc-{{ .Values.pipelinesServiceAccountName }}-rolebinding
-#   namespace: {{ .Values.dataScienceProjectNamespace }}
-# subjects:
-#   - kind: ServiceAccount
-#     name: {{ .Values.pipelinesServiceAccountName }}
-#     namespace: {{ .Values.dataScienceProjectNamespace }}
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: pipelines-scc-clusterrole
-# ---
-# kind: ClusterRoleBinding
-# apiVersion: rbac.authorization.k8s.io/v1
-# metadata:
-#   name: openshift-pipelines-clusterinterceptors-{{ .Values.pipelinesServiceAccountName }}-clusterrolebinding
-#   namespace: {{ .Values.dataScienceProjectNamespace }}
-# subjects:
-#   - kind: ServiceAccount
-#     name: {{ .Values.pipelinesServiceAccountName }}
-#     namespace: {{ .Values.dataScienceProjectNamespace }}
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: openshift-pipelines-clusterinterceptors
-# ---
-# kind: RoleBinding
-# apiVersion: rbac.authorization.k8s.io/v1
-# metadata:
-#   name: edit-{{ .Values.pipelinesServiceAccountName }}-rolebinding
-#   namespace: {{ .Values.dataScienceProjectNamespace }}
-# subjects:
-#   - kind: ServiceAccount
-#     name: {{ .Values.pipelinesServiceAccountName }}
-#     namespace: {{ .Values.dataScienceProjectNamespace }}
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: edit
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pipelines-scc-{{ .Values.pipelinesServiceAccountName }}-rolebinding
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.pipelinesServiceAccountName }}
+    namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pipelines-scc-clusterrole
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-pipelines-clusterinterceptors-{{ .Values.pipelinesServiceAccountName }}-clusterrolebinding
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.pipelinesServiceAccountName }}
+    namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-pipelines-clusterinterceptors
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: edit-{{ .Values.pipelinesServiceAccountName }}-rolebinding
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.pipelinesServiceAccountName }}
+    namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pipelines-argocd-sync-clusterrole
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+rules:
+  ##
+  ## Base operator rules
+  ##
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argocd-sync-{{ .Values.pipelinesServiceAccountName }}-rolebinding
+  namespace: openshift-gitops
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.pipelinesServiceAccountName }}
+    namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pipelines-argocd-sync-clusterrole
+
