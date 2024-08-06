@@ -5,6 +5,8 @@ vcs:
 
 gitSslVerify: true
 
+pipelinesServiceAccountName: build-bot-sa
+
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 

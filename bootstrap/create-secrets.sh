@@ -5,7 +5,7 @@
 # Environment variables
 GIT_PAT_SECRET_NAME="git-pat-secret"
 GIT_BASE="https://gitlab.cm.jccm.es"
-GIT_URL="${GIT_BASE}/inteligencia-artificial/geneva/geneva-ocp.git"
+# GIT_URL="${GIT_BASE}/inteligencia-artificial/geneva/geneva-ocp.git"
 GIT_USERNAME="gitlab"
 
 NAMESPACE_STATUS=$(kubectl get namespace/${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.status.phase}')
@@ -14,9 +14,9 @@ if [ "${NAMESPACE_STATUS}" == *"Active"* ]; then
     exit 1
 fi
 
-echo "PAT for ${GIT_URL}: " && read -s GIT_PAT
-if [ -z "${GIT_PAT}" ]; then
-    echo "You should provide a PAT for ${GIT_URL}"
+echo "PAT for ${GIT_BASE}: " && read -s GIT_PAT
+if [ -z "${GIT_BASE}" ]; then
+    echo "You should provide a PAT for ${GIT_BASE}"
     exit 1
 fi
 
@@ -34,11 +34,11 @@ stringData:
   password: ${GIT_PAT}
 EOF
 
-kubectl annotate -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
+kubectl annotate --overwrite -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
   "tekton.dev/git-0=${GIT_BASE}"
 
-kubectl annotate -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
+kubectl annotate --overwrite -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
   "build.openshift.io/source-secret-match-uri-1=${GIT_BASE}/*"
 
-kubectl label -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
+kubectl label --overwrite -n ${DATA_SCIENCE_PROJECT_NAMESPACE} secret ${GIT_PAT_SECRET_NAME} \
   credential.sync.jenkins.openshift.io=true

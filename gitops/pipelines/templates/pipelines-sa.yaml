@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.pipelinesServiceAccountName }}
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+secrets:
+- name: {{ .Values.gitPatSecretName }}
+{{- if .Values.containerRegistrySecretName }}
+- name: {{ .Values.containerRegistrySecretName }}
+{{- end }}
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: pipelines-scc-{{ .Values.pipelinesServiceAccountName }}-rolebinding
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Values.pipelinesServiceAccountName }}
+#     namespace: {{ .Values.dataScienceProjectNamespace }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: pipelines-scc-clusterrole
+# ---
+# kind: ClusterRoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: openshift-pipelines-clusterinterceptors-{{ .Values.pipelinesServiceAccountName }}-clusterrolebinding
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Values.pipelinesServiceAccountName }}
+#     namespace: {{ .Values.dataScienceProjectNamespace }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: openshift-pipelines-clusterinterceptors
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: edit-{{ .Values.pipelinesServiceAccountName }}-rolebinding
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Values.pipelinesServiceAccountName }}
+#     namespace: {{ .Values.dataScienceProjectNamespace }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: edit

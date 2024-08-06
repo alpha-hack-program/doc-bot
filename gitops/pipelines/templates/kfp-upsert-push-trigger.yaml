@@ -180,7 +180,7 @@ spec:
           value: v1
       pipelineRef:
         name: {{ .Values.kfpUpsertTektonPipelineName }}
-      # serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
+      serviceAccountName: {{ .Values.pipelinesServiceAccountName }}
       timeout: 1h0m0s
       workspaces:
         - name: workspace-source
