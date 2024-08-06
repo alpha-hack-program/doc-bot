@@ -57,18 +57,6 @@ spec:
           value: "{{ .Values.modelConnection.awsS3Bucket }}"
         - name: modelConnection.awsS3Endpoint
           value: "{{ .Values.modelConnection.awsS3Endpoint }}"
-        - name: milvus.name
-          value: "{{ .Values.milvus.name }}"
-        - name: milvus.namespace
-          value: "{{ .Values.milvus.namespace }}"
-        - name: milvus.username
-          value: "{{ .Values.milvus.username }}"
-        - name: milvus.password
-          value: "{{ .Values.milvus.password }}"
-        - name: milvus.port
-          value: "{{ .Values.milvus.port }}"
-        - name: milvus.host
-          value: "{{ .Values.milvus.host }}"
   syncPolicy:
     automated:
       # prune: true
