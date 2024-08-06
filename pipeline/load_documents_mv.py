@@ -123,6 +123,11 @@ def get_chunks_from_documents(
     region_name = os.environ.get('AWS_DEFAULT_REGION')
     bucket_name = os.environ.get('AWS_S3_BUCKET')
 
+    # Print the connection details
+    print(f"endpoint_url: {endpoint_url}")
+    print(f"region_name: {region_name}")
+    print(f"bucket_name: {bucket_name}")
+
     # Connect to the S3 bucket
     session = boto3.session.Session(
         aws_access_key_id=aws_access_key_id,
