@@ -62,9 +62,11 @@ spec:
               subPath: collections.json
             - name: kb-chat-prompts
               mountPath: /opt/app-root/src/prompts
+            {{- if .Values.mountCaCerts }}
             - name: kb-chat-cacerts
               mountPath: /opt/app-root/lib/python{{ .Values.python }}/site-packages/certifi/cacert.pem
               subPath: cacert.pem
+            {{- end }}
       volumes:
         - name: kb-chat-collections
           configMap:
@@ -77,6 +79,7 @@ spec:
           configMap:
             name: kb-chat-prompts
             defaultMode: 420
+        {{- if .Values.mountCaCerts }}
         - name: kb-chat-cacerts
           configMap:
             name: kb-chat-cacerts
@@ -84,6 +87,7 @@ spec:
               - key: cacert.pem
                 path: cacert.pem
             defaultMode: 420
+        {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
