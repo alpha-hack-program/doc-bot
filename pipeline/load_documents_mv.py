@@ -143,9 +143,12 @@ def get_chunks_from_documents(
 
     bucket = s3_resource.Bucket(bucket_name)
 
+    print(f">>>> bucket: {bucket}")
+
     # Check if the bucket exists, and create it if it doesn't
-    if not bucket.creation_date:
-        s3_resource.create_bucket(Bucket=bucket_name)
+    # if not bucket.creation_date:
+    #     print(f">>>> Creating bucket {bucket_name}")
+    #     s3_resource.create_bucket(Bucket=bucket_name)
 
     # Define a temporary directory to store the PDFs
     local_tmp_dir = '/tmp/pdfs'
