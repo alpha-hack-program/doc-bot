@@ -6,3 +6,4 @@ local*
 *.old
 old/
 __pycache__/
+*skip.*
