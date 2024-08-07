@@ -5,7 +5,9 @@ metadata:
   name: {{ .Values.pipelinesServiceAccountName }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
 secrets:
+{{- if .Values.gitPatSecretName }}
 - name: {{ .Values.gitPatSecretName }}
+{{- end }}
 {{- if .Values.containerRegistrySecretName }}
 - name: {{ .Values.containerRegistrySecretName }}
 {{- end }}
