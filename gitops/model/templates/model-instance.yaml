@@ -19,12 +19,16 @@ spec:
     model:
       modelFormat:
         name: {{ .Values.model.format }}
-      name: ''
+      name: {{ .Values.model.name }}
       resources:
         limits:
           nvidia.com/gpu: '{{ .Values.model.accelerator.max }}'
+          cpu: '{{ .Values.model.runtime.resources.limits.cpu }}'
+          memory: '{{ .Values.model.runtime.resources.limits.memory }}'
         requests:
           nvidia.com/gpu: '{{ .Values.model.accelerator.min }}'
+          cpu: '{{ .Values.model.runtime.resources.requests.cpu }}'
+          memory: '{{ .Values.model.runtime.resources.requests.memory }}'
       runtime: {{ .Values.model.name }}
       storage:
         key: aws-connection-{{ .Values.model.connection.name }}
