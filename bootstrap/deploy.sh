@@ -67,6 +67,14 @@ spec:
           value: "19530"
         - name: milvus.host
           value: "vectordb-milvus.milvus.svc.cluster.local"
+        - name: chatApplication.vcs.uri
+          value: "https://github.com/alpha-hack-program/kb-chat.git"
+        - name: chatApplication.vcs.ref
+          value: "main"
+        - name: chatApplication.vcs.name
+          value: "alpha-hack-program/kb-chat"
+        - name: chatApplication.vcs.path
+          value: "kb-chat"
   syncPolicy:
     automated:
       # prune: true
