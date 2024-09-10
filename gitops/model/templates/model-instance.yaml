@@ -8,7 +8,7 @@ metadata:
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-  name: {{ .Values.model.name }}
+  name: ''
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     opendatahub.io/dashboard: 'true'
