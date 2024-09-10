@@ -1,245 +1,245 @@
----
-apiVersion: kubeflow.org/v1
-kind: Notebook
-metadata:
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    notebooks.opendatahub.io/inject-oauth: 'true'
-    opendatahub.io/image-display-name: PyTorch
-    notebooks.opendatahub.io/oauth-logout-url: >-
-      $DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
-    opendatahub.io/accelerator-name: ''
-    openshift.io/description: ''
-    openshift.io/display-name: '{{ .Values.workbench.displayName }}'
-    notebooks.opendatahub.io/last-image-selection: '{{ .Values.workbench.image }}'
-    notebooks.opendatahub.io/last-size-selection: Small
-  name: {{ .Values.workbench.name }}
-  namespace: {{ .Values.dataScienceProjectNamespace }}
-  labels:
-    app: {{ .Values.workbench.name }}
-    opendatahub.io/dashboard: 'true'
-    opendatahub.io/odh-managed: 'true'
-spec:
-  template:
-    spec:
-      affinity: {}
-      containers:
-        - resources:
-            limits:
-              cpu: '{{ .Values.workbench.resources.limits.cpu }}'
-              memory: {{ .Values.workbench.resources.limits.memory }}
-              {{- if .Values.workbench.resources.limits.nvidiaGpu }}
-              nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
-              {{- end }}
-            requests:
-              cpu: '{{ .Values.workbench.resources.requests.cpu }}'
-              memory: {{ .Values.workbench.resources.requests.memory }}
-              {{- if .Values.workbench.resources.requests.nvidiaGpu }}
-              nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
-              {{- end }}
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}/api
-              port: notebook-port
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 1
-          name: {{ .Values.workbench.name }}
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}/api
-              port: notebook-port
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 1
-          env:
-            - name: NOTEBOOK_ARGS
-              value: |-
-                --ServerApp.port=8888
-                --ServerApp.token=''
-                --ServerApp.password=''
-                --ServerApp.base_url=/notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}
-                --ServerApp.quit_button=False
-                --ServerApp.tornado_settings={"user":"admin","hub_host":"$DASHBOARD_ROUTE","hub_prefix":"/projects/{{ .Values.dataScienceProjectNamespace }}"}
-            - name: JUPYTER_IMAGE
-              value: >-
-                image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/{{ .Values.workbench.image }}
-            - name: REQUESTS_CA_BUNDLE
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: SSL_CERT_FILE
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: PIPELINES_SSL_SA_CERTS
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: PIP_CERT
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            # - name: MILVUS_HOST
-            #   value: {{ .Values.milvus.host }}
-            # - name: MILVUS_PORT
-            #   value: '{{ .Values.milvus.port }}'
-            # - name: MILVUS_USERNAME
-            #   value: {{ .Values.milvus.username }}
-            # - name: MILVUS_PASSWORD
-            #   value: {{ .Values.milvus.password }}
-            # - name: MILVUS_COLLECTION_NAME
-            #   value: {{ .Values.documentsMilvusConnection.collectionName }}
+# ---
+# apiVersion: kubeflow.org/v1
+# kind: Notebook
+# metadata:
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     notebooks.opendatahub.io/inject-oauth: 'true'
+#     opendatahub.io/image-display-name: PyTorch
+#     notebooks.opendatahub.io/oauth-logout-url: >-
+#       $DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
+#     opendatahub.io/accelerator-name: ''
+#     openshift.io/description: ''
+#     openshift.io/display-name: '{{ .Values.workbench.displayName }}'
+#     notebooks.opendatahub.io/last-image-selection: '{{ .Values.workbench.image }}'
+#     notebooks.opendatahub.io/last-size-selection: Small
+#   name: {{ .Values.workbench.name }}
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+#   labels:
+#     app: {{ .Values.workbench.name }}
+#     opendatahub.io/dashboard: 'true'
+#     opendatahub.io/odh-managed: 'true'
+# spec:
+#   template:
+#     spec:
+#       affinity: {}
+#       containers:
+#         - resources:
+#             limits:
+#               cpu: '{{ .Values.workbench.resources.limits.cpu }}'
+#               memory: {{ .Values.workbench.resources.limits.memory }}
+#               {{- if .Values.workbench.resources.limits.nvidiaGpu }}
+#               nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
+#               {{- end }}
+#             requests:
+#               cpu: '{{ .Values.workbench.resources.requests.cpu }}'
+#               memory: {{ .Values.workbench.resources.requests.memory }}
+#               {{- if .Values.workbench.resources.requests.nvidiaGpu }}
+#               nvidia.com/gpu: '{{ .Values.workbench.resources.requests.nvidiaGpu }}'
+#               {{- end }}
+#           readinessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}/api
+#               port: notebook-port
+#               scheme: HTTP
+#             initialDelaySeconds: 10
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 1
+#           name: {{ .Values.workbench.name }}
+#           livenessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}/api
+#               port: notebook-port
+#               scheme: HTTP
+#             initialDelaySeconds: 10
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 1
+#           env:
+#             - name: NOTEBOOK_ARGS
+#               value: |-
+#                 --ServerApp.port=8888
+#                 --ServerApp.token=''
+#                 --ServerApp.password=''
+#                 --ServerApp.base_url=/notebook/{{ .Values.dataScienceProjectNamespace }}/{{ .Values.workbench.name }}
+#                 --ServerApp.quit_button=False
+#                 --ServerApp.tornado_settings={"user":"admin","hub_host":"$DASHBOARD_ROUTE","hub_prefix":"/projects/{{ .Values.dataScienceProjectNamespace }}"}
+#             - name: JUPYTER_IMAGE
+#               value: >-
+#                 image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/{{ .Values.workbench.image }}
+#             - name: REQUESTS_CA_BUNDLE
+#               value: /etc/pki/tls/custom-certs/ca-bundle.crt
+#             - name: SSL_CERT_FILE
+#               value: /etc/pki/tls/custom-certs/ca-bundle.crt
+#             - name: PIPELINES_SSL_SA_CERTS
+#               value: /etc/pki/tls/custom-certs/ca-bundle.crt
+#             - name: PIP_CERT
+#               value: /etc/pki/tls/custom-certs/ca-bundle.crt
+#             # - name: MILVUS_HOST
+#             #   value: {{ .Values.milvus.host }}
+#             # - name: MILVUS_PORT
+#             #   value: '{{ .Values.milvus.port }}'
+#             # - name: MILVUS_USERNAME
+#             #   value: {{ .Values.milvus.username }}
+#             # - name: MILVUS_PASSWORD
+#             #   value: {{ .Values.milvus.password }}
+#             # - name: MILVUS_COLLECTION_NAME
+#             #   value: {{ .Values.documentsMilvusConnection.collectionName }}
 
-          envFrom:
-            - secretRef:
-                name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
-            - secretRef:
-                name: aws-connection-{{ .Values.documentsConnection.name }}
+#           envFrom:
+#             - secretRef:
+#                 name: milvus-connection-{{ .Values.documentsMilvusConnection.name }}
+#             - secretRef:
+#                 name: aws-connection-{{ .Values.documentsConnection.name }}
 
-          ports:
-            - containerPort: 8888
-              name: notebook-port
-              protocol: TCP
-          imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /opt/app-root/src
-              name: {{ .Values.workbench.name }}
-            - mountPath: /opt/app-root/runtimes
-              name: elyra-dsp-details
-            - mountPath: /dev/shm
-              name: shm
-            - mountPath: /etc/pki/tls/custom-certs/ca-bundle.crt
-              name: trusted-ca
-              readOnly: true
-              subPath: ca-bundle.crt
-          image: >-
-            image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/{{ .Values.workbench.image }}
-          workingDir: /opt/app-root/src
-        - resources:
-            limits:
-              cpu: 100m
-              memory: 64Mi
-            requests:
-              cpu: 100m
-              memory: 64Mi
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /oauth/healthz
-              port: oauth-proxy
-              scheme: HTTPS
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 1
-          name: oauth-proxy
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /oauth/healthz
-              port: oauth-proxy
-              scheme: HTTPS
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 1
-          env:
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - containerPort: 8443
-              name: oauth-proxy
-              protocol: TCP
-          imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /etc/oauth/config
-              name: oauth-config
-            - mountPath: /etc/tls/private
-              name: tls-certificates
-          image: >-
-            registry.redhat.io/openshift4/ose-oauth-proxy@sha256:4bef31eb993feb6f1096b51b4876c65a6fb1f4401fee97fa4f4542b6b7c9bc46
-          args:
-            - '--provider=openshift'
-            - '--https-address=:8443'
-            - '--http-address='
-            - '--openshift-service-account={{ .Values.workbench.name }}'
-            - '--cookie-secret-file=/etc/oauth/config/cookie_secret'
-            - '--cookie-expire=24h0m0s'
-            - '--tls-cert=/etc/tls/private/tls.crt'
-            - '--tls-key=/etc/tls/private/tls.key'
-            - '--upstream=http://localhost:8888'
-            - '--upstream-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-            - '--email-domain=*'
-            - '--skip-provider-button'
-            - >-
-              --openshift-sar={"verb":"get","resource":"notebooks","resourceAPIGroup":"kubeflow.org","resourceName":"{{ .Values.workbench.name }}","namespace":"$(NAMESPACE)"}
-            - >-
-              --logout-url=$DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
-      enableServiceLinks: false
-      serviceAccountName: {{ .Values.workbench.name }}
-      {{- if or .Values.workbench.resources.requests.nvidiaGpu .Values.workbench.resources.limits.nvidiaGpu }}
-      tolerations:
-        - effect: NoSchedule
-          key: nvidia.com/gpu
-          operator: Exists
-      {{- end }}
-      volumes:
-        - name: {{ .Values.workbench.name }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.workbench.name }}
-        - name: elyra-dsp-details
-          secret:
-            secretName: ds-pipeline-config
-            optional: true
-        - emptyDir:
-            medium: Memory
-          name: shm
-        - configMap:
-            items:
-              - key: ca-bundle.crt
-                path: ca-bundle.crt
-            name: workbench-trusted-ca-bundle
-            optional: true
-          name: trusted-ca
-        - name: oauth-config
-          secret:
-            defaultMode: 420
-            secretName: {{ .Values.workbench.name }}-oauth-config
-        - name: tls-certificates
-          secret:
-            defaultMode: 420
-            secretName: {{ .Values.workbench.name }}-tls
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  annotations:
-    openshift.io/description: 'PVC for {{ .Values.workbench.name }}'
-    openshift.io/display-name: {{ .Values.workbench.name }}
-  name: {{ .Values.workbench.name }}
-  namespace: {{ .Values.dataScienceProjectNamespace }}
-  labels:
-    opendatahub.io/dashboard: 'true'
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  volumeMode: Filesystem
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: elyra-pipelines-{{ .Values.workbench.name }}
-  namespace: {{ .Values.dataScienceProjectNamespace }}
-  labels:
-    opendatahub.io/dashboard: 'true'
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.workbench.name }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ds-pipeline-user-access-dspa
+#           ports:
+#             - containerPort: 8888
+#               name: notebook-port
+#               protocol: TCP
+#           imagePullPolicy: Always
+#           volumeMounts:
+#             - mountPath: /opt/app-root/src
+#               name: {{ .Values.workbench.name }}
+#             - mountPath: /opt/app-root/runtimes
+#               name: elyra-dsp-details
+#             - mountPath: /dev/shm
+#               name: shm
+#             - mountPath: /etc/pki/tls/custom-certs/ca-bundle.crt
+#               name: trusted-ca
+#               readOnly: true
+#               subPath: ca-bundle.crt
+#           image: >-
+#             image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/{{ .Values.workbench.image }}
+#           workingDir: /opt/app-root/src
+#         - resources:
+#             limits:
+#               cpu: 100m
+#               memory: 64Mi
+#             requests:
+#               cpu: 100m
+#               memory: 64Mi
+#           readinessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /oauth/healthz
+#               port: oauth-proxy
+#               scheme: HTTPS
+#             initialDelaySeconds: 5
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 1
+#           name: oauth-proxy
+#           livenessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /oauth/healthz
+#               port: oauth-proxy
+#               scheme: HTTPS
+#             initialDelaySeconds: 30
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 1
+#           env:
+#             - name: NAMESPACE
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.namespace
+#           ports:
+#             - containerPort: 8443
+#               name: oauth-proxy
+#               protocol: TCP
+#           imagePullPolicy: Always
+#           volumeMounts:
+#             - mountPath: /etc/oauth/config
+#               name: oauth-config
+#             - mountPath: /etc/tls/private
+#               name: tls-certificates
+#           image: >-
+#             registry.redhat.io/openshift4/ose-oauth-proxy@sha256:4bef31eb993feb6f1096b51b4876c65a6fb1f4401fee97fa4f4542b6b7c9bc46
+#           args:
+#             - '--provider=openshift'
+#             - '--https-address=:8443'
+#             - '--http-address='
+#             - '--openshift-service-account={{ .Values.workbench.name }}'
+#             - '--cookie-secret-file=/etc/oauth/config/cookie_secret'
+#             - '--cookie-expire=24h0m0s'
+#             - '--tls-cert=/etc/tls/private/tls.crt'
+#             - '--tls-key=/etc/tls/private/tls.key'
+#             - '--upstream=http://localhost:8888'
+#             - '--upstream-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+#             - '--email-domain=*'
+#             - '--skip-provider-button'
+#             - >-
+#               --openshift-sar={"verb":"get","resource":"notebooks","resourceAPIGroup":"kubeflow.org","resourceName":"{{ .Values.workbench.name }}","namespace":"$(NAMESPACE)"}
+#             - >-
+#               --logout-url=$DASHBOARD_ROUTE/projects/{{ .Values.dataScienceProjectNamespace }}?notebookLogout={{ .Values.workbench.name }}
+#       enableServiceLinks: false
+#       serviceAccountName: {{ .Values.workbench.name }}
+#       {{- if or .Values.workbench.resources.requests.nvidiaGpu .Values.workbench.resources.limits.nvidiaGpu }}
+#       tolerations:
+#         - effect: NoSchedule
+#           key: nvidia.com/gpu
+#           operator: Exists
+#       {{- end }}
+#       volumes:
+#         - name: {{ .Values.workbench.name }}
+#           persistentVolumeClaim:
+#             claimName: {{ .Values.workbench.name }}
+#         - name: elyra-dsp-details
+#           secret:
+#             secretName: ds-pipeline-config
+#             optional: true
+#         - emptyDir:
+#             medium: Memory
+#           name: shm
+#         - configMap:
+#             items:
+#               - key: ca-bundle.crt
+#                 path: ca-bundle.crt
+#             name: workbench-trusted-ca-bundle
+#             optional: true
+#           name: trusted-ca
+#         - name: oauth-config
+#           secret:
+#             defaultMode: 420
+#             secretName: {{ .Values.workbench.name }}-oauth-config
+#         - name: tls-certificates
+#           secret:
+#             defaultMode: 420
+#             secretName: {{ .Values.workbench.name }}-tls
+# ---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   annotations:
+#     openshift.io/description: 'PVC for {{ .Values.workbench.name }}'
+#     openshift.io/display-name: {{ .Values.workbench.name }}
+#   name: {{ .Values.workbench.name }}
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+#   labels:
+#     opendatahub.io/dashboard: 'true'
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
+#   volumeMode: Filesystem
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: elyra-pipelines-{{ .Values.workbench.name }}
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+#   labels:
+#     opendatahub.io/dashboard: 'true'
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Values.workbench.name }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: Role
+#   name: ds-pipeline-user-access-dspa
