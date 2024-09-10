@@ -54,14 +54,17 @@ metadata:
   labels:
     opendatahub.io/dashboard: 'true'
 spec:
-  builtInAdapter:
-    modelLoadingTimeoutMillis: 90000
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: '8080'
+  # builtInAdapter:
+  #   modelLoadingTimeoutMillis: 90000
   containers:
     - args:
         - '--model'
         - /mnt/models/
-        - '--download-dir'
-        - /models-cache
+        # - '--download-dir'
+        # - /models-cache
         - '--port'
         - '8080'
         {{- if .Values.model.maxModelLen }}
@@ -73,19 +76,27 @@ spec:
         - float16
         - '--tensor-parallel-size={{ .Values.model.accelerator.max }}'
         {{- end }}
+        - '--distributed-executor-backend=mp'
+      command:
+        - python
+        - '-m'
+        - vllm.entrypoints.openai.api_server
+      env:
+        - name: HF_HOME
+          value: /tmp/hf_home
       image: '{{ .Values.model.runtime.image }}'
       name: kserve-container
       ports:
         - containerPort: 8080
           name: http1
           protocol: TCP
-      resources:
-        limits:
-          cpu: '{{ .Values.model.runtime.resources.limits.cpu }}'
-          memory: '{{ .Values.model.runtime.resources.limits.memory }}'
-        requests:
-          cpu: '{{ .Values.model.runtime.resources.requests.cpu }}'
-          memory: '{{ .Values.model.runtime.resources.requests.memory }}'
+      # resources:
+      #   limits:
+      #     cpu: '{{ .Values.model.runtime.resources.limits.cpu }}'
+      #     memory: '{{ .Values.model.runtime.resources.limits.memory }}'
+      #   requests:
+      #     cpu: '{{ .Values.model.runtime.resources.requests.cpu }}'
+      #     memory: '{{ .Values.model.runtime.resources.requests.memory }}'
       volumeMounts:
         - mountPath: /dev/shm
           name: shm
