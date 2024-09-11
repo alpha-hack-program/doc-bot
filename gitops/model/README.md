@@ -1,10 +1,21 @@
-# model-server
+# Deploying Granite 8B
+
+## Deploy the Application object in charge of deploying the Model
+
+Adapt the following parameters to your environment:
+
+- modelConnection.scheme: http(s)
+- name: modelConnection.awsAccessKeyId: user to access the S3 server
+- name: modelConnection.awsSecretAccessKey: user key
+- name: modelConnection.awsDefaultRegion: region, none in MinIO
+- name: modelConnection.awsS3Bucket: bucket name
+- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vllm-mistral-7b
+  name: granite-8b
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -13,127 +24,23 @@ spec:
   project: default
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: vllm-mistral-7b
+    namespace: granite-8b # DATA_SCIENCE_PROJECT_NAMESPACE used later
   source:
     path: gitops/model
     repoURL: https://github.com/alpha-hack-program/doc-bot.git
     targetRevision: main
     helm:
       parameters:
+        - name: createNamespace # This has to be false if deploying in the an existing namespace
+          value: 'true'
+        - name: createSecret # This has to be false if the secret already exists
+          value: 'false'
         - name: instanceName
-          value: "vllm-mistral-7b"
+          value: "granite-8b"
         - name: dataScienceProjectNamespace
-          value: "vllm-mistral-7b"
+          value: "granite-8b" # DATA_SCIENCE_PROJECT_NAMESPACE used later
         - name: dataScienceProjectDisplayName
-          value: "vllm-mistral-7b"
-        - name: model.root
-          value: mistralai
-        - name: model.id
-          value: Mistral-7B-Instruct-v0.2
-        - name: model.name
-          value: mistral-7b
-        - name: model.displayName
-          value: "Mistral 7b"
-        - name: model.maxModelLen
-          value: '6144'
-        - name: model.runtime.displayName
-          value: "vLLM Mistral 7B"
-        - name: model.runtime.templateName
-          value: "vllm-mistral-7b-serving-template"
-        - name: model.accelerator.productName
-          value: "NVIDIA-A10G"
-        - name: model.accelerator.min
-          value: '1'
-        - name: model.accelerator.max
-          value: '1'
-  syncPolicy:
-    automated:
-      # prune: true
-      selfHeal: true
-```
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: vllm-llama-3-8b
-  namespace: openshift-gitops
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-spec:
-  project: default
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: vllm-llama-3-8b
-  source:
-    path: gitops/model
-    repoURL: https://github.com/alpha-hack-program/doc-bot.git
-    targetRevision: main
-    helm:
-      parameters:
-        - name: instanceName
-          value: "vllm-llama-3-8b"
-        - name: dataScienceProjectNamespace
-          value: "vllm-llama-3-8b"
-        - name: dataScienceProjectDisplayName
-          value: "vllm-llama-3-8b"
-        - name: model.root
-          value: meta-llama
-        - name: model.id
-          value: Meta-Llama-3-8B-Instruct
-        - name: model.name
-          value: llama-3-8b
-        - name: model.displayName
-          value: "Llama 3 8B"
-        - name: model.runtime.displayName
-          value: "vLLM Llama 3 8B"
-        - name: model.runtime.templateName
-          value: "vllm-llama-3-8b-serving-template"
-        - name: model.accelerator.productName
-          value: "NVIDIA-A10G"
-        - name: model.accelerator.min
-          value: '1'
-        - name: model.accelerator.max
-          value: '1'
-  syncPolicy:
-    automated:
-      selfHeal: true
-    syncOptions:
-      - RespectIgnoreDifferences=true
-  ignoreDifferences:
-    - group: route.openshift.io
-      kind: Route
-      namespace: istio-system
-
-```
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: vllm-granite-8b
-  namespace: openshift-gitops
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-spec:
-  project: default
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: vllm-granite-8b
-  source:
-    path: gitops/model
-    repoURL: https://github.com/alpha-hack-program/doc-bot.git
-    targetRevision: main
-    helm:
-      parameters:
-        - name: instanceName
-          value: "vllm-granite-8b"
-        - name: dataScienceProjectNamespace
-          value: "vllm-granite-8b"
-        - name: dataScienceProjectDisplayName
-          value: "vllm-granite-8b"
+          value: "granite-8b"
         - name: model.root
           value: ibm-granite
         - name: model.id
@@ -147,7 +54,7 @@ spec:
         - name: model.runtime.displayName
           value: "vLLM Granite 3 8B"
         - name: model.runtime.templateName
-          value: "vllm-granite-8b-serving-template"
+          value: "granite-8b-serving-template"
         - name: model.accelerator.productName
           value: "NVIDIA-A10G"
         - name: model.accelerator.min
@@ -158,4 +65,130 @@ spec:
     automated:
       # prune: true
       selfHeal: true
+```
+## Create a secret called hf-creds in the namespace ${DATA_SCIENCE_PROJECT_NAMESPACE}
+
+```sh
+HF_USERNAME=xyz
+HF_TOKEN=hf_**********
+DATA_SCIENCE_PROJECT_NAMESPACE=granite-8b
+
+oc create secret generic hf-creds \
+  --from-literal=HF_USERNAME=${HF_USERNAME} \
+  --from-literal=HF_TOKEN=${HF_TOKEN} \
+  -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
+```
+
+# Llama 3 8B
+
+## Deploy the Application object in charge of deploying the Model
+
+Adapt the following parameters to your environment:
+
+- modelConnection.scheme: http(s)
+- name: modelConnection.awsAccessKeyId: user to access the S3 server
+- name: modelConnection.awsSecretAccessKey: user key
+- name: modelConnection.awsDefaultRegion: region, none in MinIO
+- name: modelConnection.awsS3Bucket: bucket name
+- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llama-3-8b
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  destination:
+    namespace: llama-3-8b # DATA_SCIENCE_PROJECT_NAMESPACE used later
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    helm:
+      parameters:
+        - name: createNamespace # This has to be false if deploying in the an existing namespace
+          value: 'true'
+        - name: createSecret # This has to be false if the secret already exists
+          value: 'false'
+        - name: instanceName
+          value: llama-3-8b
+        - name: dataScienceProjectNamespace
+          value: llama-3-8b # DATA_SCIENCE_PROJECT_NAMESPACE used later
+        - name: dataScienceProjectDisplayName
+          value: Project llama-3-8b
+        - name: model.root
+          value: mistralai
+        - name: model.id
+          value: Mistral-7B-Instruct-v0.2
+        - name: model.name
+          value: llama-3-8b
+        - name: model.displayName
+          value: Llama 8B
+        - name: model.accelerator.productName
+          value: NVIDIA-A10G
+        - name: model.accelerator.min
+          value: '1'
+        - name: model.accelerator.max
+          value: '1'
+        - name: modelConnection.name
+          value: llm
+        - name: modelConnection.displayName
+          value: llm
+        - name: modelConnection.type
+          value: s3
+        - name: modelConnection.scheme
+          value: http
+        - name: modelConnection.awsAccessKeyId
+          value: minio
+        - name: modelConnection.awsSecretAccessKey
+          value: minio123
+        - name: modelConnection.awsDefaultRegion
+          value: none
+        - name: modelConnection.awsS3Bucket
+          value: models
+        - name: modelConnection.awsS3Endpoint
+          value: 'minio.ic-shared-minio.svc:9000'
+    path: gitops/model
+    repoURL: 'https://github.com/alpha-hack-program/doc-bot.git'
+    targetRevision: main
+  syncPolicy:
+    automated:
+      selfHeal: true
+```
+
+## Create a secret called hf-creds in the namespace ${DATA_SCIENCE_PROJECT_NAMESPACE}
+
+```sh
+HF_USERNAME=xyz
+HF_TOKEN=hf_**********
+DATA_SCIENCE_PROJECT_NAMESPACE=llama-3-8b
+
+oc create secret generic hf-creds \
+  --from-literal=HF_USERNAME=${HF_USERNAME} \
+  --from-literal=HF_TOKEN=${HF_TOKEN} \
+  -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
+```
+
+# Test
+
+```sh
+INFERENCE_URL=$(oc get inferenceservice/llama-3-8b -n llama-3-8b -o jsonpath='{.status.url}')
+RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${INFERENCE_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
+echo ${RUNTIME_MODEL_ID}
+```
+
+```sh
+curl -s -X 'POST' \
+  "${INFERENCE_URL}/v1/completions" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "'${RUNTIME_MODEL_ID}'",
+  "prompt": "San Francisco is a",
+  "max_tokens": 25,
+  "temperature": 0
+}'
 ```

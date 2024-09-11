@@ -5,6 +5,8 @@ instanceName: vllm-mistral-7b
 
 createNamespace: true
 
+createSecret: true
+
 model:
   root: mistralai
   id: Mistral-7B-Instruct-v0.2

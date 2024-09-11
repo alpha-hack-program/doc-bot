@@ -1,3 +1,5 @@
+# Create secret if instructed to do so
+{{- if .Values.modelConnection.createSecret }}
 kind: Secret
 apiVersion: v1
 metadata:
@@ -17,3 +19,4 @@ stringData:
   AWS_S3_ENDPOINT: {{ printf "%s://%s" .Values.modelConnection.scheme .Values.modelConnection.awsS3Endpoint }}
   
 type: Opaque
+{{- end }}
