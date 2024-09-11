@@ -7,6 +7,7 @@ metadata:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
   name: route-reader
+  namespace: {{ .Values.dataScienceProjectNamespace }}
 rules:
 - apiGroups: ["route.openshift.io"]
   resources: ["routes"]
