@@ -9,7 +9,7 @@ vcs:
   ref: main
   name: alpha-hack-program/doc-bot
   path: examples/ui/gradio-rag-milvus-vllm-openai
-  sourceSecret: git-pat-bc-secret
+  # sourceSecret: git-pat-bc-secret
 
 model:
   name: mistral-7b

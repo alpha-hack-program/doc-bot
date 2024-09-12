@@ -231,8 +231,10 @@ spec:
       name: kb-chat:latest
   runPolicy: Serial
   source:
+    {{- if .Values.vcs.sourceSecret }}
     sourceSecret:
       name: {{ .Values.vcs.sourceSecret }}
+    {{- end }}
     contextDir: {{ .Values.vcs.path }}
     git:
       uri: {{ .Values.vcs.uri }}

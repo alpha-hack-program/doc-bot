@@ -5,7 +5,7 @@ vcs:
 
 gitSslVerify: true
 
-gitPatSecretName: git-pat-tk-secret
+# gitPatSecretName: git-pat-tk-secret
 pipelinesServiceAccountName: build-bot-sa
 
 dataScienceProjectDisplayName: vllm-mistral-7b
