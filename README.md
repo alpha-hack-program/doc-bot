@@ -275,7 +275,13 @@ EOF
 
 ## Fork this reposiroty and clone it
 
-Why forking? Because this demonstration tries to keep (to a certain extend) close to a real situation where repositories are private or password protected. 
+Why forking? Because this demonstration tries to keep (to a certain extend) close to a real situation where repositories are private or password protected.
+
+Clone your repo and change dir to the clone.
+
+```sh
+git clone <REPO_URL>
+```
 
 ### Set some basic environment variables
 
@@ -292,13 +298,9 @@ MILVUS_NAMESPACE="milvus"
 DATA_SCIENCE_PROJECT_NAMESPACE="doc-bot"
 ```
 
-Clone your repo and change dir to the clone.
-
-```sh
-git clone ${REPO_URL}
-```
-
 ## Create a PAT for your forked repo
+
+> You need this ONLY if your repo is private
 
 You will have to provide a username and PAT to the script `create-secrets.sh` located at `bootstrap`.
 

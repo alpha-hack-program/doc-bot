@@ -79,6 +79,25 @@ oc create secret generic hf-creds \
   -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
 ```
 
+## Test
+
+```sh
+INFERENCE_URL=$(oc get inferenceservice/granite-8b -n granite-8b -o jsonpath='{.status.url}')
+RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${INFERENCE_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
+echo ${RUNTIME_MODEL_ID}
+
+curl -s -X 'POST' \
+  "${INFERENCE_URL}/v1/completions" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "'${RUNTIME_MODEL_ID}'",
+  "prompt": "San Francisco is a",
+  "max_tokens": 25,
+  "temperature": 0
+}'
+```
+
 # Llama 3 8B
 
 ## Deploy the Application object in charge of deploying the Model
@@ -172,15 +191,13 @@ oc create secret generic hf-creds \
   -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
 ```
 
-# Test
+## Test
 
 ```sh
 INFERENCE_URL=$(oc get inferenceservice/llama-3-8b -n llama-3-8b -o jsonpath='{.status.url}')
 RUNTIME_MODEL_ID=$(curl -ks -X 'GET' "${INFERENCE_URL}/v1/models" -H 'accept: application/json' | jq -r .data[0].id )
 echo ${RUNTIME_MODEL_ID}
-```
 
-```sh
 curl -s -X 'POST' \
   "${INFERENCE_URL}/v1/completions" \
   -H 'accept: application/json' \
