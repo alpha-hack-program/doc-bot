@@ -7,6 +7,5 @@ data:
   collections.json: |-
     [
       {"name":"none","display_name":"None"},
-      {"name":"documents","display_name":"Documents"},
       {"name":"chunks","display_name":"Chunks"}
     ]
