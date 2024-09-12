@@ -1,5 +1,7 @@
 namespace: vllm-mistral-7b
 
+language: en
+
 createNamespace: true
 
 pythonImage:
