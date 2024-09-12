@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # Load environment variables
 . .env
 
 # Check if namespace exists
-if ! kubectl get namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} > /dev/null 2>&1; then
+if ! oc get namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} > /dev/null 2>&1; then
   echo "Namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} does not exist"
   exit 1
 fi
@@ -25,7 +25,7 @@ if [ -z "${HF_USERNAME}" ] || [ -z "${HF_TOKEN}" ]; then
 fi
 
 # Create a secret called hf-creds in the namespace ${DATA_SCIENCE_PROJECT_NAMESPACE}
-kubectl create secret generic hf-creds \
+oc create secret generic hf-creds \
   --from-literal=HF_USERNAME=${HF_USERNAME} \
   --from-literal=HF_TOKEN=${HF_TOKEN} \
   -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
