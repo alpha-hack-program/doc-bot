@@ -2,7 +2,10 @@
 
 # Pipeline to load documents from an S3 bucket into Milvus using pymilvus => mv
 
+from math import exp
 import os
+from pydoc import cli
+import re
 import sys
 
 import kfp
@@ -14,6 +17,7 @@ from kfp.dsl import Input, Output, Dataset
 from kfp import kubernetes
 
 from kubernetes import client, config
+from sympy import N
 
 # # Chunk the text of a document into smaller chunks
 # def chunk_text(doc, chunk_size=1024, chunk_overlap=40):
@@ -478,13 +482,15 @@ if __name__ == '__main__':
 
     # If both kfp_endpoint and token are provided, upload the pipeline
     if kfp_endpoint and token:
-        client = kfp.Client(host=kfp_endpoint, existing_token=token)
-
         # If endpoint doesn't have a protocol (http or https), add https
         if not kfp_endpoint.startswith("http"):
             kfp_endpoint = f"https://{kfp_endpoint}"
 
+        # Create a Kubeflow Pipelines client
+        client = kfp.Client(host=kfp_endpoint, existing_token=token)
+
         try:
+            result = None
             # Get the pipeline by name
             print(f"Pipeline name: {pipeline_name}")
             existing_pipeline = get_pipeline_by_name(client, pipeline_name)
@@ -492,7 +498,7 @@ if __name__ == '__main__':
                 print(f"Pipeline {existing_pipeline.pipeline_id} already exists. Uploading a new version.")
                 # Upload a new version of the pipeline with a version name equal to the pipeline package path plus a timestamp
                 pipeline_version_name=f"{pipeline_name}-{int(time.time())}"
-                client.upload_pipeline_version(
+                result = client.upload_pipeline_version(
                     pipeline_package_path=pipeline_package_path,
                     pipeline_id=existing_pipeline.pipeline_id,
                     pipeline_version_name=pipeline_version_name
@@ -502,12 +508,61 @@ if __name__ == '__main__':
                 print(f"Pipeline {pipeline_name} does not exist. Uploading a new pipeline.")
                 print(f"Pipeline package path: {pipeline_package_path}")
                 # Upload the compiled pipeline
-                client.upload_pipeline(
+                result = client.upload_pipeline(
                     pipeline_package_path=pipeline_package_path,
                     pipeline_name=pipeline_name
                 )
                 print(f"Pipeline uploaded successfully to {kfp_endpoint}")
+
+            # Recurring execution of the pipeline
+            try:
+                from datetime import datetime, timezone
+
+                # Get the default experiment ID
+                default_experiment = client.get_experiment(experiment_name='Default')
+
+                # Check if the recurring run already exists
+                job_name = f'job-{pipeline_name}'
+                recurring_runs_response = client.list_recurring_runs(experiment_id=default_experiment.experiment_id)
+                # print(f"Recurring runs: {recurring_runs_response.recurring_runs}")
+                current_recurring_run = None
+                if recurring_runs_response.recurring_runs:
+                    for run in recurring_runs_response.recurring_runs:
+                        # print(f"Run: {run}")
+                        # print(f">>>> Run: {run.display_name}")
+                        if run.display_name == job_name:
+                            print(f"Recurring run {run.display_name} already exists for {pipeline_name}.")
+                            current_recurring_run = run
+                            break
+
+                # If the recurring run exists, delete it
+                if current_recurring_run:
+                    print(f"Deleting the recurring run {current_recurring_run.recurring_run_id} for {pipeline_name}.")
+                    client.delete_recurring_run(current_recurring_run.recurring_run_id)
+
+                # Specify parameters for the recurring run
+                experiment_id = default_experiment.experiment_id
+                # job_name = f'job-{pipeline_name}'
+                start_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+                print(f"Start time: {start_time}")
+                interval_second = 300  # Run every hour
+                if result and result.pipeline_id and result.pipeline_version_id:
+                    print(f"Creating a pipeline run for pipeline {result.pipeline_id}")
+                    client.create_recurring_run(
+                        experiment_id=experiment_id,
+                        job_name=job_name,
+                        pipeline_id=result.pipeline_id,
+                        version_id=result.pipeline_version_id,
+                        start_time=start_time,
+                        interval_second=interval_second
+                    )
+                
+                print(f"Recurring Pipeline run created successfully for {pipeline_name}.")
+            except Exception as e:
+                print(f"Failed to create the pipeline run: {e}")
         except Exception as e:
             print(f"Failed to upload the pipeline: {e}")
+
+        
     else:
         print("KFP endpoint or token not provided. Skipping pipeline upload.")
