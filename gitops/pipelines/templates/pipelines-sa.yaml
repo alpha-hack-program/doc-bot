@@ -4,12 +4,15 @@ kind: ServiceAccount
 metadata:
   name: {{ .Values.pipelinesServiceAccountName }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
+{{- if or .Values.gitPatSecretName .Values.containerRegistrySecretName }}
+# If there are secrets to be mounted, add them to the service account
 secrets:
 {{- if .Values.gitPatSecretName }}
 - name: {{ .Values.gitPatSecretName }}
 {{- end }}
 {{- if .Values.containerRegistrySecretName }}
 - name: {{ .Values.containerRegistrySecretName }}
+{{- end }}
 {{- end }}
 ---
 kind: RoleBinding
