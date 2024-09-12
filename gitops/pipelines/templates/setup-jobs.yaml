@@ -40,8 +40,6 @@ spec:
                 namespace: {{ .Values.dataScienceProjectNamespace }}
                 labels:
                   app.kubernetes.io/instance: {{ .Values.kfpUpsertTektonPipelineName }}
-                  pipeline.openshift.io/runtime: quarkus
-                  pipeline.openshift.io/type: knative
                 annotations:
                   argocd.argoproj.io/hook: PostSync
                   argocd.argoproj.io/hook-delete-policy: BeforeHookCreation

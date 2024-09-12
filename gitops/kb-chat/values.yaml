@@ -2,7 +2,10 @@ namespace: vllm-mistral-7b
 
 createNamespace: true
 
-python: "3.9"
+pythonImage:
+  version: "3.9"
+  name: "python"
+  tag: "3.9-ubi8"
 
 vcs:
   uri: https://github.com/alpha-hack-program/doc-bot.git

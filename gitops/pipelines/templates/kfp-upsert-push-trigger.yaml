@@ -159,8 +159,6 @@ spec:
       namespace: {{ .Values.dataScienceProjectNamespace }}
       labels:
         app.kubernetes.io/instance: "{{ .Values.instanceName }}"
-        pipeline.openshift.io/runtime: quarkus
-        pipeline.openshift.io/type: knative
         tekton.dev/pipeline: {{ .Values.kfpUpsertTektonPipelineName }}
     spec:
       params:

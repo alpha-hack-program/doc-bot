@@ -19,7 +19,10 @@ kfpUpsertTektonPipelineName: kfp-upsert-pl
 
 pipelinesWorkspaceDefaultSize: 2Gi
 
-python: "3.9"
+pythonImage:
+  version: "3.9"
+  name: "python"
+  tag: "3.9-ubi8"
 
 mountCaCerts: "false"
 

@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     app.kubernetes.io/instance: {{ .Values.kfpUpsertTektonPipelineName }}
-    pipeline.openshift.io/runtime: quarkus
+    pipeline.openshift.io/runtime: python
     pipeline.openshift.io/type: knative
 spec:
   params:
@@ -57,8 +57,8 @@ spec:
       runAfter:
         - fetch-repository
       params:
-        - name: TASK_IMAGE
-          value: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
+        # - name: TASK_IMAGE
+        #   value: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
         - name: PIPELINE_NAME
           value: deploy
         - name: REQUIREMENTS_FILE

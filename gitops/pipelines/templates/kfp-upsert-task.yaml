@@ -18,7 +18,7 @@ spec:
       name: TASK_IMAGE
       type: string
       # default: quay.io/modh/runtime-images:runtime-cuda-tensorflow-ubi9-python-3.9-2023b-20240301
-      default: image-registry.openshift-image-registry.svc:5000/openshift/python:{{ .Values.python }}-ubi8
+      default: image-registry.openshift-image-registry.svc:5000/openshift/{{ .Values.pythonImage.name }}:{{ .Values.pythonImage.tag }}
     - description: The pipeline python script to compile
       name: PIPELINE_NAME
       type: string
