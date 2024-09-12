@@ -80,6 +80,7 @@ workbench:
       # nvidiaGpu: '1'
     
 modelConnection:
+  createSecret: true
   name: llm
   displayName: llm
   type: s3

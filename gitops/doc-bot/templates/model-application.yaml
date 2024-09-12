@@ -39,6 +39,8 @@ spec:
           value: '{{ .Values.model.accelerator.min }}'
         - name: model.accelerator.max
           value: '{{ .Values.model.accelerator.max }}'
+        - name: modelConnection.createSecret
+          value: "{{ .Values.modelConnection.createSecret }}"
         - name: modelConnection.name
           value: "{{ .Values.modelConnection.name }}"
         - name: modelConnection.displayName
