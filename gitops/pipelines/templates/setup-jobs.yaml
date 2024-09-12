@@ -5,7 +5,8 @@ metadata:
   name: kickstart-plr-job
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
-    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   selector: {}
@@ -80,3 +81,19 @@ spec:
           name: kickstart-plr
       restartPolicy: Never
       serviceAccountName: pipelines-setup-jobs
+---
+{{- if .Values.pipelinesWorkspaceDefaultSize }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: "{{ .Values.kfpUpsertTektonPipelineName }}-source-pvc"
+  namespace: "{{ .Values.dataScienceProjectNamespace }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pipelinesWorkspaceDefaultSize }}
+{{- end }}
