@@ -1,0 +1,93 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-documents-setup
+  namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  selector: {}
+  backoffLimit: 10
+  template:
+    spec:
+      containers:
+        - args:
+            - -ec
+            - |-
+              # Check if {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT} is reachable
+              echo -n 'Waiting for {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}'
+              while ! curl -s -o /dev/null -w "%{http_code}" "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>/dev/null | grep -q 200; do
+                echo -n .
+                sleep 5
+              done; echo
+
+              GIT_MOUNT_PATH=/mnt/git
+
+              # Check if GIT_MOUNT_PATH exists and fail if it doesn't
+              if [ ! -d "${GIT_MOUNT_PATH}" ]; then
+                  echo "Directory '${GIT_MOUNT_PATH}' does not exist. Exiting..."
+                  exit 1
+              fi
+
+              # Clone the repository
+              echo ">>>>>> Cloning repository..."
+              git clone {{ .Values.vcs.uri }} ${GIT_MOUNT_PATH}
+
+              # Set up AWS CLI
+              AWS_CONFIG_FILE=/scratch/aws-config
+              AWS_S3_BUCKET={{ .Values.documentsConnection.awsS3Bucket }}
+              AWS_ACCESS_KEY_ID={{ .Values.documentsConnection.awsAccessKeyId }}
+              AWS_SECRET_ACCESS_KEY={{ .Values.documentsConnection.awsSecretAccessKey }}
+              AWS_DEFAULT_REGION={{ .Values.documentsConnection.awsDefaultRegion }}
+              AWS_S3_ENDPOINT={{ .Values.documentsConnection.awsS3Endpoint }}
+              AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
+              AWS_S3_USE_PATH_STYLE=1
+
+              cat << EOF > ${AWS_CONFIG_FILE}
+              [default]
+              aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+              aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+              region = ${AWS_DEFAULT_REGION}
+              EOF
+
+              # Check if the bucket exists and create it if it doesn't
+              echo ">>>>>> Checking if S3 bucket exists..."
+              if aws s3api head-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>&1 | grep -q "Not Found"; then
+                  echo "Bucket ${AWS_S3_BUCKET} does not exist. Creating..."
+                  aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}"
+              else
+                  echo "Bucket ${AWS_S3_BUCKET} already exists. Continuing..."
+              fi
+
+              # Upload the sample documents to the bucket excluding safetensor files
+              SAMPLE_DOCUMENTS=${GIT_MOUNT_PATH}/examples/documents
+
+              # Check if SAMPLE_DOCUMENTS exists and fail if it doesn't
+              if [ ! -d "${SAMPLE_DOCUMENTS}" ]; then
+                  echo "Directory '${SAMPLE_DOCUMENTS}' does not exist. Exiting..."
+                  exit 1
+              fi
+
+              echo ">>>>>> Uploading documents to AWS_S3_BUCKET ${AWS_S3_BUCKET}"
+              aws s3 sync ${SAMPLE_DOCUMENTS} s3://${AWS_S3_BUCKET}/ --endpoint-url "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}"
+          command:
+            - /bin/bash
+          image: {{ .Values.setup.image }}
+          imagePullPolicy: Always
+          name: documents-setup
+          volumeMounts:
+            - name: git
+              mountPath: /mnt/git
+            # - name: models-volume
+            #   mountPath: /mnt/models
+      restartPolicy: Never
+      serviceAccount: documents-setup-job
+      serviceAccountName: documents-setup-job
+      volumes:
+          - name: git
+            emptyDir: {}
+      #   - name: models-volume
+      #     persistentVolumeClaim:
+      #       claimName: models-pvc

@@ -1,0 +1,52 @@
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: documents-setup-route-reader
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# rules:
+# - apiGroups: ["route.openshift.io"]
+#   resources: ["routes"]
+#   verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+  name: documents-setup-job
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+  name: documents-setup-job-edit
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: documents-setup-job
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   annotations:
+#     argocd.argoproj.io/hook: Sync
+#     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+#   name: documents-setup-job-documents-setup-route-reader-binding
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# subjects:
+# - kind: ServiceAccount
+#   name: documents-setup-job
+#   namespace: {{ .Values.dataScienceProjectNamespace }}
+# roleRef:
+#   kind: Role
+#   name: documents-setup-route-reader
+#   apiGroup: rbac.authorization.k8s.io
