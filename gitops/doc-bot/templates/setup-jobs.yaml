@@ -47,7 +47,7 @@ spec:
 
               # Check if {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT} is reachable
               echo -n 'Waiting for {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}'
-              while ! curl -s -o /dev/null -w "%{http_code}" "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>/dev/null | grep -q 200; do
+              while ! curl -o /dev/null -w "%{http_code}" "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>/dev/null | grep -q 200; do
                 echo -n .
                 sleep 5
               done; echo
