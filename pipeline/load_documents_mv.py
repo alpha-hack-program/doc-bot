@@ -2,10 +2,7 @@
 
 # Pipeline to load documents from an S3 bucket into Milvus using pymilvus => mv
 
-from math import exp
 import os
-from pydoc import cli
-import re
 import sys
 
 import kfp
@@ -17,7 +14,6 @@ from kfp.dsl import Input, Output, Dataset
 from kfp import kubernetes
 
 from kubernetes import client, config
-from sympy import N
 
 # # Chunk the text of a document into smaller chunks
 # def chunk_text(doc, chunk_size=1024, chunk_overlap=40):
