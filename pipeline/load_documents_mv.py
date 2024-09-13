@@ -14,6 +14,7 @@ from kfp.dsl import Input, Output, Dataset
 from kfp import kubernetes
 
 from kubernetes import client, config
+from numpy import source
 
 # # Chunk the text of a document into smaller chunks
 # def chunk_text(doc, chunk_size=1024, chunk_overlap=40):
@@ -79,6 +80,7 @@ def get_chunks_from_documents(
             end_index = len(split) - 1
             doc_splits[i] = {
                 'source': doc["source"],
+                'language': doc["language"],
                 'page_count': doc["page_count"],
                 'text': split,
                 'dossier': doc["dossier"],
@@ -92,24 +94,52 @@ def get_chunks_from_documents(
     def load_pdfs_from_directory(directory_path):
         from pypdf import PdfReader
 
+        # List all PDF files in the directory_path recursively
         docs = []
-        for filename in os.listdir(directory_path):
-            if filename.endswith('.pdf'):
-                file_path = os.path.join(directory_path, filename)
-                with open(file_path, 'rb') as f:
-                    pdf_reader = PdfReader(f)
-                    doc = {
-                        'source': filename,
-                        'page_count': pdf_reader.get_num_pages(),
-                        'text': '',
-                        'page_nums': []
-                    }
-                    index = 0
-                    for page_num in range(pdf_reader.get_num_pages()):
-                        doc["text"] += pdf_reader.get_page(page_num).extract_text()
-                        doc["page_nums"].append((index, len(doc["text"]) - 1))
-                        index = len(doc["text"])
-                    docs.append(doc)
+        for root, dirs, files in os.walk(directory_path):
+            for file in files:
+                print(f">>> root, dirs, files: {root} {dirs} {file}")
+                if file.endswith('.pdf'):
+                    file_path = os.path.join(root, file)
+                    print(f">>> file_path: {file_path}")
+                    with open(file_path, 'rb') as f:
+                        pdf_reader = PdfReader(f)
+                        # source = file_path - directory_path 
+                        source = file_path.replace(f"{directory_path}/", '')
+                        # language = source - file
+                        language = source.replace(f"/{file}", '')
+                        doc = {
+                            'source': source, 
+                            'language': language,
+                            'page_count': pdf_reader.get_num_pages(),
+                            'text': '',
+                            'page_nums': []
+                        }
+                        index = 0
+                        for page_num in range(pdf_reader.get_num_pages()):
+                            doc["text"] += pdf_reader.get_page(page_num).extract_text()
+                            doc["page_nums"].append((index, len(doc["text"]) - 1))
+                            index = len(doc["text"])
+                        docs.append(doc)
+
+
+        # for filename in os.listdir(directory_path):
+        #     if filename.endswith('.pdf'):
+        #         file_path = os.path.join(directory_path, filename)
+        #         with open(file_path, 'rb') as f:
+        #             pdf_reader = PdfReader(f)
+        #             doc = {
+        #                 'source': filename,
+        #                 'page_count': pdf_reader.get_num_pages(),
+        #                 'text': '',
+        #                 'page_nums': []
+        #             }
+        #             index = 0
+        #             for page_num in range(pdf_reader.get_num_pages()):
+        #                 doc["text"] += pdf_reader.get_page(page_num).extract_text()
+        #                 doc["page_nums"].append((index, len(doc["text"]) - 1))
+        #                 index = len(doc["text"])
+        #             docs.append(doc)
         return docs
 
     # Print the chunk_size and chunk_overlap
@@ -167,9 +197,17 @@ def get_chunks_from_documents(
         key = obj.key
         if key.endswith('.pdf'):
             # Define the local file path
-            local_file_path = os.path.join(local_tmp_dir, os.path.basename(key))
+            print(f"key: {key}")
+            print(f"local_tmp_dir: {local_tmp_dir}/{key}")
+            local_file_path = os.path.join(local_tmp_dir, key)
+            print(f"local_file_path: {local_file_path}")
+
+            # Ensure that the local directory exists
+            local_dir = os.path.dirname(local_file_path)
+            if not os.path.exists(local_dir):
+                os.makedirs(local_dir)
             
-            # Download the file
+            # Download the file to the local path
             bucket.download_file(key, local_file_path)
             print(f'Downloaded {key} to {local_file_path}')
 
@@ -179,7 +217,7 @@ def get_chunks_from_documents(
 
     # Print page_count and page_nums for each document
     for doc in docs:
-        print(f"source={doc['source']}, page_count={doc['page_count']}, page_nums={doc['page_nums']}, counted={len(doc['page_nums'])}")
+        print(f"source={doc['source']}, language={doc['language']}, page_count={doc['page_count']}, page_nums={doc['page_nums']}, counted={len(doc['page_nums'])}")
 
     # Add metadata to the documents
     pattern = re.compile(r'^([0-9]+)-(.*)\.pdf$', re.IGNORECASE)
@@ -289,6 +327,7 @@ def add_chunks_to_milvus(
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
         FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=vector_size),
         FieldSchema(name="source", dtype=DataType.VARCHAR, max_length=255),
+        FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=8),
         FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=65535),
         FieldSchema(name="page_start", dtype=DataType.INT16),
         FieldSchema(name="page_end", dtype=DataType.INT16),
@@ -308,6 +347,7 @@ def add_chunks_to_milvus(
 
     # Extract attr from the doc_chunks and store them in separate lists
     sources = [doc_chunk['source'] for doc_chunk in chunks]
+    languages = [doc_chunk['language'] for doc_chunk in chunks]
     texts = [doc_chunk['text'] for doc_chunk in chunks]
     page_starts = [doc_chunk['page_start'] for doc_chunk in chunks]
     page_ends = [doc_chunk['page_end'] for doc_chunk in chunks]
@@ -317,6 +357,7 @@ def add_chunks_to_milvus(
     entities = [
         vectors,
         sources,
+        languages,
         texts,
         page_starts,
         page_ends,
@@ -487,6 +528,8 @@ if __name__ == '__main__':
 
         try:
             result = None
+            pipeline_id = None
+            pipeline_version_id = None
             # Get the pipeline by name
             print(f"Pipeline name: {pipeline_name}")
             existing_pipeline = get_pipeline_by_name(client, pipeline_name)
@@ -500,6 +543,8 @@ if __name__ == '__main__':
                     pipeline_version_name=pipeline_version_name
                 )
                 print(f"Pipeline version uploaded successfully to {kfp_endpoint}")
+                pipeline_id = result.pipeline_id
+                pipeline_version_id = result.pipeline_version_id
             else:
                 print(f"Pipeline {pipeline_name} does not exist. Uploading a new pipeline.")
                 print(f"Pipeline package path: {pipeline_package_path}")
@@ -509,6 +554,11 @@ if __name__ == '__main__':
                     pipeline_name=pipeline_name
                 )
                 print(f"Pipeline uploaded successfully to {kfp_endpoint}")
+                pipeline_id = result.pipeline_id
+                pipeline_versions = client.list_pipeline_versions(pipeline_id=pipeline_id)
+                assert pipeline_versions.pipeline_versions, "No pipeline versions found."
+                assert pipeline_versions.pipeline_versions[0].pipeline_version_id, "No pipeline version ID found."
+                pipeline_version_id = pipeline_versions.pipeline_versions[0].pipeline_version_id
 
             # Recurring execution of the pipeline
             try:
@@ -542,13 +592,13 @@ if __name__ == '__main__':
                 start_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
                 print(f"Start time: {start_time}")
                 interval_second = 300  # Run every hour
-                if result and result.pipeline_id and result.pipeline_version_id:
-                    print(f"Creating a pipeline run for pipeline {result.pipeline_id}")
+                if pipeline_id and pipeline_version_id:
+                    print(f"Creating a pipeline run for pipeline {pipeline_id}")
                     client.create_recurring_run(
                         experiment_id=experiment_id,
                         job_name=job_name,
-                        pipeline_id=result.pipeline_id,
-                        version_id=result.pipeline_version_id,
+                        pipeline_id=pipeline_id,
+                        version_id=pipeline_version_id,
                         start_time=start_time,
                         interval_second=interval_second
                     )

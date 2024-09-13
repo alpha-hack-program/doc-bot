@@ -14,7 +14,7 @@ local.init(runner=local.SubprocessRunner())
 os.environ['AWS_ACCESS_KEY_ID'] = 'minio'
 os.environ['AWS_SECRET_ACCESS_KEY'] = 'minio123'
 os.environ['AWS_DEFAULT_REGION'] = 'none'
-os.environ['AWS_S3_ENDPOINT'] = 'https://minio-s3-ic-shared-minio.apps.cluster-msq7f.sandbox3206.opentlc.com'
+os.environ['AWS_S3_ENDPOINT'] = 'https://minio-s3-ic-shared-minio.apps.cluster-n5l28.n5l28.sandbox2968.opentlc.com/'
 os.environ['AWS_S3_BUCKET'] = 'documents'
 
 os.environ['MILVUS_HOST'] = 'localhost'
