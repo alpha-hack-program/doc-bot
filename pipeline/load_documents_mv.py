@@ -222,7 +222,9 @@ def get_chunks_from_documents(
     # Add metadata to the documents
     pattern = re.compile(r'^([0-9]+)-(.*)\.pdf$', re.IGNORECASE)
     for doc in docs:
-        match = pattern.match(doc["source"])
+        # Split doc["source"] by '/' and get the last element
+        source = doc["source"].split('/')[-1] if doc["source"].split('/') else doc["source"]
+        match = pattern.match(source)
         if match:
             doc["dossier"] = match.group(1)
         else:
@@ -591,7 +593,7 @@ if __name__ == '__main__':
                 # job_name = f'job-{pipeline_name}'
                 start_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
                 print(f"Start time: {start_time}")
-                interval_second = 300  # Run every hour
+                interval_second = 15 * 60  # Run every 15 minutes
                 if pipeline_id and pipeline_version_id:
                     print(f"Creating a pipeline run for pipeline {pipeline_id}")
                     client.create_recurring_run(
