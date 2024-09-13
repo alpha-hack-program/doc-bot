@@ -110,24 +110,32 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Manual
-  startingCSV: rhods-operator.2.11.0
+  startingCSV: rhods-operator.2.12.0
 EOF
 ```
 
 The previous step creates a `manual` subscription that generates an `InstallPlan` that has to be approved.
 
-> There should be only one install plan! If there are two delete one of them...
+> **CAUTION:** There should be only one install plan! If there are two delete one of them...
 
 ```sh
-oc get installplans -n redhat-ods-operator -o name
+# List all install plans in namespace redhat-ods-operator then delete all but the first one
+for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
+  # Check if the `INSTALL_PLAN_TO_PATCH` environment variable is empty.
+  if [ -z "$INSTALL_PLAN_TO_PATCH" ]; then
+    INSTALL_PLAN_TO_PATCH=$installplan
+    oc patch $installplan -n redhat-ods-operator --type merge --patch '{"spec":{"approved":true}}'
+    continue
+  fi
+  echo "Deleting $installplan"
+  oc delete $installplan -n redhat-ods-operator
+done
 ```
 
-Patch it in order to approve it:
+Check if the plan was approved
 
 ```sh
-for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
-  oc patch $installplan -n redhat-ods-operator --type merge --patch '{"spec":{"approved":true}}'
-done
+echo "Install plan is approved? $(oc get installplans -n redhat-ods-operator -o jsonpath='{.items[].spec.approved}')"
 ```
 
 ## Create the Data Science Cluster
@@ -271,6 +279,12 @@ spec:
 EOF
 ```
 
+Check is the `default-dsc` cluster is available.
+
+```sh
+oc get dsc default-dsc -o jsonpath='{.status.conditions[?(@.type=="Available")].status}' && echo
+```
+
 # Doc Bot Application deployment
 
 ## Fork this reposiroty and clone it
@@ -300,7 +314,7 @@ DATA_SCIENCE_PROJECT_NAMESPACE="doc-bot"
 
 ## Create a PAT for your forked repo
 
-> You need this ONLY if your repo is private
+> You need this **ONLY** if your repo is private
 
 You will have to provide a username and PAT to the script `create-secrets.sh` located at `bootstrap`.
 
