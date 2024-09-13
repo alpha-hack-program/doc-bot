@@ -16,13 +16,6 @@ spec:
         - args:
             - -ec
             - |-
-              # Check if {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT} is reachable
-              echo -n 'Waiting for {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}'
-              while ! curl -s -o /dev/null -w "%{http_code}" "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>/dev/null | grep -q 200; do
-                echo -n .
-                sleep 5
-              done; echo
-
               GIT_MOUNT_PATH=/mnt/git
 
               # Check if GIT_MOUNT_PATH exists and fail if it doesn't
@@ -51,6 +44,13 @@ spec:
               aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
               region = ${AWS_DEFAULT_REGION}
               EOF
+
+              # Check if {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT} is reachable
+              echo -n 'Waiting for {{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}'
+              while ! curl -s -o /dev/null -w "%{http_code}" "{{ .Values.documentsConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>/dev/null | grep -q 200; do
+                echo -n .
+                sleep 5
+              done; echo
 
               # Check if the bucket exists and create it if it doesn't
               echo ">>>>>> Checking if S3 bucket exists..."
