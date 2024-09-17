@@ -5,22 +5,18 @@ instanceName: vllm-mistral-7b
 
 createNamespace: true
 
-createSecret: true
-
 model:
   root: mistralai
   id: Mistral-7B-Instruct-v0.2
   name: mistral-7b
   displayName: Mistral 7b
   maxReplicas: 1
-  # format: pytorch
   format: vLLM
   maxModelLen: '6144'
   apiProtocol: REST
   runtime:
     templateName: vllm-mistral-7b-serving-template
     templateDisplayName: vLLM Mistral 7B
-    # image: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2
     image: quay.io/modh/vllm@sha256:b51fde66f162f1a78e8c027320dddf214732d5345953b1599a84fe0f0168c619
     resources:
       limits:
@@ -35,12 +31,12 @@ model:
     productName: NVIDIA-A10G
   connection:
     name: llm
-    # path: mistralai/Mistral-7B-Instruct-v0.2
   volumes:
     shm:
       sizeLimit: 2Gi
     
 modelConnection:
+  createSecret: true
   name: llm
   displayName: llm
   type: s3

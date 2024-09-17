@@ -57,14 +57,10 @@ spec:
   annotations:
     prometheus.io/path: /metrics
     prometheus.io/port: '8080'
-  # builtInAdapter:
-  #   modelLoadingTimeoutMillis: 90000
   containers:
     - args:
         - '--model'
         - /mnt/models/
-        # - '--download-dir'
-        # - /models-cache
         - '--port'
         - '8080'
         {{- if .Values.model.maxModelLen }}
@@ -90,13 +86,6 @@ spec:
         - containerPort: 8080
           name: http1
           protocol: TCP
-      # resources:
-      #   limits:
-      #     cpu: '{{ .Values.model.runtime.resources.limits.cpu }}'
-      #     memory: '{{ .Values.model.runtime.resources.limits.memory }}'
-      #   requests:
-      #     cpu: '{{ .Values.model.runtime.resources.requests.cpu }}'
-      #     memory: '{{ .Values.model.runtime.resources.requests.memory }}'
       volumeMounts:
         - mountPath: /dev/shm
           name: shm
