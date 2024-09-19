@@ -15,8 +15,8 @@ model:
   maxModelLen: '6144'
   apiProtocol: REST
   runtime:
-    templateName: vllm-mistral-7b-serving-template
-    templateDisplayName: vLLM Mistral 7B
+    templateName: vllm-serving-template
+    templateDisplayName: vLLM Serving Template
     image: quay.io/modh/vllm@sha256:b51fde66f162f1a78e8c027320dddf214732d5345953b1599a84fe0f0168c619
     resources:
       limits:
