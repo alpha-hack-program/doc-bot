@@ -121,25 +121,6 @@ def get_chunks_from_documents(
                             doc["page_nums"].append((index, len(doc["text"]) - 1))
                             index = len(doc["text"])
                         docs.append(doc)
-
-
-        # for filename in os.listdir(directory_path):
-        #     if filename.endswith('.pdf'):
-        #         file_path = os.path.join(directory_path, filename)
-        #         with open(file_path, 'rb') as f:
-        #             pdf_reader = PdfReader(f)
-        #             doc = {
-        #                 'source': filename,
-        #                 'page_count': pdf_reader.get_num_pages(),
-        #                 'text': '',
-        #                 'page_nums': []
-        #             }
-        #             index = 0
-        #             for page_num in range(pdf_reader.get_num_pages()):
-        #                 doc["text"] += pdf_reader.get_page(page_num).extract_text()
-        #                 doc["page_nums"].append((index, len(doc["text"]) - 1))
-        #                 index = len(doc["text"])
-        #             docs.append(doc)
         return docs
 
     # Print the chunk_size and chunk_overlap
