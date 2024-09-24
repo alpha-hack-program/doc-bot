@@ -201,7 +201,7 @@ def get_chunks_from_documents(
         print(f"source={doc['source']}, language={doc['language']}, page_count={doc['page_count']}, page_nums={doc['page_nums']}, counted={len(doc['page_nums'])}")
 
     # Add metadata to the documents
-    pattern = re.compile(r'^([0-9]+)-(.*)\.pdf$', re.IGNORECASE)
+    pattern = re.compile(r'^([0-9]+)[-_](.*)\.pdf$', re.IGNORECASE)
     for doc in docs:
         # Split doc["source"] by '/' and get the last element
         source = doc["source"].split('/')[-1] if doc["source"].split('/') else doc["source"]
