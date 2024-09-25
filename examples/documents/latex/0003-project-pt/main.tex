@@ -1,0 +1,138 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[brazil]{babel}
+\usepackage{pgfplots}
+\usepackage{array}
+\pgfplotsset{compat=1.18}
+
+\title{Relatório Executivo do Projeto 0003}
+\author{Gerente do Projeto: Ana Silva}
+\date{24 de setembro de 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section*{Resumo Executivo}
+\addcontentsline{toc}{section}{Resumo Executivo}
+Este relatório detalha o progresso e a situação atual do projeto XYZ. Inclui uma análise do cronograma, do orçamento e dos principais riscos enfrentados. Adicionalmente, são apresentadas estratégias para mitigar atrasos e melhorar a eficiência da equipe. O projeto, iniciado em junho de 2024, visa a conclusão até janeiro de 2025.
+
+\section*{Contexto}
+\addcontentsline{toc}{section}{Contexto}
+O projeto XYZ foi criado para modernizar a infraestrutura de TI da empresa, com foco na implementação de um novo sistema de gerenciamento de dados. O principal objetivo é reduzir o tempo de processamento de informações em 40\% e aumentar a segurança dos dados. A equipe do projeto inclui especialistas em TI, engenheiros de software e consultores externos.
+
+Os principais objetivos incluem:
+\begin{itemize}
+    \item Reduzir o tempo de processamento de dados em 40\%.
+    \item Implementar um sistema de backup automatizado.
+    \item Aumentar a segurança com criptografia avançada.
+    \item Melhorar a acessibilidade dos dados para diferentes departamentos.
+\end{itemize}
+
+\section*{Progresso Até o Momento}
+\addcontentsline{toc}{section}{Progresso Até o Momento}
+O projeto encontra-se na fase de desenvolvimento, com 70\% das tarefas concluídas. A seguir, um resumo das etapas finalizadas:
+
+\begin{itemize}
+    \item \textbf{Fase 1: Planejamento e Design} (Completado em 30 de julho de 2024)
+    \item \textbf{Fase 2: Desenvolvimento} (70\% completo, conclusão prevista para 20 de outubro de 2024)
+    \item \textbf{Fase 3: Testes e Implantação} (Agendado para novembro-dezembro de 2024)
+\end{itemize}
+
+\section*{Cronograma do Projeto e Marcos}
+\addcontentsline{toc}{section}{Cronograma do Projeto e Marcos}
+A tabela a seguir apresenta o cronograma detalhado dos marcos do projeto e o status de conclusão de cada um:
+
+\begin{center}
+\begin{tabular}{|m{4cm}|m{3cm}|m{3cm}|m{3cm}|}
+\hline
+\textbf{Marco} & \textbf{Data Planejada} & \textbf{Data Real} & \textbf{Status de Conclusão} \\
+\hline
+Planejamento Completo & 30 de julho de 2024 & 30 de julho de 2024 & 100\% \\
+\hline
+Desenvolvimento de API & 15 de setembro de 2024 & 20 de setembro de 2024 & 100\% \\
+\hline
+Integração de Banco de Dados & 1 de outubro de 2024 & Em andamento & 60\% \\
+\hline
+Testes de Sistema & 15 de novembro de 2024 & A definir & Não Iniciado \\
+\hline
+Implantação Final & 15 de janeiro de 2025 & A definir & Não Iniciado \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{Análise Orçamentária}
+\addcontentsline{toc}{section}{Análise Orçamentária}
+O orçamento do projeto está dentro dos limites, embora o atraso na integração do banco de dados possa resultar em custos adicionais. A seguir, o orçamento alocado em comparação com os valores reais até o momento:
+
+\begin{itemize}
+    \item \textbf{Orçamento Total:} R\$600.000
+    \item \textbf{Total Gasto:} R\$350.000 (Até 24 de setembro de 2024)
+\end{itemize}
+
+\subsection*{Detalhamento do Orçamento}
+\begin{itemize}
+    \item Planejamento e Design: R\$120.000 (Gasto: R\$110.000)
+    \item Desenvolvimento: R\$300.000 (Gasto: R\$180.000)
+    \item Testes: R\$120.000 (Alocado)
+    \item Implantação: R\$60.000 (Alocado)
+\end{itemize}
+
+\section*{Status Atual}
+\addcontentsline{toc}{section}{Status Atual}
+Atualmente, o projeto está focado na integração do banco de dados. A seguir, um gráfico de Gantt que ilustra o cronograma do projeto:
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        title={Cronograma do Projeto (Gráfico de Gantt)},
+        xlabel={Fases do Projeto},
+        ylabel={Cronograma (Meses)},
+        symbolic x coords={Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro, Janeiro},
+        xtick=data,
+        ybar=0.7,
+        ymin=0, ymax=8,
+        bar width=15pt,
+        enlarge x limits={abs=0.5cm},
+        legend pos=north west
+    ]
+    \addplot coordinates {(Junho, 1) (Julho, 2) (Agosto, 2) (Setembro, 3) (Outubro, 4) (Novembro, 5) (Dezembro, 6) (Janeiro, 7)};
+    \addlegendentry{Progresso Esperado}
+    
+    \addplot coordinates {(Junho, 1) (Julho, 2) (Agosto, 2) (Setembro, 3) (Outubro, 3.5) (Novembro, 0) (Dezembro, 0) (Janeiro, 0)};
+    \addlegendentry{Progresso Real}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\section*{Riscos e Mitigação}
+\addcontentsline{toc}{section}{Riscos e Mitigação}
+Alguns riscos identificados que podem impactar o cronograma e o orçamento do projeto incluem:
+\begin{itemize}
+    \item \textbf{Risco:} Atrasos na integração do banco de dados.
+    \item \textbf{Mitigação:} Alocação de uma equipe dedicada para acelerar o processo de integração.
+    \item \textbf{Risco:} Problemas de segurança durante os testes.
+    \item \textbf{Mitigação:} Implementação de auditorias de segurança contínuas durante o desenvolvimento.
+\end{itemize}
+
+\section*{Próximos Passos}
+\addcontentsline{toc}{section}{Próximos Passos}
+As principais atividades para as próximas semanas são:
+\begin{itemize}
+    \item Finalizar a integração do banco de dados até 15 de outubro de 2024.
+    \item Iniciar os testes de sistema até 1 de novembro de 2024.
+    \item Garantir a conclusão da implantação até janeiro de 2025.
+\end{itemize}
+
+\section*{Conclusão}
+\addcontentsline{toc}{section}{Conclusão}
+O projeto XYZ está progredindo conforme o cronograma ajustado. Embora tenha havido atrasos no desenvolvimento, os recursos adicionais alocados devem garantir que o projeto seja concluído dentro do prazo revisado. Espera-se que a integração do banco de dados seja finalizada em breve, o que permitirá a execução dos testes de sistema e a implantação dentro do prazo.
+
+\end{document}

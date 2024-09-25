@@ -1,0 +1,138 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[spanish]{babel}
+\usepackage{pgfplots}
+\usepackage{array}
+\pgfplotsset{compat=1.18}
+
+\title{Informe Ejecutivo del Proyecto 0003}
+\author{Gerente de Proyecto: Ana Silva}
+\date{24 de septiembre de 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section*{Resumen Ejecutivo}
+\addcontentsline{toc}{section}{Resumen Ejecutivo}
+Este informe detalla el progreso y el estado actual del proyecto XYZ. Incluye un análisis del cronograma, el presupuesto y los principales riesgos enfrentados. Además, se presentan estrategias para mitigar los retrasos y mejorar la eficiencia del equipo. El proyecto, que comenzó en junio de 2024, tiene como objetivo completarse en enero de 2025.
+
+\section*{Contexto}
+\addcontentsline{toc}{section}{Contexto}
+El proyecto XYZ fue creado para modernizar la infraestructura de TI de la empresa, con un enfoque en la implementación de un nuevo sistema de gestión de datos. El objetivo principal es reducir el tiempo de procesamiento de datos en un 40\% y aumentar la seguridad de los datos. El equipo del proyecto incluye especialistas en TI, ingenieros de software y consultores externos.
+
+Los principales objetivos incluyen:
+\begin{itemize}
+    \item Reducir el tiempo de procesamiento de datos en un 40\%.
+    \item Implementar un sistema automatizado de respaldo.
+    \item Aumentar la seguridad con encriptación avanzada.
+    \item Mejorar la accesibilidad de los datos para diferentes departamentos.
+\end{itemize}
+
+\section*{Progreso Hasta la Fecha}
+\addcontentsline{toc}{section}{Progreso Hasta la Fecha}
+El proyecto se encuentra en la fase de desarrollo, con el 70\% de las tareas completadas. A continuación, un resumen de las etapas finalizadas:
+
+\begin{itemize}
+    \item \textbf{Fase 1: Planificación y Diseño} (Completada el 30 de julio de 2024)
+    \item \textbf{Fase 2: Desarrollo} (70\% completado, conclusión prevista para el 20 de octubre de 2024)
+    \item \textbf{Fase 3: Pruebas e Implementación} (Programada para noviembre-diciembre de 2024)
+\end{itemize}
+
+\section*{Cronograma del Proyecto y Hitos}
+\addcontentsline{toc}{section}{Cronograma del Proyecto y Hitos}
+La siguiente tabla muestra el cronograma detallado de los hitos del proyecto y el estado de finalización de cada uno:
+
+\begin{center}
+\begin{tabular}{|m{4cm}|m{3cm}|m{3cm}|m{3cm}|}
+\hline
+\textbf{Hito} & \textbf{Fecha Planeada} & \textbf{Fecha Real} & \textbf{Estado de Finalización} \\
+\hline
+Planificación Completa & 30 de julio de 2024 & 30 de julio de 2024 & 100\% \\
+\hline
+Desarrollo de API & 15 de septiembre de 2024 & 20 de septiembre de 2024 & 100\% \\
+\hline
+Integración de la Base de Datos & 1 de octubre de 2024 & En curso & 60\% \\
+\hline
+Pruebas del Sistema & 15 de noviembre de 2024 & Por definir & No Iniciado \\
+\hline
+Implementación Final & 15 de enero de 2025 & Por definir & No Iniciado \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{Análisis Presupuestario}
+\addcontentsline{toc}{section}{Análisis Presupuestario}
+El presupuesto del proyecto está dentro de los límites, aunque el retraso en la integración de la base de datos podría generar costos adicionales. A continuación, el presupuesto asignado en comparación con los valores reales hasta la fecha:
+
+\begin{itemize}
+    \item \textbf{Presupuesto Total:} R\$600,000
+    \item \textbf{Total Gastado:} R\$350,000 (Hasta el 24 de septiembre de 2024)
+\end{itemize}
+
+\subsection*{Desglose del Presupuesto}
+\begin{itemize}
+    \item Planificación y Diseño: R\$120,000 (Gastado: R\$110,000)
+    \item Desarrollo: R\$300,000 (Gastado: R\$180,000)
+    \item Pruebas: R\$120,000 (Asignado)
+    \item Implementación: R\$60,000 (Asignado)
+\end{itemize}
+
+\section*{Estado Actual}
+\addcontentsline{toc}{section}{Estado Actual}
+Actualmente, el proyecto está enfocado en la integración de la base de datos. A continuación, un gráfico de Gantt que ilustra el cronograma del proyecto:
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        title={Cronograma del Proyecto (Gráfico de Gantt)},
+        xlabel={Fases del Proyecto},
+        ylabel={Cronograma (Meses)},
+        symbolic x coords={Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre, Enero},
+        xtick=data,
+        ybar=0.7,
+        ymin=0, ymax=8,
+        bar width=15pt,
+        enlarge x limits={abs=0.5cm},
+        legend pos=north west
+    ]
+    \addplot coordinates {(Junio, 1) (Julio, 2) (Agosto, 2) (Septiembre, 3) (Octubre, 4) (Noviembre, 5) (Diciembre, 6) (Enero, 7)};
+    \addlegendentry{Progreso Esperado}
+    
+    \addplot coordinates {(Junio, 1) (Julio, 2) (Agosto, 2) (Septiembre, 3) (Octubre, 3.5) (Noviembre, 0) (Diciembre, 0) (Enero, 0)};
+    \addlegendentry{Progreso Real}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\section*{Riesgos y Mitigación}
+\addcontentsline{toc}{section}{Riesgos y Mitigación}
+Algunos riesgos identificados que podrían impactar el cronograma y el presupuesto del proyecto incluyen:
+\begin{itemize}
+    \item \textbf{Riesgo:} Retrasos en la integración de la base de datos.
+    \item \textbf{Mitigación:} Asignar un equipo dedicado para acelerar el proceso de integración.
+    \item \textbf{Riesgo:} Problemas de seguridad durante las pruebas.
+    \item \textbf{Mitigación:} Implementar auditorías de seguridad continuas durante el desarrollo.
+\end{itemize}
+
+\section*{Próximos Pasos}
+\addcontentsline{toc}{section}{Próximos Pasos}
+Las actividades principales para las próximas semanas son:
+\begin{itemize}
+    \item Finalizar la integración de la base de datos para el 15 de octubre de 2024.
+    \item Iniciar las pruebas del sistema para el 1 de noviembre de 2024.
+    \item Asegurar la finalización de la implementación para enero de 2025.
+\end{itemize}
+
+\section*{Conclusión}
+\addcontentsline{toc}{section}{Conclusión}
+El proyecto XYZ está progresando conforme al cronograma revisado. Aunque ha habido retrasos en el desarrollo, los recursos adicionales asignados deberían asegurar que el proyecto se complete dentro del plazo revisado. Se espera que la integración de la base de datos se finalice pronto, lo que permitirá realizar las pruebas del sistema e implementar el proyecto dentro del plazo.
+
+\end{document}

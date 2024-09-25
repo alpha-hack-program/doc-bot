@@ -1,0 +1,133 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[spanish]{babel}
+\usepackage{pgfplots}
+\usepackage{array}
+\pgfplotsset{compat=1.18} 
+
+\title{Memorándum Extendido del Proyecto 0002}
+\author{Gerente de Proyecto: Juan Pérez}
+\date{24 de septiembre de 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Resumen Ejecutivo}
+Este memorándum ofrece una visión completa del proyecto ABC. Cubre el contexto, el progreso, los riesgos y desafíos. Además, se presenta un análisis detallado del cronograma y del presupuesto. También se proporcionará una comparación del plan inicial con el estado actual, destacando desviaciones y estrategias de mitigación de riesgos.
+
+\section{Contexto}
+El proyecto ABC se inició para abordar las ineficiencias del sistema existente. El proyecto busca mejorar el rendimiento del sistema en un 30\%, reducir el tiempo de inactividad y mejorar la experiencia del usuario. El proyecto comenzó oficialmente el 1 de julio de 2024, con una fecha de finalización esperada en diciembre de 2024.
+
+El proyecto involucra varios equipos, incluidos desarrollo de software, aseguramiento de la calidad y gestión de proyectos. Los principales objetivos son:
+\begin{itemize}
+    \item Mejorar el rendimiento del sistema en un 30\%.
+    \item Mejorar la experiencia del usuario mediante una interfaz rediseñada.
+    \item Reducir el tiempo de inactividad del sistema en un 50\%.
+    \item Asegurar la sincronización de datos entre plataformas.
+\end{itemize}
+
+\section{Progreso Hasta la Fecha}
+El proyecto se encuentra actualmente en la segunda fase, con un 60\% del trabajo de desarrollo completado. A continuación, se presenta un desglose del trabajo realizado hasta la fecha:
+
+\begin{itemize}
+    \item \textbf{Fase 1: Recolección de Requisitos} (Completado el 15 de agosto de 2024)
+    \item \textbf{Fase 2: Desarrollo} (60\% completado, finalización prevista el 15 de octubre de 2024)
+    \item \textbf{Fase 3: Pruebas e Implementación} (Programado para noviembre - diciembre de 2024)
+\end{itemize}
+
+\section{Cronograma del Proyecto y Hitos}
+La siguiente tabla proporciona un cronograma detallado de los hitos del proyecto y el porcentaje completado:
+
+\begin{center}
+\begin{table}[h]
+\small
+% \fontsize{10pt}{10pt}\selectfont
+\begin{tabular}{|m{4cm}|m{4cm}|m{4cm}|m{2cm}|}
+\hline
+\textbf{Hito} & \textbf{Fecha Planificada} & \textbf{Fecha Real} & \textbf{Estado} \\
+\hline
+Recolección Requisitos & 15 de agosto de 2024 & 15 de agosto de 2024 & 100\% \\
+\hline
+Autenticación Usuarios & 1 de septiembre de 2024 & 5 de septiembre de 2024 & 100\% \\
+\hline
+Integración API & 1 de octubre de 2024 & En curso & 50\% \\
+\hline
+Fase de Pruebas & 15 de noviembre de 2024 & Por determinar & No Iniciado \\
+\hline
+Implementación Final & 15 de diciembre de 2024 & Por determinar & No Iniciado \\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+\section{Análisis Presupuestario}
+El presupuesto del proyecto se ha mantenido dentro de los límites, aunque el retraso en la integración de API podría afectar los costos. A continuación se presenta un desglose del presupuesto asignado frente al presupuesto real para cada fase.
+
+\begin{itemize}
+    \item \textbf{Presupuesto Total:} \$500,000
+    \item \textbf{Cantidad Gastada:} \$300,000 (Hasta el 24 de septiembre de 2024)
+\end{itemize}
+
+\subsection*{Desglose Detallado del Presupuesto}
+\begin{itemize}
+    \item Recolección de Requisitos: \$100,000 (Gastado: \$95,000)
+    \item Desarrollo: \$250,000 (Gastado: \$150,000)
+    \item Pruebas: \$100,000 (Asignado)
+    \item Implementación: \$50,000 (Asignado)
+\end{itemize}
+
+\section{Estado Actual}
+La fase de desarrollo está en curso, centrada en la integración de API. A continuación se muestra un gráfico de Gantt que ofrece una representación visual del cronograma del proyecto.
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        title={Cronograma del Proyecto (Gráfico de Gantt)},
+        xlabel={Fases del Proyecto},
+        ylabel={Cronograma (Meses)},
+        symbolic x coords={Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre},
+        xtick=data,
+        ybar=0.7,
+        ymin=0, ymax=6,
+        bar width=15pt,
+        enlarge x limits={abs=0.5cm},
+        legend pos=north west
+    ]
+    \addplot coordinates {(Julio, 1) (Agosto, 2) (Septiembre, 2) (Octubre, 3) (Noviembre, 4) (Diciembre, 5)};
+    \addlegendentry{Progreso Esperado}
+    
+    \addplot coordinates {(Julio, 1) (Agosto, 2) (Septiembre, 2) (Octubre, 2.5) (Noviembre, 0) (Diciembre, 0)};
+    \addlegendentry{Progreso Real}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\section{Riesgos y Mitigación}
+El proyecto ha encontrado varios riesgos que podrían afectar su cronograma y presupuesto:
+\begin{itemize}
+    \item \textbf{Riesgo:} Retrasos en la integración de API.
+    \item \textbf{Mitigación:} Se han asignado recursos adicionales para centrarse en el desarrollo de API.
+    \item \textbf{Riesgo:} Potenciales retrasos en las pruebas de aceptación debido a la finalización tardía del desarrollo.
+    \item \textbf{Mitigación:} Los cronogramas de prueba se ajustarán para correr en paralelo con el trabajo de desarrollo restante.
+\end{itemize}
+
+\section{Próximos Pasos}
+Las siguientes tareas son prioritarias para la próxima fase del proyecto:
+\begin{itemize}
+    \item Completar la integración de API antes del 1 de octubre de 2024.
+    \item Iniciar pruebas antes del 1 de noviembre de 2024.
+    \item Asegurar la implementación del sistema para diciembre de 2024.
+\end{itemize}
+
+\section{Conclusión}
+En conclusión, el proyecto ABC está progresando a pesar de algunos retrasos menores en el desarrollo. Confiamos en que el proyecto cumplirá con el cronograma revisado, y se espera que la integración de API se complete pronto. Se han asignado recursos adicionales para garantizar que las fases de pruebas e implementación se mantengan en el cronograma.
+
+\end{document}

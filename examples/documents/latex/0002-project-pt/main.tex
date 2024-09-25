@@ -1,0 +1,133 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[portuguese]{babel}
+\usepackage{pgfplots}
+\usepackage{array}
+\pgfplotsset{compat=1.18} 
+
+\title{Memorando Estendido do Projeto 0002}
+\author{Gerente de Projeto: Juan Pérez}
+\date{24 de setembro de 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Resumo Executivo}
+Este memorando oferece uma visão completa do projeto ABC. Ele cobre o contexto, progresso, riscos e desafios. Além disso, é apresentada uma análise detalhada do cronograma e do orçamento. Também será fornecida uma comparação entre o plano inicial e o estado atual, destacando desvios e estratégias de mitigação de riscos.
+
+\section{Contexto}
+O projeto ABC foi iniciado para resolver ineficiências no sistema existente. O projeto busca melhorar o desempenho do sistema em 30\%, reduzir o tempo de inatividade e aprimorar a experiência do usuário. O projeto foi oficialmente iniciado em 1º de julho de 2024, com data de conclusão esperada para dezembro de 2024.
+
+O projeto envolve várias equipes, incluindo desenvolvimento de software, garantia de qualidade e gerenciamento de projetos. Os principais objetivos são:
+\begin{itemize}
+    \item Melhorar o desempenho do sistema em 30\%.
+    \item Melhorar a experiência do usuário por meio de uma interface redesenhada.
+    \item Reduzir o tempo de inatividade do sistema em 50\%.
+    \item Garantir a sincronização de dados entre plataformas.
+\end{itemize}
+
+\section{Progresso até o Momento}
+Atualmente, o projeto está na segunda fase, com 60\% do trabalho de desenvolvimento concluído. Abaixo está uma divisão do trabalho realizado até o momento:
+
+\begin{itemize}
+    \item \textbf{Fase 1: Coleta de Requisitos} (Concluída em 15 de agosto de 2024)
+    \item \textbf{Fase 2: Desenvolvimento} (60\% concluído, conclusão prevista para 15 de outubro de 2024)
+    \item \textbf{Fase 3: Testes e Implementação} (Programada para novembro - dezembro de 2024)
+\end{itemize}
+
+\section{Cronograma do Projeto e Marcos}
+A tabela a seguir fornece um cronograma detalhado dos marcos do projeto e o percentual de conclusão:
+
+\begin{center}
+\begin{table}[h]
+\small
+% \fontsize{10pt}{10pt}\selectfont
+\begin{tabular}{|m{4cm}|m{4cm}|m{4cm}|m{2cm}|}
+\hline
+\textbf{Marco} & \textbf{Data Planejada} & \textbf{Data Real} & \textbf{Status} \\
+\hline
+Coleta de Requisitos & 15 de agosto de 2024 & 15 de agosto de 2024 & 100\% \\
+\hline
+Autenticação de Usuários & 1º de setembro de 2024 & 5 de setembro de 2024 & 100\% \\
+\hline
+Integração de API & 1º de outubro de 2024 & Em andamento & 50\% \\
+\hline
+Fase de Testes & 15 de novembro de 2024 & A ser determinado & Não Iniciado \\
+\hline
+Implementação Final & 15 de dezembro de 2024 & A ser determinado & Não Iniciado \\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+\section{Análise Orçamentária}
+O orçamento do projeto permaneceu dentro dos limites, embora o atraso na integração da API possa impactar os custos. A seguir, uma divisão do orçamento alocado versus o orçamento real para cada fase.
+
+\begin{itemize}
+    \item \textbf{Orçamento Total:} \$500,000
+    \item \textbf{Valor Gasto:} \$300,000 (Até 24 de setembro de 2024)
+\end{itemize}
+
+\subsection*{Detalhamento do Orçamento}
+\begin{itemize}
+    \item Coleta de Requisitos: \$100,000 (Gasto: \$95,000)
+    \item Desenvolvimento: \$250,000 (Gasto: \$150,000)
+    \item Testes: \$100,000 (Alocado)
+    \item Implementação: \$50,000 (Alocado)
+\end{itemize}
+
+\section{Status Atual}
+A fase de desenvolvimento está em andamento, focada na integração da API. Abaixo está um gráfico de Gantt que oferece uma representação visual do cronograma do projeto.
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        title={Cronograma do Projeto (Gráfico de Gantt)},
+        xlabel={Fases do Projeto},
+        ylabel={Cronograma (Meses)},
+        symbolic x coords={Julho, Agosto, Setembro, Outubro, Novembro, Dezembro},
+        xtick=data,
+        ybar=0.7,
+        ymin=0, ymax=6,
+        bar width=15pt,
+        enlarge x limits={abs=0.5cm},
+        legend pos=north west
+    ]
+    \addplot coordinates {(Julho, 1) (Agosto, 2) (Setembro, 2) (Outubro, 3) (Novembro, 4) (Dezembro, 5)};
+    \addlegendentry{Progresso Esperado}
+    
+    \addplot coordinates {(Julho, 1) (Agosto, 2) (Setembro, 2) (Outubro, 2.5) (Novembro, 0) (Dezembro, 0)};
+    \addlegendentry{Progresso Real}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\section{Riscos e Mitigação}
+O projeto encontrou diversos riscos que podem afetar o cronograma e o orçamento:
+\begin{itemize}
+    \item \textbf{Risco:} Atrasos na integração da API.
+    \item \textbf{Mitigação:} Recursos adicionais foram alocados para focar no desenvolvimento da API.
+    \item \textbf{Risco:} Potenciais atrasos nos testes de aceitação devido à conclusão tardia do desenvolvimento.
+    \item \textbf{Mitigação:} Os cronogramas de teste serão ajustados para ocorrer em paralelo com o trabalho de desenvolvimento restante.
+\end{itemize}
+
+\section{Próximos Passos}
+As seguintes tarefas são prioritárias para a próxima fase do projeto:
+\begin{itemize}
+    \item Concluir a integração da API até 1º de outubro de 2024.
+    \item Iniciar os testes antes de 1º de novembro de 2024.
+    \item Garantir a implementação do sistema até dezembro de 2024.
+\end{itemize}
+
+\section{Conclusão}
+Em conclusão, o projeto ABC está progredindo apesar de alguns pequenos atrasos no desenvolvimento. Estamos confiantes de que o projeto cumprirá o cronograma revisado, e a integração da API deverá ser concluída em breve. Recursos adicionais foram alocados para garantir que as fases de testes e implementação permaneçam dentro do cronograma.
+
+\end{document}
