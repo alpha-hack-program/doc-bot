@@ -14,7 +14,6 @@ from kfp.dsl import Input, Output, Dataset
 from kfp import kubernetes
 
 from kubernetes import client, config
-from numpy import source
 
 # # Chunk the text of a document into smaller chunks
 # def chunk_text(doc, chunk_size=1024, chunk_overlap=40):
