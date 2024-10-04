@@ -42,6 +42,6 @@ data:
     <</SYS>>
 
     Contexto: 
-    {contexto}
+    {context}
 
     Pergunta: {question} [/INST]
