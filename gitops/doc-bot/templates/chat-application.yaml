@@ -23,6 +23,8 @@ spec:
           value: "{{ .Values.dataScienceProjectNamespace }}"
         - name: model.name
           value: "{{ .Values.model.name }}"
+        - name: language
+          value: "{{ .Values.chatApplication.language }}"
         - name: vcs.uri
           value: "{{ .Values.chatApplication.vcs.uri }}"
         - name: vcs.ref

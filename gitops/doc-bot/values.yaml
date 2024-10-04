@@ -23,6 +23,7 @@ chatApplication:
   repoURL: https://github.com/alpha-hack-program/doc-bot.git
   path: gitops/kb-chat
   targetRevision: main
+  language: en
   vcs:
     uri: https://github.com/alpha-hack-program/doc-bot.git
     ref: main
