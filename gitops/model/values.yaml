@@ -32,8 +32,6 @@ model:
   connection:
     name: llm
   volumes:
-    model:
-      storageClassName: ocs-storagecluster-ceph-rbd
     shm:
       sizeLimit: 2Gi
     
