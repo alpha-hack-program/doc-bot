@@ -34,7 +34,7 @@ cat <<EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: doc-bot
+  name: ${DATA_SCIENCE_PROJECT_NAMESPACE}
   namespace: openshift-gitops
   # annotations:
   #   argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -67,6 +67,8 @@ spec:
           value: "19530"
         - name: milvus.host
           value: "vectordb-milvus.milvus.svc.cluster.local"
+        - name: chatApplication.name
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-chat"
         - name: chatApplication.vcs.uri
           value: "https://github.com/alpha-hack-program/kb-chat.git"
         - name: chatApplication.vcs.ref
@@ -75,6 +77,10 @@ spec:
           value: "alpha-hack-program/kb-chat"
         - name: chatApplication.vcs.path
           value: "kb-chat"
+        - name: pipelinesApplication.name
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
+        - name: modelApplication.name
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-mistral-7b"
   syncPolicy:
     automated:
       # prune: true

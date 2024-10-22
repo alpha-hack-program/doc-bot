@@ -51,6 +51,32 @@ Install the following operators prior to installing the OpenShift AI operator:
 - OpenShift Serverless
 - OpenShift Service Mesh
 
+Check if the default storage class is set, if that is not the case you could use this command to set it up:
+
+> **CAVEAT:** This is for an ocs enabled environment as the one you get from RHPDS AI demos like Parasol.
+
+```sh
+oc patch storageclass ocs-storagecluster-ceph-rbd -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+This demo expands on the environment of the Parasol demo, but it only relies on the Minio instance in the `ic-shared-minio` namespace.
+
+Some manual steps:
+
+  > Expand the MinIO PVC `minio` in namespace `ic-shared-minio` to 150Gi
+
+  > Find the `bootstrap` ApplicationSet and delete all the elements in the list generator but `ic-shared-minio-app`.
+  ```yaml
+  generators:
+    - list:
+        elements:
+          - cluster: in-cluster
+            name: ic-shared-minio-app
+            path: bootstrap/ic-shared-minio
+            repoURL: 'https://github.com/rh-aiservices-bu/parasol-insurance.git'
+            targetRevision: main
+  ```
+
 ## Installing the Red Hat OpenShift AI operator
 
 If you want to use stable versions use `stable`.
@@ -215,10 +241,10 @@ apiVersion: v1
 metadata:
 name: rhods-internal-primary-cert-bundle-secret
 data:
-tls.crt: >-
-    LS0tLS1CRUd...
-tls.key: >-
-    LS0tLS1CRUd...
+  tls.crt: >-
+      LS0tLS1CRUd...
+  tls.key: >-
+      LS0tLS1CRUd...
 type: kubernetes.io/tls
 ```
 
@@ -299,11 +325,11 @@ git clone <REPO_URL>
 
 ### Set some basic environment variables
 
-Create a `.env` file in `bootstrap`:
+Create a `.env` file in `bootstrap` or adapt the one provided if needed:
 
-> This variables will be used by some scripts later.
+> This variables will be used by some scripts later. Pay special attention to **${DATA_SCIENCE_PROJECT_NAMESPACE}**.
 
-> `GIT_BASE` and `REPO_URL`should point to your clone repo and base url.
+> `GIT_BASE` and `REPO_URL` should point to your clone repo and base url.
 
 ```sh
 GIT_BASE="https://github.com"
@@ -349,6 +375,8 @@ Run the `deploy.sh` script from `bootstrap` folder:
 
 Run `create-secrets.sh` and be ready to input the username and PAT when asked for:
 
+> Only if needed, remember.
+
 ```sh
 ./create-secrets.sh
 ```
@@ -363,6 +391,14 @@ From `bootstrap` run:
 ./hf-creds.sh
 ```
 
+# Demo
+
+Use the following command to get the URL of the chat to start chatting with your docs. From `bootstrap`:
+
+```sh
+. .env
+oc get route kb-chat -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{"https://"}{.spec.host}{"\n"}'
+```
 
 
 

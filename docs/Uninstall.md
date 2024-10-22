@@ -92,6 +92,8 @@ done
 
 Delete CRDs
 
+> This usually doesn't do the all the work... and you have to delete the finalizer manually of **DSPAs**!!!. Remember this should be for demos starting with RHPDS not in a real enviroment where the installation doesn't involve necesarily unistalling RHOAI.
+
 ```sh
 for crd in $(oc get crd | grep opendatahub.io | awk '{print $1}'); do
   oc delete crd $crd
