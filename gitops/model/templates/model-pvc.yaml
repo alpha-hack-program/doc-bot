@@ -12,6 +12,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
+  storageClassName: {{ .Values.model.volumes.model.storageClassName }}
   resources:
     requests:
       storage: 100Gi
