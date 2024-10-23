@@ -150,6 +150,7 @@ for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
   # Check if the `INSTALL_PLAN_TO_PATCH` environment variable is empty.
   if [ -z "$INSTALL_PLAN_TO_PATCH" ]; then
     INSTALL_PLAN_TO_PATCH=$installplan
+    echo "Approving $installplan"
     oc patch $installplan -n redhat-ods-operator --type merge --patch '{"spec":{"approved":true}}'
     continue
   fi
@@ -305,7 +306,7 @@ spec:
 EOF
 ```
 
-Check is the `default-dsc` cluster is available.
+Check if the `default-dsc` cluster is available. This command should return `True`.
 
 ```sh
 oc get dsc default-dsc -o jsonpath='{.status.conditions[?(@.type=="Available")].status}' && echo
@@ -372,10 +373,13 @@ Run the `deploy.sh` script from `bootstrap` folder:
 ```
 
 ## Create the git credentials secret
+> **NOTE:** This is needed only if the git repository is private, for instance if you have forked this repository and made it private.
+
+Create a PAT for the Tekton pipeline `kfp-upsert-pl` and another one for the build config `kb-chat` or one for both of them. This PAT should have read-only privileges on the git repository.
 
 Run `create-secrets.sh` and be ready to input the username and PAT when asked for:
 
-> Only if needed, remember.
+> **Only if needed**, remember.
 
 ```sh
 ./create-secrets.sh
