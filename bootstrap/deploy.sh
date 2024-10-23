@@ -4,7 +4,7 @@
 . .env
 
 # Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/milvus
-cat <<EOF | kubectl apply -f -
+cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -30,7 +30,7 @@ spec:
 EOF
 
 # Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/doc-bot
-cat <<EOF | kubectl apply -f -
+cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
