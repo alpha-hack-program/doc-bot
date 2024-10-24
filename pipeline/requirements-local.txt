@@ -8,3 +8,4 @@ pymilvus>=2.4.3
 langchain-community
 transformers
 torch
+numpy
