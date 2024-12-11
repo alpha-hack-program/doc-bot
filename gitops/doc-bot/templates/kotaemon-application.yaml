@@ -1,0 +1,58 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.kotaemonApplication.name }}
+  namespace: {{ .Values.argocdNamespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  source:
+    path: "{{ .Values.kotaemonApplication.path }}"
+    repoURL: "{{ .Values.kotaemonApplication.repoURL }}"
+    targetRevision: "{{ .Values.kotaemonApplication.targetRevision }}"
+    helm:
+      parameters:
+        - name: createNamespace
+          value: "false"
+
+        - name: dataScienceProjectDisplayName
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+        - name: dataScienceProjectNamespace
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+
+        - name: language
+          value: "{{ .Values.kotaemonApplication.language }}"
+        - name: vcs.uri
+          value: "{{ .Values.kotaemonApplication.vcs.uri }}"
+        - name: vcs.ref
+          value: "{{ .Values.kotaemonApplication.vcs.ref }}"
+        - name: vcs.name
+          value: "{{ .Values.kotaemonApplication.vcs.name }}"
+        - name: vcs.path
+          value: "{{ .Values.kotaemonApplication.vcs.path }}"
+        
+
+        - name: localOpenaiApiChatPredictorName
+          value: {{ .Values.model.name }}
+        - name: localOpenaiChatModel
+          value: /mnt/models/
+        - name: localOpenaiApiEmbeddingsPredictorName
+          value: {{ .Values.embeddings.name }}
+        - name: localOpenaiEmbeddingsModel
+          value: {{ .Values.embeddings.name }}
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: kotaemon
+      jqPathExpressions:
+        - '.spec.template.spec.containers[].image'

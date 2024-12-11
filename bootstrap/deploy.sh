@@ -91,6 +91,12 @@ spec:
           value: ${MINIO_SECRET_KEY}
         - name: modelConnection.awsS3Endpoint
           value: ${MINIO_ENDPOINT}
+        - name: embeddings.connection.awsAccessKeyId
+          value: ${MINIO_ACCESS_KEY}
+        - name: embeddings.connection.awsSecretAccessKey
+          value: ${MINIO_SECRET_KEY}
+        - name: embeddings.connection.awsS3Endpoint
+          value: ${MINIO_ENDPOINT}
         - name: documentsConnection.awsAccessKeyId
           value: ${MINIO_ACCESS_KEY}
         - name: documentsConnection.awsSecretAccessKey

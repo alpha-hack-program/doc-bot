@@ -38,6 +38,18 @@ chatApplication:
     name: alpha-hack-program/doc-bot
     path: examples/ui/gradio-rag-milvus-vllm-openai
 
+kotaemonApplication:
+  name: doc-bot-kotaemon
+  repoURL: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
+  path: gitops/kotaemon
+  targetRevision: fb-get-pred
+  language: en
+  vcs:
+    uri: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
+    ref: fb-get-pred
+    name: alpha-hack-program/doc-bot-kotaemon
+    path: src
+
 dataScienceProjectDisplayName: vllm-mistral-7b
 dataScienceProjectNamespace: vllm-mistral-7b
 
