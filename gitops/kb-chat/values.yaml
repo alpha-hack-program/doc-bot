@@ -1,3 +1,5 @@
+argocdNamespace: openshift-gitops
+
 namespace: vllm-mistral-7b
 
 language: en

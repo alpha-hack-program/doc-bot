@@ -3,13 +3,15 @@
 # Load environment variables
 . .env
 
+echo "DATA_SCIENCE_PROJECT_NAMESPACE: ${DATA_SCIENCE_PROJECT_NAMESPACE}"
+
 # Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/milvus
 cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: milvus
-  namespace: openshift-gitops
+  namespace: ${ARGOCD_NAMESPACE}
 spec:
   project: default
   destination:
@@ -35,7 +37,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: ${DATA_SCIENCE_PROJECT_NAMESPACE}
-  namespace: openshift-gitops
+  namespace: ${ARGOCD_NAMESPACE}
   # annotations:
   #   argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
@@ -49,6 +51,8 @@ spec:
     targetRevision: main
     helm:
       parameters:
+        - name: argocdNamepace
+          value: "${ARGOCD_NAMESPACE}"
         - name: instanceName
           value: "vllm-mistral-7b"
         - name: dataScienceProjectDisplayName
@@ -81,6 +85,24 @@ spec:
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
         - name: modelApplication.name
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-mistral-7b"
+        - name: modelConnection.awsAccessKeyId
+          value: ${MINIO_ACCESS_KEY}
+        - name: modelConnection.awsSecretAccessKey
+          value: ${MINIO_SECRET_KEY}
+        - name: modelConnection.awsS3Endpoint
+          value: ${MINIO_ENDPOINT}
+        - name: documentsConnection.awsAccessKeyId
+          value: ${MINIO_ACCESS_KEY}
+        - name: documentsConnection.awsSecretAccessKey
+          value: ${MINIO_SECRET_KEY}
+        - name: documentsConnection.awsS3Endpoint
+          value: ${MINIO_ENDPOINT}
+        - name: pipelinesConnection.awsAccessKeyId
+          value: ${MINIO_ACCESS_KEY}
+        - name: pipelinesConnection.awsSecretAccessKey
+          value: ${MINIO_SECRET_KEY}
+        - name: pipelinesConnection.awsS3Endpoint
+          value: ${MINIO_ENDPOINT}
   syncPolicy:
     automated:
       # prune: true

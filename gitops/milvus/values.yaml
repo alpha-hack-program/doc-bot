@@ -1,1 +1,2 @@
+argocdNamespace: openshift-gitops
 milvusNamespace: milvus

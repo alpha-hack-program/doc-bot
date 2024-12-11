@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Values.pipelinesApplication.name }}
-  namespace: openshift-gitops
+  namespace: {{ .Values.argocdNamespace }}
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-wave: "2"
@@ -17,6 +17,8 @@ spec:
     targetRevision: "{{ .Values.pipelinesApplication.targetRevision }}"
     helm:
       parameters:
+        - name: argocdNamepace
+          value: {{ .Values.argocdNamespace }}
         - name: createNamespace
           value: "false"
         - name: instanceName

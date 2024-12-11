@@ -10,5 +10,5 @@ metadata:
       This namespace is to deploy Milvus.
     openshift.io/display-name: "Milvus"
   labels:
-    argocd.argoproj.io/managed-by: openshift-gitops #argocd instance ns
+    argocd.argoproj.io/managed-by: {{ .Values.argocdNamespace }} #argocd instance ns
     kubernetes.io/metadata.name: "Milvus"

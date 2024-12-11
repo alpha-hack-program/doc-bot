@@ -1,3 +1,5 @@
+argocdNamespace: openshift-gitops
+
 vcs:
   uri: https://github.com/alpha-hack-program/doc-bot.git
   ref: main
