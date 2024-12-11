@@ -14,6 +14,12 @@ modelApplication:
   path: gitops/model
   targetRevision: main
 
+embeddingsApplication:
+  name: embeddings
+  repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
+  path: gitops/embeddings
+  targetRevision: main
+
 pipelinesApplication:
   name: doc-bot-pipelines
   repoURL: https://github.com/alpha-hack-program/doc-bot.git
@@ -63,6 +69,43 @@ model:
   connection:
     name: llm
     path: mistralai/Mistral-7B-Instruct-v0.2
+  volumes:
+    shm:
+      sizeLimit: 2Gi
+
+embeddings:
+  root: nomic-ai
+  id: nomic-embed-text-v1
+  name: nomic-embed-text-v1
+  displayName: Nomic Embed Text v1
+  maxReplicas: 1
+  format: pytorch
+  apiProtocol: REST
+  runtime:
+    templateName: nomic-serving-template
+    templateDisplayName: Nomic Serving Template
+    resources:
+      limits:
+        cpu: '2'
+        memory: 8Gi
+      requests:
+        cpu: '1'
+        memory: 4Gi
+  # accelerator:
+  #   max: '1'
+  #   min: '1'
+  #   productName: NVIDIA-A10G
+  connection:
+    name: embeddings
+    createSecret: true
+    displayName: embeddings
+    type: s3
+    scheme: http
+    awsAccessKeyId: minio
+    awsSecretAccessKey: minio123
+    awsDefaultRegion: none
+    awsS3Bucket: models
+    awsS3Endpoint: minio.ic-shared-minio.svc:9000
   volumes:
     shm:
       sizeLimit: 2Gi

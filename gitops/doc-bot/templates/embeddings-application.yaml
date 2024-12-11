@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.embeddingsApplication.name }}
+  namespace: {{ .Values.argocdNamespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: "{{ .Values.dataScienceProjectNamespace }}"
+  source:
+    path: "{{ .Values.embeddingsApplication.path }}"
+    repoURL: "{{ .Values.embeddingsApplication.repoURL }}"
+    targetRevision: "{{ .Values.embeddingsApplication.targetRevision }}"
+    helm:
+      parameters:
+        - name: argocdNamespace
+          value: {{ .Values.argocdNamespace }}
+        - name: createNamespace
+          value: "false"
+        - name: dataScienceProjectNamespace
+          value: "{{ .Values.dataScienceProjectNamespace }}"
+        - name: dataScienceProjectDisplayName
+          value: "{{ .Values.dataScienceProjectDisplayName }}"
+        - name: model.root
+          value: "{{ .Values.embeddings.root }}"
+        - name: model.id
+          value: "{{ .Values.embeddings.id }}"
+        - name: model.name
+          value: "{{ .Values.embeddings.name }}"
+        - name: model.displayName
+          value: "{{ .Values.embeddings.displayName }}"
+        {{- if .Values.embeddings.accelerator }}
+        - name: model.accelerator.productName
+          value: "{{ .Values.embeddings.accelerator.productName }}"
+        - name: model.accelerator.min
+          value: '{{ .Values.embeddings.accelerator.min }}'
+        - name: model.accelerator.max
+          value: '{{ .Values.embeddings.accelerator.max }}'
+        {{- end }}
+        - name: model.connection.createSecret
+          value: "{{ .Values.embeddings.connection.createSecret }}"
+        - name: model.connection.name
+          value: "{{ .Values.embeddings.connection.name }}"
+        - name: model.connection.displayName
+          value: "{{ .Values.embeddings.connection.displayName }}"
+        - name: model.connection.type
+          value: "{{ .Values.embeddings.connection.type }}"
+        - name: model.connection.scheme
+          value: "{{ .Values.embeddings.connection.scheme }}"
+        - name: model.connection.awsAccessKeyId
+          value: "{{ .Values.embeddings.connection.awsAccessKeyId }}"
+        - name: model.connection.awsSecretAccessKey
+          value: "{{ .Values.embeddings.connection.awsSecretAccessKey }}"
+        - name: model.connection.awsDefaultRegion
+          value: "{{ .Values.embeddings.connection.awsDefaultRegion }}"
+        - name: model.connection.awsS3Bucket
+          value: "{{ .Values.embeddings.connection.awsS3Bucket }}"
+        - name: model.connection.awsS3Endpoint
+          value: "{{ .Values.embeddings.connection.awsS3Endpoint }}"
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
