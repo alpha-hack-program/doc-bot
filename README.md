@@ -102,7 +102,7 @@ metadata:
   namespace: redhat-ods-operator 
 spec:
   name: rhods-operator
-  channel: stable-2.10
+  channel: stable-2.13
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Manual
@@ -136,7 +136,7 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Manual
-  startingCSV: rhods-operator.2.12.0
+  startingCSV: rhods-operator.2.15.0
 EOF
 ```
 

@@ -132,6 +132,6 @@ Delete installplans of the operator if found:
 
 ```sh
 for installplan in $(oc get installplans -n redhat-ods-operator -o name); do
-  kubectl delete $installplan -n redhat-ods-operator
+  oc delete $installplan -n redhat-ods-operator
 done
 ```
