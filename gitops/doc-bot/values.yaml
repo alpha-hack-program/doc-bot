@@ -9,13 +9,13 @@ paths:
   ui: examples/ui/gradio-rag-milvus-vllm-openai
 
 modelApplication:
-  name: mistral-7b
+  name: doc-bot-model
   repoURL: https://github.com/alpha-hack-program/doc-bot.git
   path: gitops/model
   targetRevision: main
 
 embeddingsApplication:
-  name: embeddings
+  name: doc-bot-embeddings
   repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
   path: gitops/embeddings
   targetRevision: main
