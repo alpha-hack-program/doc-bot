@@ -51,7 +51,7 @@ spec:
     targetRevision: main
     helm:
       parameters:
-        - name: argocdNamepace
+        - name: argocdNamespace
           value: "${ARGOCD_NAMESPACE}"
         - name: instanceName
           value: "vllm-mistral-7b"
