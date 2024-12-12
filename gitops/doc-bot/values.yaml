@@ -42,11 +42,11 @@ kotaemonApplication:
   name: doc-bot-kotaemon
   repoURL: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
   path: gitops/kotaemon
-  targetRevision: fb-get-pred
+  targetRevision: main
   language: en
   vcs:
     uri: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
-    ref: fb-get-pred
+    ref: main
     name: alpha-hack-program/doc-bot-kotaemon
     path: src
 
