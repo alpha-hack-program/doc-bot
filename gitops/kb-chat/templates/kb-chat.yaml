@@ -130,7 +130,7 @@ apiVersion: v1
 stringData:
   APP_TITLE: "Chat with your documents"
   SHOW_TITLE_IMAGE: "True"
-  MODEL_NAME: "/mnt/models/"
+  MODEL_NAME: "/mnt/models"
   MAX_TOKENS: "1024"
   TOP_P: "0.95"
   TEMPERATURE: "0.01"
