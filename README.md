@@ -102,7 +102,7 @@ metadata:
   namespace: redhat-ods-operator 
 spec:
   name: rhods-operator
-  channel: stable-2.13
+  channel: stable-2.16
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Manual
@@ -181,40 +181,47 @@ Use this command to create the DSC and use the same certificate your OpenShift c
 ```sh
 cat << EOF| oc create -f -
 ---
-kind: DataScienceCluster
 apiVersion: datasciencecluster.opendatahub.io/v1
+kind: DataScienceCluster
 metadata:
   name: default-dsc
   labels:
-    app.kubernetes.io/name: datasciencecluster
-    app.kubernetes.io/instance: default-dsc
-    app.kubernetes.io/part-of: rhods-operator
-    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: rhods-operator
+    app.kubernetes.io/instance: default-dsc
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: datasciencecluster
+    app.kubernetes.io/part-of: rhods-operator
 spec:
   components:
     codeflare:
       managementState: Managed
-    dashboard:
-      managementState: Managed
-    datasciencepipelines:
-      managementState: Managed
     kserve:
-      managementState: Managed
       serving:
         ingressGateway:
           certificate:
             type: OpenshiftDefaultIngress
         managementState: Managed
         name: knative-serving
-    modelmeshserving:
       managementState: Managed
-    kueue:
+    modelregistry:
+      registriesNamespace: rhoai-model-registries
+      managementState: Managed
+    trustyai:
       managementState: Managed
     ray:
       managementState: Managed
+    kueue:
+      managementState: Managed
     workbenches:
       managementState: Managed
+    dashboard:
+      managementState: Managed
+    modelmeshserving:
+      managementState: Managed
+    datasciencepipelines:
+      managementState: Managed
+    trainingoperator:
+      managementState: Removed
 EOF
 ```
 

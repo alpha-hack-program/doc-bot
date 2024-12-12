@@ -71,6 +71,7 @@ spec:
           value: "19530"
         - name: milvus.host
           value: "vectordb-milvus.milvus.svc.cluster.local"
+        
         - name: chatApplication.name
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-chat"
         - name: chatApplication.vcs.uri
@@ -81,10 +82,16 @@ spec:
           value: "alpha-hack-program/kb-chat"
         - name: chatApplication.vcs.path
           value: "kb-chat"
+        
         - name: pipelinesApplication.name
           value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
         - name: modelApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-mistral-7b"
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-model"
+        - name: embeddingsApplication.name
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
+        - name: kotaemonApplication.name
+          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-kotaemon"
+        
         - name: modelConnection.awsAccessKeyId
           value: ${MINIO_ACCESS_KEY}
         - name: modelConnection.awsSecretAccessKey

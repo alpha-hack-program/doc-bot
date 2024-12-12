@@ -9,6 +9,14 @@ In the OpenShift command-line interface (CLI), log in to your OpenShift Containe
 oc login <openshift_cluster_url> -u system:admin
 ```
 
+Delete DCSs:
+
+```sh
+for dsc in $(oc get dsc | awk '{print $1}'); do
+  oc delete dsc $dsc
+done
+```
+
 Create a ConfigMap object for deletion of the Red Hat OpenShift AI Operator.
 
 ```sh
