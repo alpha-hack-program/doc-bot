@@ -17,7 +17,7 @@ model:
   runtime:
     templateName: vllm-serving-template
     templateDisplayName: vLLM Serving Template
-    image: quay.io/modh/vllm@sha256:b51fde66f162f1a78e8c027320dddf214732d5345953b1599a84fe0f0168c619
+    image: quay.io/modh/vllm@sha256:c86ff1e89c86bc9821b75d7f2bbc170b3c13e3ccf538bf543b1110f23e056316
     resources:
       limits:
         cpu: '8'

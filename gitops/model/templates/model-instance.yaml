@@ -50,6 +50,7 @@ metadata:
     opendatahub.io/template-display-name: "{{ .Values.model.runtime.templateDisplayName }}"
     opendatahub.io/template-name: "{{ .Values.model.runtime.templateName }}"
     openshift.io/display-name: "{{ .Values.model.displayName }}"
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
   name: {{ .Values.model.name }}
   labels:
     opendatahub.io/dashboard: 'true'
@@ -59,10 +60,9 @@ spec:
     prometheus.io/port: '8080'
   containers:
     - args:
-        - '--model'
-        - /mnt/models/
-        - '--port'
-        - '8080'
+        - '--port=8080'
+        - '--model=/mnt/models'
+        - '--served-model-name={{.Name}}'
         {{- if .Values.model.maxModelLen }}
         - '--max-model-len'
         - '{{ .Values.model.maxModelLen }}'
@@ -84,7 +84,6 @@ spec:
       name: kserve-container
       ports:
         - containerPort: 8080
-          name: http1
           protocol: TCP
       volumeMounts:
         - mountPath: /dev/shm
