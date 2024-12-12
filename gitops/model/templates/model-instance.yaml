@@ -62,7 +62,7 @@ spec:
     - args:
         - '--port=8080'
         - '--model=/mnt/models'
-        - '--served-model-name={{.Name}}'
+        - '--served-model-name={.Name}'
         {{- if .Values.model.maxModelLen }}
         - '--max-model-len'
         - '{{ .Values.model.maxModelLen }}'
