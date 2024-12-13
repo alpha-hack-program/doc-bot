@@ -145,7 +145,7 @@ stringData:
   PROMPT_FILE: "prompts/default-prompt.{{ .Values.language }}"
   MAX_RETRIEVED_DOCS: "4"
   SCORE_THRESHOLD: "0.99"
-  PREDICTOR_NAME: "{{ .Values.inferenceService.predictorName }}"
+  PREDICTOR_NAME: "{{ .Values.inferenceService.name }}"
 kind: Secret
 metadata:
   labels:
