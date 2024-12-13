@@ -10,7 +10,7 @@ paths:
 
 modelApplication:
   name: doc-bot-model
-  repoURL: https://github.com/alpha-hack-program/doc-bot.git
+  repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
   path: gitops/model
   targetRevision: main
 
