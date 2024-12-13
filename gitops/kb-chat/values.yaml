@@ -18,8 +18,11 @@ vcs:
   path: examples/ui/gradio-rag-milvus-vllm-openai
   # sourceSecret: git-pat-bc-secret
 
-model:
+inferenceService:
   name: mistral-7b
+
+model:
+  name: mistral-7b # /mnt/models in older versions of vLLM Serving Runtime
 
 milvus:
   name: milvus

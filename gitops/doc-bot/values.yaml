@@ -61,12 +61,7 @@ model:
   name: mistral-7b
   displayName: Mistral 7b
   maxReplicas: 1
-  format: pytorch
-  apiProtocol: REST
   runtime:
-    templateName: vllm-mistral-7b-serving-template
-    templateDisplayName: vLLM Mistral 7B
-    image: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2
     resources:
       limits:
         cpu: '8'

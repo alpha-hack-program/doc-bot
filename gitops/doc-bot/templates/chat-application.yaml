@@ -24,6 +24,8 @@ spec:
         - name: namespace
           value: "{{ .Values.dataScienceProjectNamespace }}"
         - name: model.name
+          value: "{{ .Values.model.name }}" # was /mnt/models in older vLLM versions
+        - name: inferenceService.name
           value: "{{ .Values.model.name }}"
         - name: language
           value: "{{ .Values.chatApplication.language }}"

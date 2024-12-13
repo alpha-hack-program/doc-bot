@@ -130,7 +130,7 @@ apiVersion: v1
 stringData:
   APP_TITLE: "Chat with your documents"
   SHOW_TITLE_IMAGE: "True"
-  MODEL_NAME: "/mnt/models"
+  MODEL_NAME: "{{ .Values.model.name }}"
   MAX_TOKENS: "1024"
   TOP_P: "0.95"
   TEMPERATURE: "0.01"
@@ -145,7 +145,7 @@ stringData:
   PROMPT_FILE: "prompts/default-prompt.{{ .Values.language }}"
   MAX_RETRIEVED_DOCS: "4"
   SCORE_THRESHOLD: "0.99"
-  PREDICTOR_NAME: "{{ .Values.model.name }}"
+  PREDICTOR_NAME: "{{ .Values.inferenceService.predictorName }}"
 kind: Secret
 metadata:
   labels:
