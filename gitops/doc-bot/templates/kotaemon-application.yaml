@@ -41,7 +41,7 @@ spec:
         - name: localOpenaiApiChatPredictorName
           value: {{ .Values.model.name }}
         - name: localOpenaiChatModel
-          value: /mnt/models/
+          value: {{ .Values.model.name }}
         - name: localOpenaiApiEmbeddingsPredictorName
           value: {{ .Values.embeddings.name }}
         - name: localOpenaiEmbeddingsModel
