@@ -41,26 +41,26 @@ spec:
           value: '{{ .Values.model.accelerator.min }}'
         - name: model.accelerator.max
           value: '{{ .Values.model.accelerator.max }}'
-        - name: modelConnection.createSecret
-          value: "{{ .Values.model.connection.createSecret }}"
-        - name: modelConnection.name
-          value: "{{ .Values.model.connection.name }}"
-        - name: modelConnection.displayName
-          value: "{{ .Values.model.connection.displayName }}"
-        - name: modelConnection.type
-          value: "{{ .Values.model.connection.type }}"
-        - name: modelConnection.scheme
-          value: "{{ .Values.model.connection.scheme }}"
-        - name: modelConnection.awsAccessKeyId
-          value: "{{ .Values.model.connection.awsAccessKeyId }}"
-        - name: modelConnection.awsSecretAccessKey
-          value: "{{ .Values.model.connection.awsSecretAccessKey }}"
-        - name: modelConnection.awsDefaultRegion
-          value: "{{ .Values.model.connection.awsDefaultRegion }}"
-        - name: modelConnection.awsS3Bucket
-          value: "{{ .Values.model.connection.awsS3Bucket }}"
-        - name: modelConnection.awsS3Endpoint
-          value: "{{ .Values.model.connection.awsS3Endpoint }}"
+        - name: model.connection.createSecret
+          value: "{{ .Values.modelConnection.createSecret }}"
+        - name: model.connection.name
+          value: "{{ .Values.modelConnection.name }}"
+        - name: model.connection.displayName
+          value: "{{ .Values.modelConnection.displayName }}"
+        - name: model.connection.type
+          value: "{{ .Values.modelConnection.type }}"
+        - name: model.connection.scheme
+          value: "{{ .Values.modelConnection.scheme }}"
+        - name: model.connection.awsAccessKeyId
+          value: "{{ .Values.modelConnection.awsAccessKeyId }}"
+        - name: model.connection.awsSecretAccessKey
+          value: "{{ .Values.modelConnection.awsSecretAccessKey }}"
+        - name: model.connection.awsDefaultRegion
+          value: "{{ .Values.modelConnection.awsDefaultRegion }}"
+        - name: model.connection.awsS3Bucket
+          value: "{{ .Values.modelConnection.awsS3Bucket }}"
+        - name: model.connection.awsS3Endpoint
+          value: "{{ .Values.modelConnection.awsS3Endpoint }}"
   syncPolicy:
     automated:
       # prune: true
