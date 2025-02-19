@@ -186,11 +186,11 @@ kind: DataScienceCluster
 metadata:
   name: default-dsc
   labels:
-    app.kubernetes.io/created-by: rhods-operator
-    app.kubernetes.io/instance: default-dsc
-    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: datasciencecluster
+    app.kubernetes.io/instance: default-dsc
     app.kubernetes.io/part-of: rhods-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: rhods-operator
 spec:
   components:
     codeflare:

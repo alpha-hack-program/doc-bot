@@ -42,25 +42,25 @@ spec:
           value: '{{ .Values.embeddings.accelerator.max }}'
         {{- end }}
         - name: model.connection.createSecret
-          value: "{{ .Values.embeddingsConnection.createSecret }}"
+          value: "{{ .Values.embeddings.connection.createSecret }}"
         - name: model.connection.name
-          value: "{{ .Values.embeddingsConnection.name }}"
+          value: "{{ .Values.embeddings.connection.name }}"
         - name: model.connection.displayName
-          value: "{{ .Values.embeddingsConnection.displayName }}"
+          value: "{{ .Values.embeddings.connection.displayName }}"
         - name: model.connection.type
-          value: "{{ .Values.embeddingsConnection.type }}"
+          value: "{{ .Values.embeddings.connection.type }}"
         - name: model.connection.scheme
-          value: "{{ .Values.embeddingsConnection.scheme }}"
+          value: "{{ .Values.embeddings.connection.scheme }}"
         - name: model.connection.awsAccessKeyId
-          value: "{{ .Values.embeddingsConnection.awsAccessKeyId }}"
+          value: "{{ .Values.embeddings.connection.awsAccessKeyId }}"
         - name: model.connection.awsSecretAccessKey
-          value: "{{ .Values.embeddingsConnection.awsSecretAccessKey }}"
+          value: "{{ .Values.embeddings.connection.awsSecretAccessKey }}"
         - name: model.connection.awsDefaultRegion
-          value: "{{ .Values.embeddingsConnection.awsDefaultRegion }}"
+          value: "{{ .Values.embeddings.connection.awsDefaultRegion }}"
         - name: model.connection.awsS3Bucket
-          value: "{{ .Values.embeddingsConnection.awsS3Bucket }}"
+          value: "{{ .Values.embeddings.connection.awsS3Bucket }}"
         - name: model.connection.awsS3Endpoint
-          value: "{{ .Values.embeddingsConnection.awsS3Endpoint }}"
+          value: "{{ .Values.embeddings.connection.awsS3Endpoint }}"
   syncPolicy:
     automated:
       # prune: true

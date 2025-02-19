@@ -3,6 +3,11 @@
 # Load environment variables
 . .env
 
+# If CHAT_APPLICATION_LANGUAGE is not set, set it to "en"
+if [ -z "$CHAT_APPLICATION_LANGUAGE" ]; then
+  CHAT_APPLICATION_LANGUAGE="en"
+fi
+
 echo "DATA_SCIENCE_PROJECT_NAMESPACE: ${DATA_SCIENCE_PROJECT_NAMESPACE}"
 
 # Create an ArgoCD application to deploy the helm chart at this repository and path ./gitops/milvus
@@ -38,8 +43,6 @@ kind: Application
 metadata:
   name: ${DATA_SCIENCE_PROJECT_NAMESPACE}
   namespace: ${ARGOCD_NAMESPACE}
-  # annotations:
-  #   argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   project: default
   destination:
@@ -50,75 +53,54 @@ spec:
     repoURL: ${REPO_URL}
     targetRevision: main
     helm:
-      parameters:
-        - name: argocdNamespace
-          value: "${ARGOCD_NAMESPACE}"
-        - name: instanceName
-          value: "vllm-mistral-7b"
-        - name: dataScienceProjectDisplayName
-          value: "Project ${DATA_SCIENCE_PROJECT_NAMESPACE}"
-        - name: dataScienceProjectNamespace
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}"
-        - name: milvus.name
-          value: "milvus"
-        - name: milvus.namespace
-          value: "milvus"
-        - name: milvus.username
-          value: "root"
-        - name: milvus.password
-          value: "Milvus"
-        - name: milvus.port
-          value: "19530"
-        - name: milvus.host
-          value: "vectordb-milvus.milvus.svc.cluster.local"
-        
-        - name: chatApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-chat"
-        - name: chatApplication.vcs.uri
-          value: "https://github.com/alpha-hack-program/kb-chat.git"
-        - name: chatApplication.vcs.ref
-          value: "main"
-        - name: chatApplication.vcs.name
-          value: "alpha-hack-program/kb-chat"
-        - name: chatApplication.vcs.path
-          value: "kb-chat"
-        
-        - name: pipelinesApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
-        - name: modelApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-model"
-        - name: embeddingsApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
-        - name: kotaemonApplication.name
-          value: "${DATA_SCIENCE_PROJECT_NAMESPACE}-kotaemon"
-        
-        - name: modelConnection.awsAccessKeyId
-          value: ${MINIO_ACCESS_KEY}
-        - name: modelConnection.awsSecretAccessKey
-          value: ${MINIO_SECRET_KEY}
-        - name: modelConnection.awsS3Endpoint
-          value: ${MINIO_ENDPOINT}
-        - name: embeddings.connection.awsAccessKeyId
-          value: ${MINIO_ACCESS_KEY}
-        - name: embeddings.connection.awsSecretAccessKey
-          value: ${MINIO_SECRET_KEY}
-        - name: embeddings.connection.awsS3Endpoint
-          value: ${MINIO_ENDPOINT}
-        - name: documentsConnection.awsAccessKeyId
-          value: ${MINIO_ACCESS_KEY}
-        - name: documentsConnection.awsSecretAccessKey
-          value: ${MINIO_SECRET_KEY}
-        - name: documentsConnection.awsS3Endpoint
-          value: ${MINIO_ENDPOINT}
-        - name: pipelinesConnection.awsAccessKeyId
-          value: ${MINIO_ACCESS_KEY}
-        - name: pipelinesConnection.awsSecretAccessKey
-          value: ${MINIO_SECRET_KEY}
-        - name: pipelinesConnection.awsS3Endpoint
-          value: ${MINIO_ENDPOINT}
+      values: |
+        argocdNamespace: "${ARGOCD_NAMESPACE}"
+        instanceName: "vllm-mistral-7b"
+        dataScienceProjectDisplayName: "Project ${DATA_SCIENCE_PROJECT_NAMESPACE}"
+        dataScienceProjectNamespace: "${DATA_SCIENCE_PROJECT_NAMESPACE}"
+        milvus:
+          name: "milvus"
+          namespace: "milvus"
+          username: "root"
+          password: "Milvus"
+          port: 19530
+          host: "vectordb-milvus.milvus.svc.cluster.local"
+        chatApplication:
+          name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-chat"
+          vcs:
+            uri: "https://github.com/alpha-hack-program/kb-chat.git"
+            ref: "main"
+            name: "alpha-hack-program/kb-chat"
+            path: "kb-chat"
+          language: "${CHAT_APPLICATION_LANGUAGE}"
+        pipelinesApplication:
+          name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
+        modelApplication:
+          name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-model"
+        embeddingsApplication:
+          name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
+        kotaemonApplication:
+          name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-kotaemon"
+        model:
+          connection:
+            awsAccessKeyId: ${MINIO_ACCESS_KEY}
+            awsSecretAccessKey: ${MINIO_SECRET_KEY}
+            awsS3Endpoint: ${MINIO_ENDPOINT}
+        embeddings:
+          connection:
+            awsAccessKeyId: ${MINIO_ACCESS_KEY}
+            awsSecretAccessKey: ${MINIO_SECRET_KEY}
+            awsS3Endpoint: ${MINIO_ENDPOINT}
+        documentsConnection:
+          awsAccessKeyId: ${MINIO_ACCESS_KEY}
+          awsSecretAccessKey: ${MINIO_SECRET_KEY}
+          awsS3Endpoint: ${MINIO_ENDPOINT}
+        pipelinesConnection:
+          awsAccessKeyId: ${MINIO_ACCESS_KEY}
+          awsSecretAccessKey: ${MINIO_SECRET_KEY}
+          awsS3Endpoint: ${MINIO_ENDPOINT}
   syncPolicy:
     automated:
-      # prune: true
       selfHeal: true
   ignoreDifferences:
     - group: apps
@@ -126,6 +108,5 @@ spec:
       name: doc-bot
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
-      
 EOF
 
