@@ -33,6 +33,10 @@ spec:
           value: "{{ .Values.embeddings.name }}"
         - name: model.displayName
           value: "{{ .Values.embeddings.displayName }}"
+        - name: model.enableAuth
+          value: "{{ .Values.embeddings.enableAuth }}"
+        - name: model.rawDeployment
+          value: "{{ .Values.embeddings.rawDeployment }}"
         {{- if .Values.embeddings.accelerator }}
         - name: model.accelerator.productName
           value: "{{ .Values.embeddings.accelerator.productName }}"

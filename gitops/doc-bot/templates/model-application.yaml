@@ -35,6 +35,10 @@ spec:
           value: "{{ .Values.model.name }}"
         - name: model.displayName
           value: "{{ .Values.model.displayName }}"
+        - name: model.enableAuth
+          value: "{{ .Values.model.enableAuth }}"
+        - name: model.rawDeployment
+          value: "{{ .Values.model.rawDeployment }}"
         - name: model.accelerator.productName
           value: "{{ .Values.model.accelerator.productName }}"
         - name: model.accelerator.min
