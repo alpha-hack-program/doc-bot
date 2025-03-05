@@ -16,51 +16,58 @@ spec:
     repoURL: "{{ .Values.embeddingsApplication.repoURL }}"
     targetRevision: "{{ .Values.embeddingsApplication.targetRevision }}"
     helm:
-      parameters:
-        - name: argocdNamespace
-          value: {{ .Values.argocdNamespace }}
-        - name: createNamespace
-          value: "false"
-        - name: dataScienceProjectNamespace
-          value: "{{ .Values.dataScienceProjectNamespace }}"
-        - name: dataScienceProjectDisplayName
-          value: "{{ .Values.dataScienceProjectDisplayName }}"
-        - name: model.root
-          value: "{{ .Values.embeddings.root }}"
-        - name: model.id
-          value: "{{ .Values.embeddings.id }}"
-        - name: model.name
-          value: "{{ .Values.embeddings.name }}"
-        - name: model.displayName
-          value: "{{ .Values.embeddings.displayName }}"
+      helm:
+      values: |
+        dataScienceProjectDisplayName: {{ .Values.dataScienceProjectNamespace }}
+        dataScienceProjectNamespace: {{ .Values.dataScienceProjectNamespace }}
+        
+        createNamespace: false
+
+        instanceName: {{ .Values.embeddings.name }}
+
+        model:
+          root: {{ .Values.embeddings.root }}
+          id: {{ .Values.embeddings.id }}
+          name: {{ .Values.embeddings.name }}
+          displayName: {{ .Values.embeddings.displayName }}
+          maxReplicas: {{ .Values.embeddings.maxReplicas }}
+          format: {{ .Values.embeddings.format }}
+          maxModelLen: {{ .Values.embeddings.maxModelLen }}
+          apiProtocol: {{ .Values.embeddings.apiProtocol }}
+          embeddingsModel: true
+          enableAuth: false
+          rawDeployment: true
+          runtime:
+            templateName: {{ .Values.embeddings.runtime.templateName }}
+            templateDisplayName: {{ .Values.embeddings.runtime.templateDisplayName }}
+            image: {{ .Values.embeddings.runtime.image }}
+            resources:
+              limits:
+                cpu: {{ .Values.embeddings.runtime.resources.limits.cpu }}
+                memory: {{ .Values.embeddings.runtime.resources.limits.memory }}
+              requests:
+                cpu: {{ .Values.embeddings.runtime.resources.requests.cpu }}
+                memory: {{ .Values.embeddings.runtime.resources.requests.memory }}
         {{- if .Values.embeddings.accelerator }}
-        - name: model.accelerator.productName
-          value: "{{ .Values.embeddings.accelerator.productName }}"
-        - name: model.accelerator.min
-          value: '{{ .Values.embeddings.accelerator.min }}'
-        - name: model.accelerator.max
-          value: '{{ .Values.embeddings.accelerator.max }}'
+          accelerator:
+            max: {{ .Values.embeddings.accelerator.max }}
+            min: {{ .Values.embeddings.accelerator.min }}
+            productName: {{ .Values.embeddings.accelerator.productName }}
         {{- end }}
-        - name: model.connection.createSecret
-          value: "{{ .Values.embeddings.connection.createSecret }}"
-        - name: model.connection.name
-          value: "{{ .Values.embeddings.connection.name }}"
-        - name: model.connection.displayName
-          value: "{{ .Values.embeddings.connection.displayName }}"
-        - name: model.connection.type
-          value: "{{ .Values.embeddings.connection.type }}"
-        - name: model.connection.scheme
-          value: "{{ .Values.embeddings.connection.scheme }}"
-        - name: model.connection.awsAccessKeyId
-          value: "{{ .Values.embeddings.connection.awsAccessKeyId }}"
-        - name: model.connection.awsSecretAccessKey
-          value: "{{ .Values.embeddings.connection.awsSecretAccessKey }}"
-        - name: model.connection.awsDefaultRegion
-          value: "{{ .Values.embeddings.connection.awsDefaultRegion }}"
-        - name: model.connection.awsS3Bucket
-          value: "{{ .Values.embeddings.connection.awsS3Bucket }}"
-        - name: model.connection.awsS3Endpoint
-          value: "{{ .Values.embeddings.connection.awsS3Endpoint }}"
+          connection:
+            name: {{ .Values.embeddings.connection.name }}
+            createSecret: {{ .Values.embeddings.connection.createSecret }}
+            displayName: {{ .Values.embeddings.connection.displayName }}
+            type: {{ .Values.embeddings.connection.type }}
+            scheme: {{ .Values.embeddings.connection.scheme }}
+            awsAccessKeyId: {{ .Values.embeddings.connection.awsAccessKeyId }}
+            awsSecretAccessKey: {{ .Values.embeddings.connection.awsSecretAccessKey }}
+            awsDefaultRegion: {{ .Values.embeddings.connection.awsDefaultRegion }}
+            awsS3Bucket: {{ .Values.embeddings.connection.awsS3Bucket }}
+            awsS3Endpoint: {{ .Values.embeddings.connection.awsS3Endpoint }}
+          volumes:
+            shm:
+              sizeLimit: {{ .Values.embeddings.volumes.shm.sizeLimit }}
   syncPolicy:
     automated:
       # prune: true

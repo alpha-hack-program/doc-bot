@@ -17,7 +17,7 @@ modelApplication:
 embeddingsApplication:
   name: doc-bot-embeddings
   repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
-  path: gitops/embeddings
+  path: gitops/model
   targetRevision: main
 
 pipelinesApplication:
@@ -81,16 +81,18 @@ model:
       sizeLimit: 2Gi
 
 embeddings:
-  root: nomic-ai
-  id: nomic-embed-text-v1
-  name: nomic-embed-text-v1
-  displayName: Nomic Embed Text v1
+  root: intfloat
+  id: multilingual-e5-large
+  name: multilingual-e5-large-gpu
+  displayName: multilingual-e5-large GPU
   maxReplicas: 1
-  format: pytorch
+  format: vLLM
+  maxModelLen: '512'
   apiProtocol: REST
   runtime:
-    templateName: nomic-serving-template
-    templateDisplayName: Nomic Serving Template
+    templateName: vllm-serving-template
+    templateDisplayName: vLLM Serving Template
+    image: quay.io/modh/vllm:rhoai-2.17-cuda
     resources:
       limits:
         cpu: '2'
@@ -98,10 +100,10 @@ embeddings:
       requests:
         cpu: '1'
         memory: 4Gi
-  # accelerator:
-  #   max: '1'
-  #   min: '1'
-  #   productName: NVIDIA-A10G
+  accelerator:
+    max: '1'
+    min: '1'
+    productName: NVIDIA-A10G
   connection:
     name: embeddings
     createSecret: true
