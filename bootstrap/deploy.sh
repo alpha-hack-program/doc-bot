@@ -79,6 +79,11 @@ spec:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-model"
         embeddingsApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
+          model:
+            connection:
+              awsAccessKeyId: ${MINIO_ACCESS_KEY}
+              awsSecretAccessKey: ${MINIO_SECRET_KEY}
+              awsS3Endpoint: ${MINIO_ENDPOINT}
         kotaemonApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-kotaemon"
         model:
