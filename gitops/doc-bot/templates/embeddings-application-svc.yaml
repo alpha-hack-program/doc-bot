@@ -12,7 +12,7 @@ spec:
     server: 'https://kubernetes.default.svc'
     namespace: "{{ .Values.dataScienceProjectNamespace }}"
   source:
-    path: "{{ .Values.embeddingsApplication.path }}"
+    path: "gitops/embeddings" # This should be {{ .Values.embeddingsApplication.path }}
     repoURL: "{{ .Values.embeddingsApplication.repoURL }}"
     targetRevision: "{{ .Values.embeddingsApplication.targetRevision }}"
     helm:
