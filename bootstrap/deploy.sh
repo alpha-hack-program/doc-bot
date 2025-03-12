@@ -84,6 +84,8 @@ spec:
               awsAccessKeyId: ${MINIO_ACCESS_KEY}
               awsSecretAccessKey: ${MINIO_SECRET_KEY}
               awsS3Endpoint: ${MINIO_ENDPOINT}
+            accelerator:
+              productName: ${GPU_NAME}
         kotaemonApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-kotaemon"
         model:
@@ -91,6 +93,8 @@ spec:
             awsAccessKeyId: ${MINIO_ACCESS_KEY}
             awsSecretAccessKey: ${MINIO_SECRET_KEY}
             awsS3Endpoint: ${MINIO_ENDPOINT}
+          accelerator:
+            productName: ${GPU_NAME}
         embeddings:
           connection:
             awsAccessKeyId: ${MINIO_ACCESS_KEY}
