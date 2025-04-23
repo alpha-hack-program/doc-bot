@@ -3,6 +3,26 @@
 # Load environment variables
 . .env
 
+# Check if the required environment variables are set
+if [ -z "$ARGOCD_NAMESPACE" ] || [ -z "$MILVUS_NAMESPACE" ] || [ -z "$REPO_URL" ] || [ -z "$DATA_SCIENCE_PROJECT_NAMESPACE" ]; then
+  echo "Error: Required environment variables are not set."
+  exit 1
+fi
+if [ -z "$MINIO_ACCESS_KEY" ] || [ -z "$MINIO_SECRET_KEY" ] || [ -z "$MINIO_ENDPOINT" ]; then
+  echo "Error: MinIO credentials are not set."
+  exit 1
+fi
+if [ -z "$GPU_NAME" ]; then
+  echo "Error: GPU name is not set."
+  exit 1
+fi
+
+# Check if hf-creds.sh exists
+if [ ! -f "./hf-creds.sh" ]; then
+  echo "Error: hf-creds.sh not found."
+  exit 1
+fi
+
 # If CHAT_APPLICATION_LANGUAGE is not set, set it to "en"
 if [ -z "$CHAT_APPLICATION_LANGUAGE" ]; then
   CHAT_APPLICATION_LANGUAGE="en"
@@ -119,3 +139,13 @@ spec:
         - '.spec.template.spec.containers[].image'
 EOF
 
+# Check if the namespace exists
+if oc get namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} >/dev/null 2>&1; then
+  echo "Namespace ${DATA_SCIENCE_PROJECT_NAMESPACE} already exists."
+else
+  # Create the namespace
+  oc create namespace ${DATA_SCIENCE_PROJECT_NAMESPACE}
+fi
+
+# Create HF credentials
+./hf-creds.sh
