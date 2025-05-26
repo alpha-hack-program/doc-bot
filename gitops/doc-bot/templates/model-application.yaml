@@ -30,6 +30,17 @@ spec:
           maxModelLen: {{ .Values.modelApplication.model.maxModelLen }}
           enableAuth: {{ .Values.modelApplication.model.enableAuth }}
           rawDeployment: {{ .Values.modelApplication.model.rawDeployment }}
+          runtime:
+            templateName: {{ .Values.modelApplication.model.runtime.templateName }}
+            templateDisplayName: {{ .Values.modelApplication.model.runtime.templateDisplayName }}
+            image: {{ .Values.modelApplication.model.runtime.image }}
+            resources:
+              limits:
+                cpu: '{{ .Values.modelApplication.model.runtime.resources.limits.cpu }}'
+                memory: {{ .Values.modelApplication.model.runtime.resources.limits.memory }}
+              requests:
+                cpu: '{{ .Values.modelApplication.model.runtime.resources.requests.cpu }}'
+                memory: {{ .Values.modelApplication.model.runtime.resources.requests.memory }}
           accelerator:
             productName: {{ .Values.modelApplication.model.accelerator.productName }}
             min: {{ .Values.modelApplication.model.accelerator.min }}

@@ -31,6 +31,17 @@ spec:
           embeddingsModel: true
           enableAuth: {{ .Values.embeddingsApplication.model.enableAuth }}
           rawDeployment: {{ .Values.embeddingsApplication.model.rawDeployment }}
+          runtime:
+            templateName: {{ .Values.embeddingsApplication.model.runtime.templateName }}
+            templateDisplayName: {{ .Values.embeddingsApplication.model.runtime.templateDisplayName }}
+            image: {{ .Values.embeddingsApplication.model.runtime.image }}
+            resources:
+              limits:
+                cpu: '{{ .Values.embeddingsApplication.model.runtime.resources.limits.cpu }}'
+                memory: {{ .Values.embeddingsApplication.model.runtime.resources.limits.memory }}
+              requests:
+                cpu: '{{ .Values.embeddingsApplication.model.runtime.resources.requests.cpu }}'
+                memory: {{ .Values.embeddingsApplication.model.runtime.resources.requests.memory }}
           accelerator:
             productName: {{ .Values.embeddingsApplication.model.accelerator.productName }}
             min: {{ .Values.embeddingsApplication.model.accelerator.min }}
