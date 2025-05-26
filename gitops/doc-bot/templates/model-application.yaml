@@ -16,55 +16,34 @@ spec:
     repoURL: "{{ .Values.modelApplication.repoURL }}"
     targetRevision: "{{ .Values.modelApplication.targetRevision }}"
     helm:
-      parameters:
-        - name: argocdNamespace
-          value: {{ .Values.argocdNamespace }}
-        - name: createNamespace
-          value: "false"
-        - name: instanceName
-          value: "{{ .Values.model.name }}"
-        - name: dataScienceProjectNamespace
-          value: "{{ .Values.dataScienceProjectNamespace }}"
-        - name: dataScienceProjectDisplayName
-          value: "{{ .Values.dataScienceProjectDisplayName }}"
-        - name: model.root
-          value: "{{ .Values.model.root }}"
-        - name: model.id
-          value: "{{ .Values.model.id }}"
-        - name: model.name
-          value: "{{ .Values.model.name }}"
-        - name: model.displayName
-          value: "{{ .Values.model.displayName }}"
-        - name: model.enableAuth
-          value: "{{ .Values.model.enableAuth }}"
-        - name: model.rawDeployment
-          value: "{{ .Values.model.rawDeployment }}"
-        - name: model.accelerator.productName
-          value: "{{ .Values.model.accelerator.productName }}"
-        - name: model.accelerator.min
-          value: '{{ .Values.model.accelerator.min }}'
-        - name: model.accelerator.max
-          value: '{{ .Values.model.accelerator.max }}'
-        - name: model.connection.createSecret
-          value: "{{ .Values.model.connection.createSecret }}"
-        - name: model.connection.name
-          value: "{{ .Values.model.connection.name }}"
-        - name: model.connection.displayName
-          value: "{{ .Values.model.connection.displayName }}"
-        - name: model.connection.type
-          value: "{{ .Values.model.connection.type }}"
-        - name: model.connection.scheme
-          value: "{{ .Values.model.connection.scheme }}"
-        - name: model.connection.awsAccessKeyId
-          value: "{{ .Values.model.connection.awsAccessKeyId }}"
-        - name: model.connection.awsSecretAccessKey
-          value: "{{ .Values.model.connection.awsSecretAccessKey }}"
-        - name: model.connection.awsDefaultRegion
-          value: "{{ .Values.model.connection.awsDefaultRegion }}"
-        - name: model.connection.awsS3Bucket
-          value: "{{ .Values.model.connection.awsS3Bucket }}"
-        - name: model.connection.awsS3Endpoint
-          value: "{{ .Values.model.connection.awsS3Endpoint }}"
+      values: |
+        argocdNamespace: {{ .Values.argocdNamespace }}
+        createNamespace: false
+        instanceName: {{ .Values.model.name }}
+        dataScienceProjectNamespace: {{ .Values.dataScienceProjectNamespace }}
+        dataScienceProjectDisplayName: {{ .Values.dataScienceProjectDisplayName }}
+        model:
+          root: {{ .Values.model.root }}
+          id: {{ .Values.model.id }}
+          name: {{ .Values.model.name }}
+          displayName: {{ .Values.model.displayName }}
+          enableAuth: {{ .Values.model.enableAuth }}
+          rawDeployment: {{ .Values.model.rawDeployment }}
+          accelerator:
+            productName: {{ .Values.model.accelerator.productName }}
+            min: {{ .Values.model.accelerator.min }}
+            max: {{ .Values.model.accelerator.max }}
+          connection:
+            createSecret: {{ .Values.model.connection.createSecret }}
+            name: {{ .Values.model.connection.name }}
+            displayName: {{ .Values.model.connection.displayName }}
+            type: {{ .Values.model.connection.type }}
+            scheme: {{ .Values.model.connection.scheme }}
+            awsAccessKeyId: {{ .Values.model.connection.awsAccessKeyId }}
+            awsSecretAccessKey: {{ .Values.model.connection.awsSecretAccessKey }}
+            awsDefaultRegion: {{ .Values.model.connection.awsDefaultRegion }}
+            awsS3Bucket: {{ .Values.model.connection.awsS3Bucket }}
+            awsS3Endpoint: {{ .Values.model.connection.awsS3Endpoint }}
   syncPolicy:
     automated:
       # prune: true
