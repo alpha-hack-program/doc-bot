@@ -22,6 +22,9 @@ modelApplication:
     enableAuth: false
     rawDeployment: false
     runtime:
+      templateName: vllm-serving-template
+      templateDisplayName: vLLM Serving Template
+      image: quay.io/modh/vllm:rhoai-2.20-cuda
       resources:
         limits:
           cpu: '8'
@@ -51,7 +54,7 @@ modelApplication:
 embeddingsApplication:
   name: doc-bot-embeddings
   repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
-  path: gitops/embeddings
+  path: gitops/model
   targetRevision: main
   model:
     root: intfloat
@@ -67,7 +70,7 @@ embeddingsApplication:
     runtime:
       templateName: vllm-serving-template
       templateDisplayName: vLLM Serving Template
-      image: quay.io/modh/vllm:rhoai-2.17-cuda
+      image: quay.io/modh/vllm:rhoai-2.20-cuda
       resources:
         limits:
           cpu: '2'
