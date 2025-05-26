@@ -102,7 +102,7 @@ spec:
           model:
             connection:
               name: "llm"
-              displayName: "LLM"
+              displayName: "llm"
               awsAccessKeyId: ${MINIO_ACCESS_KEY}
               awsSecretAccessKey: ${MINIO_SECRET_KEY}
               awsS3Endpoint: ${MINIO_ENDPOINT}
@@ -112,6 +112,8 @@ spec:
           targetRevision: "${MODEL_SERVING_TARGET_REVISION:-main}"
           model:
             connection:
+              name: "embeddings"
+              displayName: "embeddings"
               awsAccessKeyId: ${MINIO_ACCESS_KEY}
               awsSecretAccessKey: ${MINIO_SECRET_KEY}
               awsS3Endpoint: ${MINIO_ENDPOINT}
