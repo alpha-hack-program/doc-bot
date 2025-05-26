@@ -106,6 +106,8 @@ spec:
               awsAccessKeyId: ${MINIO_ACCESS_KEY}
               awsSecretAccessKey: ${MINIO_SECRET_KEY}
               awsS3Endpoint: ${MINIO_ENDPOINT}
+            accelerator:
+              productName: ${GPU_NAME}
         embeddingsApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
           repoURL: "${MODEL_SERVING_REPO_URL:-https://github.com/alpha-hack-program/model-serving-utils.git}"
