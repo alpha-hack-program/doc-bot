@@ -16,55 +16,34 @@ spec:
     repoURL: "{{ .Values.embeddingsApplication.repoURL }}"
     targetRevision: "{{ .Values.embeddingsApplication.targetRevision }}"
     helm:
-      parameters:
-        - name: argocdNamespace
-          value: {{ .Values.argocdNamespace }}
-        - name: createNamespace
-          value: "false"
-        - name: dataScienceProjectNamespace
-          value: "{{ .Values.dataScienceProjectNamespace }}"
-        - name: dataScienceProjectDisplayName
-          value: "{{ .Values.dataScienceProjectDisplayName }}"
-        - name: model.root
-          value: "{{ .Values.embeddings.root }}"
-        - name: model.id
-          value: "{{ .Values.embeddings.id }}"
-        - name: model.name
-          value: "{{ .Values.embeddings.name }}"
-        - name: model.displayName
-          value: "{{ .Values.embeddings.displayName }}"
-        - name: model.enableAuth
-          value: "{{ .Values.embeddings.enableAuth }}"
-        - name: model.rawDeployment
-          value: "{{ .Values.embeddings.rawDeployment }}"
-        {{- if .Values.embeddings.accelerator }}
-        - name: model.accelerator.productName
-          value: "{{ .Values.embeddings.accelerator.productName }}"
-        - name: model.accelerator.min
-          value: '{{ .Values.embeddings.accelerator.min }}'
-        - name: model.accelerator.max
-          value: '{{ .Values.embeddings.accelerator.max }}'
-        {{- end }}
-        - name: model.connection.createSecret
-          value: "{{ .Values.embeddings.connection.createSecret }}"
-        - name: model.connection.name
-          value: "{{ .Values.embeddings.connection.name }}"
-        - name: model.connection.displayName
-          value: "{{ .Values.embeddings.connection.displayName }}"
-        - name: model.connection.type
-          value: "{{ .Values.embeddings.connection.type }}"
-        - name: model.connection.scheme
-          value: "{{ .Values.embeddings.connection.scheme }}"
-        - name: model.connection.awsAccessKeyId
-          value: "{{ .Values.embeddings.connection.awsAccessKeyId }}"
-        - name: model.connection.awsSecretAccessKey
-          value: "{{ .Values.embeddings.connection.awsSecretAccessKey }}"
-        - name: model.connection.awsDefaultRegion
-          value: "{{ .Values.embeddings.connection.awsDefaultRegion }}"
-        - name: model.connection.awsS3Bucket
-          value: "{{ .Values.embeddings.connection.awsS3Bucket }}"
-        - name: model.connection.awsS3Endpoint
-          value: "{{ .Values.embeddings.connection.awsS3Endpoint }}"
+      values: |
+        argocdNamespace: {{ .Values.argocdNamespace }}
+        createNamespace: false
+        instanceName: {{ .Values.embeddingsApplication.model.name }}
+        dataScienceProjectNamespace: {{ .Values.dataScienceProjectNamespace }}
+        dataScienceProjectDisplayName: {{ .Values.dataScienceProjectDisplayName }}
+        model:
+          root: {{ .Values.embeddingsApplication.model.root }}
+          id: {{ .Values.embeddingsApplication.model.id }}
+          name: {{ .Values.embeddingsApplication.model.name }}
+          displayName: {{ .Values.embeddingsApplication.model.displayName }}
+          enableAuth: {{ .Values.embeddingsApplication.model.enableAuth }}
+          rawDeployment: {{ .Values.embeddingsApplication.model.rawDeployment }}
+          accelerator:
+            productName: {{ .Values.embeddingsApplication.model.accelerator.productName }}
+            min: {{ .Values.embeddingsApplication.model.accelerator.min }}
+            max: {{ .Values.embeddingsApplication.model.accelerator.max }}
+          connection:
+            createSecret: {{ .Values.embeddingsApplication.model.connection.createSecret }}
+            name: {{ .Values.embeddingsApplication.model.connection.name }}
+            displayName: {{ .Values.embeddingsApplication.model.connection.displayName }}
+            type: {{ .Values.embeddingsApplication.model.connection.type }}
+            scheme: {{ .Values.embeddingsApplication.model.connection.scheme }}
+            awsAccessKeyId: {{ .Values.embeddingsApplication.model.connection.awsAccessKeyId }}
+            awsSecretAccessKey: {{ .Values.embeddingsApplication.model.connection.awsSecretAccessKey }}
+            awsDefaultRegion: {{ .Values.embeddingsApplication.model.connection.awsDefaultRegion }}
+            awsS3Bucket: {{ .Values.embeddingsApplication.model.connection.awsS3Bucket }}
+            awsS3Endpoint: {{ .Values.embeddingsApplication.model.connection.awsS3Endpoint }}
   syncPolicy:
     automated:
       # prune: true
