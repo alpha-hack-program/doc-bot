@@ -71,7 +71,7 @@ spec:
   source:
     path: gitops/doc-bot
     repoURL: ${REPO_URL}
-    targetRevision: main
+    targetRevision: ${GIT_REVISION:-main}
     helm:
       values: |
         argocdNamespace: "${ARGOCD_NAMESPACE}"
@@ -97,8 +97,19 @@ spec:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-pipelines"
         modelApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-model"
+          repoURL: "${MODEL_SERVING_REPO_URL:-https://github.com/alpha-hack-program/model-serving-utils.git}"
+          targetRevision: "${MODEL_SERVING_TARGET_REVISION:-main}"
+          model:
+            connection:
+              name: "llm"
+              displayName: "LLM"
+              awsAccessKeyId: ${MINIO_ACCESS_KEY}
+              awsSecretAccessKey: ${MINIO_SECRET_KEY}
+              awsS3Endpoint: ${MINIO_ENDPOINT}
         embeddingsApplication:
           name: "${DATA_SCIENCE_PROJECT_NAMESPACE}-embeddings"
+          repoURL: "${MODEL_SERVING_REPO_URL:-https://github.com/alpha-hack-program/model-serving-utils.git}"
+          targetRevision: "${MODEL_SERVING_TARGET_REVISION:-main}"
           model:
             connection:
               awsAccessKeyId: ${MINIO_ACCESS_KEY}

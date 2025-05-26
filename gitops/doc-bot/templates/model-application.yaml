@@ -19,31 +19,31 @@ spec:
       values: |
         argocdNamespace: {{ .Values.argocdNamespace }}
         createNamespace: false
-        instanceName: {{ .Values.model.name }}
+        instanceName: {{ .Values.modelApplication.model.name }}
         dataScienceProjectNamespace: {{ .Values.dataScienceProjectNamespace }}
         dataScienceProjectDisplayName: {{ .Values.dataScienceProjectDisplayName }}
         model:
-          root: {{ .Values.model.root }}
-          id: {{ .Values.model.id }}
-          name: {{ .Values.model.name }}
-          displayName: {{ .Values.model.displayName }}
-          enableAuth: {{ .Values.model.enableAuth }}
-          rawDeployment: {{ .Values.model.rawDeployment }}
+          root: {{ .Values.modelApplication.model.root }}
+          id: {{ .Values.modelApplication.model.id }}
+          name: {{ .Values.modelApplication.model.name }}
+          displayName: {{ .Values.modelApplication.model.displayName }}
+          enableAuth: {{ .Values.modelApplication.model.enableAuth }}
+          rawDeployment: {{ .Values.modelApplication.model.rawDeployment }}
           accelerator:
-            productName: {{ .Values.model.accelerator.productName }}
-            min: {{ .Values.model.accelerator.min }}
-            max: {{ .Values.model.accelerator.max }}
+            productName: {{ .Values.modelApplication.model.accelerator.productName }}
+            min: {{ .Values.modelApplication.model.accelerator.min }}
+            max: {{ .Values.modelApplication.model.accelerator.max }}
           connection:
-            createSecret: {{ .Values.model.connection.createSecret }}
-            name: {{ .Values.model.connection.name }}
-            displayName: {{ .Values.model.connection.displayName }}
-            type: {{ .Values.model.connection.type }}
-            scheme: {{ .Values.model.connection.scheme }}
-            awsAccessKeyId: {{ .Values.model.connection.awsAccessKeyId }}
-            awsSecretAccessKey: {{ .Values.model.connection.awsSecretAccessKey }}
-            awsDefaultRegion: {{ .Values.model.connection.awsDefaultRegion }}
-            awsS3Bucket: {{ .Values.model.connection.awsS3Bucket }}
-            awsS3Endpoint: {{ .Values.model.connection.awsS3Endpoint }}
+            createSecret: {{ .Values.modelApplication.model.connection.createSecret }}
+            name: {{ .Values.modelApplication.model.connection.name }}
+            displayName: {{ .Values.modelApplication.model.connection.displayName }}
+            type: {{ .Values.modelApplication.model.connection.type }}
+            scheme: {{ .Values.modelApplication.model.connection.scheme }}
+            awsAccessKeyId: {{ .Values.modelApplication.model.connection.awsAccessKeyId }}
+            awsSecretAccessKey: {{ .Values.modelApplication.model.connection.awsSecretAccessKey }}
+            awsDefaultRegion: {{ .Values.modelApplication.model.connection.awsDefaultRegion }}
+            awsS3Bucket: {{ .Values.modelApplication.model.connection.awsS3Bucket }}
+            awsS3Endpoint: {{ .Values.modelApplication.model.connection.awsS3Endpoint }}
   syncPolicy:
     automated:
       # prune: true

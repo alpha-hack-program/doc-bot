@@ -13,6 +13,40 @@ modelApplication:
   repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
   path: gitops/model
   targetRevision: main
+  model:
+    root: mistralai
+    id: Mistral-7B-Instruct-v0.2
+    name: mistral-7b
+    displayName: Mistral 7b
+    maxReplicas: 1
+    enableAuth: false
+    rawDeployment: false
+    runtime:
+      resources:
+        limits:
+          cpu: '8'
+          memory: 24Gi
+        requests:
+          cpu: '6'
+          memory: 24Gi
+    accelerator:
+      max: '1'
+      min: '1'
+      productName: NVIDIA-A10G
+    connection:
+      name: llm
+      createSecret: true
+      displayName: LLM
+      type: s3
+      scheme: http
+      awsAccessKeyId: minio
+      awsSecretAccessKey: minio123
+      awsDefaultRegion: none
+      awsS3Bucket: models
+      awsS3Endpoint: minio.ic-shared-minio.svc:9000
+    volumes:
+      shm:
+        sizeLimit: 2Gi
 
 embeddingsApplication:
   name: doc-bot-embeddings
