@@ -27,6 +27,7 @@ spec:
           id: {{ .Values.modelApplication.model.id }}
           name: {{ .Values.modelApplication.model.name }}
           displayName: {{ .Values.modelApplication.model.displayName }}
+          maxModelLen: {{ .Values.modelApplication.model.maxModelLen }}
           enableAuth: {{ .Values.modelApplication.model.enableAuth }}
           rawDeployment: {{ .Values.modelApplication.model.rawDeployment }}
           accelerator:

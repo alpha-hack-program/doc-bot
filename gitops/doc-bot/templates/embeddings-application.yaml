@@ -27,6 +27,8 @@ spec:
           id: {{ .Values.embeddingsApplication.model.id }}
           name: {{ .Values.embeddingsApplication.model.name }}
           displayName: {{ .Values.embeddingsApplication.model.displayName }}
+          maxModelLen: {{ .Values.embeddingsApplication.model.maxModelLen }}
+          embeddingsModel: true
           enableAuth: {{ .Values.embeddingsApplication.model.enableAuth }}
           rawDeployment: {{ .Values.embeddingsApplication.model.rawDeployment }}
           accelerator:
