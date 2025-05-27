@@ -270,6 +270,7 @@ milvus:
   password: Milvus
   port: '19530'
   host: vectordb-milvus
+  database: default
 
 setup:
   image: quay.io/atarazana/hf-cli:latest

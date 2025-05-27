@@ -9,5 +9,6 @@ stringData:
   MILVUS_USERNAME: '{{ .Values.milvus.username }}'
   MILVUS_PASSWORD: '{{ .Values.milvus.password }}'
   MILVUS_COLLECTION_NAME: '{{ .Values.documentsMilvusConnection.collectionName }}'
+  MILVUS_DATABASE: '{{ .Values.milvus.database }}'
   
 type: Opaque
