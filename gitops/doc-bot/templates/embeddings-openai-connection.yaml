@@ -6,6 +6,6 @@ metadata:
 stringData:
   OPENAI_API_KEY: ''
   OPENAI_API_MODEL: '{{ .Values.embeddingsApplication.model.name }}'
-  OPENAI_API_BASE: 'http://{{ .Values.embeddingsApplication.model.name }}.{{ .Values.dataScienceProjectNamespace }}.svc.cluster.local'
+  OPENAI_API_BASE: 'http://{{ .Values.embeddingsApplication.model.name }}-predictor.{{ .Values.dataScienceProjectNamespace }}.svc.cluster.local'
   
 type: Opaque
